@@ -25,13 +25,14 @@ import time
 FSTAB = '/etc/fstab'
 MTAB = '/etc/mtab'
 CIFS_PATTERN = re.compile(r"""
-^(?P<file_system>[^#]+)  # File system string at start of line
-\s+                      # Whitespace
-(?P<mount_point>.+)      # Second item is the mount point
-\s+                      # Whitespace
-cifs                     # We're only interested in cifs mounts
-\s+                      # Whitespace
-.+$                      # Rest of the line until the end.
+^(?P<file_system>[^#\s]+)  # File system string at start of line
+                           # (not a # and not whitespace)
+\s+                        # Whitespace
+(?P<mount_point>\S+)       # Second item is the mount point
+\s+                        # Whitespace
+cifs                       # We're only interested in cifs mounts
+\s+                        # Whitespace
+.+$                        # Rest of the line until the end.
 """, re.VERBOSE)
 
 logger = logging.getLogger(__name__)
