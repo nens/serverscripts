@@ -22,7 +22,7 @@ This prints a /tmp dir where the dist has been made. Scp that::
 
     $ scp /that/tmp/dir/dist/serverscripts-0.1.tar.gz vanrees.org:www/download/
 
-And on a server, as root:
+And on a server, as root::
 
     $ pip install http://reinout.vanrees.org/download/serverscripts-0.1.tar.gz
 
