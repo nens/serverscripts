@@ -29,6 +29,9 @@ And on a server, as root:
 You could also copy the tgz directly to the server and ``pip install the/file.tgz``.
 
 
+Prerequisite: ``apt-get install python-pip``.
+
+
 Cifsfixer
 ---------
 
