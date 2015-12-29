@@ -16,8 +16,9 @@ install_requires = [
     ],
 
 tests_require = [
-    'nose',
     'coverage',
+    'mock',
+    'nose',
     ]
 
 setup(name='serverscripts',
