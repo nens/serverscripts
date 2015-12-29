@@ -1,4 +1,8 @@
-# Include docs in the root.
+include *.in
+include *.py
 include *.rst
-# Include everything in our project directory.
-graft serverscripts
+include .coveragerc
+include buildout.cfg
+recursive-include serverscripts *.py
+recursive-include serverscripts/tests *
+global-exclude *.pyc
