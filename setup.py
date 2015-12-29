@@ -19,13 +19,13 @@ tests_require = [
 
 setup(name='serverscripts',
       version=version,
-      description="TODO",
+      description="Python scripts for sysadmin tasks on every linux server ",
       long_description=long_description,
       # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[],
       keywords=[],
-      author='TODO',
-      author_email='TODO@nelen-schuurmans.nl',
+      author='Reinout van Rees',
+      author_email='reinout.vanrees@nelen-schuurmans.nl',
       url='',
       license='GPL',
       packages=['serverscripts'],
