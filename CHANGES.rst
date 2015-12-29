@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.1 (unreleased)
+0.1 (2015-12-29)
 ----------------
 
 - Added tests for reading fstab/mtab files.
