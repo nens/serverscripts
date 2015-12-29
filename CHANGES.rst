@@ -5,6 +5,9 @@ Changelog of serverscripts
 0.1 (unreleased)
 ----------------
 
+- Added tests for reading fstab/mtab files.
+  [reinout]
+
 - Added cifschecker script for auto-remounting necessary cifs mounts.
   [reinout]
 
