@@ -5,7 +5,11 @@ Changelog of serverscripts
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added bare-bones installation instructions.
+  [reinout]
+
+- Fixed regex: multiple spaces aren't a problem anymore.
+  [reinout]
 
 
 0.1 (2015-12-29)
