@@ -107,7 +107,7 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
     return num_errors
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-v",
