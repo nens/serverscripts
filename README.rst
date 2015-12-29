@@ -32,10 +32,6 @@ You could also copy the tgz directly to the server and ``pip install the/file.tg
 Prerequisite: ``apt-get install python-pip``.
 
 
-Suggestion for the crontab (note: it needs to run as root)::
-
-    */5 * * * * /usr/local/bin/cifsfixer > /dev/null 2>&1
-
 
 Cifsfixer
 ---------
@@ -44,4 +40,12 @@ Script that monitors the cifs mounts. If one isn't mounted, it mounts it. If
 one isn't listable, it unmounts it (lazily if needed) and later tries to
 re-mount it.
 
-Should be installed in a cronjob.
+Should be installed in a cronjob. Suggestion for the crontab (note: it needs
+to run as root)::
+
+    */5 * * * * /usr/local/bin/cifsfixer > /dev/null 2>&1
+
+It logs to ``/var/log/cifsfixer.log``. It automatically rotates the file
+itself if it gets too large. Note: if everything is OK, there is no output in
+the logfile. If you want to check if the tool runs OK, run it with
+``--verbose``.
