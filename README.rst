@@ -14,6 +14,20 @@ Installation
 TODO. Build python package locally. Scp somewhere. As root, ``pip install
 URL``.
 
+0.1 test release::
+
+    $ bin/fullrelease
+
+This prints a /tmp dir where the dist has been made. Scp that::
+
+    $ scp /that/tmp/dir/dist/serverscripts-0.1.tar.gz vanrees.org:www/download/
+
+And on a server, as root:
+
+    $ pip install http://reinout.vanrees.org/download/serverscripts-0.1.tar.gz
+
+You could also copy the tgz directly to the server and ``pip install the/file.tgz``.
+
 
 Cifsfixer
 ---------
