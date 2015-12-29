@@ -1,0 +1,2 @@
+/dev/sda2 / ext4 rw,errors=remount-ro 0 0
+//someserver/somewhere /some/mount cifs rw 0 0
