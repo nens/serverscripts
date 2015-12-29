@@ -9,7 +9,10 @@ long_description = '\n\n'.join([
     ])
 
 install_requires = [
-    'setuptools',
+    # This shall remain empty upon pain of death.
+    #
+    # We're being installed on servers and we don't want to pollute the
+    # system-wide python lib directory with dependencies.
     ],
 
 tests_require = [
