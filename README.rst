@@ -32,6 +32,11 @@ You could also copy the tgz directly to the server and ``pip install the/file.tg
 Prerequisite: ``apt-get install python-pip``.
 
 
+Suggestion for the crontab (note: it needs to run as root)::
+
+    */5 * * * * /usr/local/bin/cifsfixer > /dev/null 2>&1
+
+
 Cifsfixer
 ---------
 
