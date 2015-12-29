@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '0.1.dev'
+version = '0.1.dev0'
 
 long_description = '\n\n'.join([
     open('README.rst').read(),
@@ -23,7 +23,7 @@ tests_require = [
 
 setup(name='serverscripts',
       version=version,
-      description="Python scripts for sysadmin tasks on every linux server ",
+      description="Python scripts for sysadmin tasks on every linux server",
       long_description=long_description,
       # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[],
