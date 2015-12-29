@@ -1,0 +1,4 @@
+UUID=d0d4dc51-d02e-4cc1-9dd5-43af478943f4 /               ext4    errors=remount-ro 0       1
+UUID=0c2290d3-47ac-47ba-b358-b6efd314cfba none            swap    sw              0       0
+//someserver/somewhere /some/mount1 cifs credentials=/etc/blabla.txt,iocharset=utf8 0 0
+//someserver/somewhere /some/mount2 cifs credentials=/etc/blabla.txt,iocharset=utf8 0 0
