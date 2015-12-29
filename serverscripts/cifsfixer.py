@@ -17,6 +17,7 @@ import logging
 import logging.handlers
 import os
 import re
+import serverscripts
 import subprocess
 import sys
 import time
@@ -117,6 +118,13 @@ def main():
         default=False,
         help="Verbose output")
     parser.add_argument(
+        "-V",
+        "--version",
+        action="store_true",
+        dest="print_version",
+        default=False,
+        help="Print version")
+    parser.add_argument(
         "-f",
         "--force",
         action="store_true",
@@ -124,6 +132,9 @@ def main():
         default=False,
         help="Force processing even when %s has been edited recently" % FSTAB)
     options = parser.parse_args()
+    if options.print_version:
+        print(serverscripts.__version__)
+        sys.exit()
     if options.verbose:
         loglevel = logging.DEBUG
     else:
