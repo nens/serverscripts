@@ -49,3 +49,20 @@ It logs to ``/var/log/cifsfixer.log``. It automatically rotates the file
 itself if it gets too large. Note: if everything is OK, there is no output in
 the logfile. If you want to check if the tool runs OK, run it with
 ``--verbose``.
+
+
+
+TODO/ideas
+----------
+
+- Jenkins integration, test coverage.
+
+- zest.releaser plugin (google for it first!) for uploading the sdist
+  somewhere non-vanrees-like.
+
+- nginx info grabber, /srv django info grabber. Resurrect it from ye olde
+  serverinfo tool.
+
+- Figure out how to feed it to ansible's info collection machinery.
+
+- Prepare info for zabbix.
