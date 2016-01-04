@@ -83,28 +83,39 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
             continue  # This goes to the next one in the 'for' loop.
 
         # Check if the mount is readable. Listing the contents is OK.
-        try:
-            subprocess.check_output(['ls', fstab_mount])
-        except subprocess.CalledProcessError as e:
-            logger.error(e.output)
-            logger.error(
-                "Listing the contents of %s went wrong, unmounting it...",
-                fstab_mount)
-            exit_code = subprocess.call(['umount', fstab_mount])
-            if exit_code:
-                logger.error("Regular unmounting failed, re-trying it lazy..")
-                exit_code = subprocess.call(['umount', '-l', fstab_mount])
-
-            time.sleep(3)
-            logger.info("Mounting %s...", fstab_mount)
-            exit_code = subprocess.call(['mount', fstab_mount])
-            if exit_code == 0:
-                logger.info("Re-mounted %s succesfully", fstab_mount)
-            else:
-                logger.error("Re-mounting %s failed", fstab_mount)
-
-            num_errors += 1
+        # "ls -f -1" doesn't sort and immediately returns results, so it
+        # is safe to use on huge directories. See
+        # http://unixetc.co.uk/2012/05/20/large-directory-causes-ls-to-hang/
+        p1 = subprocess.Popen(['ls', '-1', '-f', fstab_mount],
+                              stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(['head'],
+                              stdin=p1.stdout,
+                              stdout=subprocess.PIPE)
+        p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+        output = p2.communicate()[0]
+        exit_code = p2.returncode
+        if exit_code == 0:
+            logger.debug("Contents of %s can be listed just fine", fstab_mount)
             continue
+        logger.error(output)
+        logger.error(
+            "Listing the contents of %s went wrong, unmounting it...",
+            fstab_mount)
+        exit_code = subprocess.call(['umount', fstab_mount])
+        if exit_code:
+            logger.error("Regular unmounting failed, re-trying it lazy..")
+            exit_code = subprocess.call(['umount', '-l', fstab_mount])
+
+        time.sleep(3)
+        logger.info("Mounting %s...", fstab_mount)
+        exit_code = subprocess.call(['mount', fstab_mount])
+        if exit_code == 0:
+            logger.info("Re-mounted %s succesfully", fstab_mount)
+        else:
+            logger.error("Re-mounting %s failed", fstab_mount)
+
+        num_errors += 1
+        continue
 
     return num_errors
 
