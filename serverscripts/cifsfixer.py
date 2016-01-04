@@ -60,6 +60,7 @@ def _cifs_lines(tabfile):
 
 def _mount(local_folder):
     """Mount cifs_share. No need to raise errors if unsuccessful."""
+    logger.info("Mounting %s...", local_folder)
     exit_code = subprocess.call(['mount', local_folder])
     if exit_code == 0:
         logger.info("Mounted %s succesfully", local_folder)
@@ -83,8 +84,25 @@ def _is_folder_accessible(local_folder):
         logger.debug("Contents of %s can be listed just fine", local_folder)
         return True
     else:
-        logger.error("%s cannot be listed", local_folder)
+        logger.error("Contents of %s cannot be listed", local_folder)
         return False
+
+
+def _unmount(local_folder):
+    """Unmount cifs_share. No need to raise errors if unsuccessful.
+
+    First try a regular unmount. If it fails, do a lazy unmount. We'll try
+    mounting afterwards, which might fail, but that's not our concern. It'll
+    fail and the whole script will re-try 5 minutes later, so it is fine.
+
+    """
+    logger.info("Unmounting %s...", local_folder)
+    exit_code = subprocess.call(['umount', local_folder])
+    if exit_code == 0:
+        logger.debug("Succesfully unmounted %s", local_folder)
+    else:
+        logger.error("Regular unmounting failed, re-trying it lazy...")
+        subprocess.call(['umount', '-l', local_folder])
 
 
 def check_if_mounted(fstab_mounts, mtab_mounts):
@@ -110,25 +128,11 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
             logger.debug("Contents of %s can be listed just fine", local_folder)
             continue
 
-        # The folder could not be read...
-        logger.error(
-            "Listing the contents of %s went wrong, unmounting it...",
-            local_folder)
-        exit_code = subprocess.call(['umount', local_folder])
-        if exit_code:
-            logger.error("Regular unmounting failed, re-trying it lazy..")
-            exit_code = subprocess.call(['umount', '-l', local_folder])
-
-        time.sleep(3)
-        logger.info("Mounting %s...", local_folder)
-        exit_code = subprocess.call(['mount', local_folder])
-        if exit_code == 0:
-            logger.info("Re-mounted %s succesfully", local_folder)
-        else:
-            logger.error("Re-mounting %s failed", local_folder)
-
+        # The folder could not be read... Remount it.
         num_errors += 1
-        continue
+        _unmount(local_folder)
+        time.sleep(3)
+        _mount(local_folder)
 
     return num_errors
 
