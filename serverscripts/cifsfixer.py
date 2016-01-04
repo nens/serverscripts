@@ -67,6 +67,26 @@ def _mount(local_folder):
         logger.error("Mounting %s failed", local_folder)
 
 
+def _is_folder_accessible(local_folder):
+    """Return if the local folder is readable.
+
+    Listing the contents is OK.  ``ls -f -1`` doesn't sort and immediately
+    returns results, so it is safe to use on huge directories. See
+    http://unixetc.co.uk/2012/05/20/large-directory-causes-ls-to-hang/
+
+    """
+    command = "ls -1 -f %s | head" % local_folder
+    exit_code = subprocess.call(
+        ['/bin/bash', '-c', 'set -o pipefail; ' + command])
+    # See http://stackoverflow.com/a/21742965/27401 for the pipefail magic.
+    if exit_code == 0:
+        logger.debug("Contents of %s can be listed just fine", local_folder)
+        return True
+    else:
+        logger.error("%s cannot be listed", local_folder)
+        return False
+
+
 def check_if_mounted(fstab_mounts, mtab_mounts):
     """Return number of cifs mount related errors
 
@@ -86,22 +106,11 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
             num_errors += 1  # We *did* originally have an error!
             continue  # This goes to the next one in the 'for' loop.
 
-        # Check if the mount is readable. Listing the contents is OK.
-        # "ls -f -1" doesn't sort and immediately returns results, so it
-        # is safe to use on huge directories. See
-        # http://unixetc.co.uk/2012/05/20/large-directory-causes-ls-to-hang/
-        p1 = subprocess.Popen(['ls', '-1', '-f', local_folder],
-                              stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(['head'],
-                              stdin=p1.stdout,
-                              stdout=subprocess.PIPE)
-        p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
-        output = p2.communicate()[0]
-        exit_code = p2.returncode
-        if exit_code == 0:
+        if _is_folder_accessible(local_folder):
             logger.debug("Contents of %s can be listed just fine", local_folder)
             continue
-        logger.error(output)
+
+        # The folder could not be read...
         logger.error(
             "Listing the contents of %s went wrong, unmounting it...",
             local_folder)
