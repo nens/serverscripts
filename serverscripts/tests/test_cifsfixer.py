@@ -22,7 +22,7 @@ class TabfileTestCase(TestCase):
         expected = {'/some/mount': '//someserver/somewhere'}
         # So: only cifs mounts are returned and commented-out cifs mounts are
         # ignored.
-        self.assertEquals(expected, cifsfixer._cifs_lines(self.fstab))
+        self.assertEquals(expected, cifsfixer._cifs_lines(self.fstab)[0])
 
     def test_fstab_with_duplicate_mount_point(self):
         expected = {'/some/mount': '//someserver/something'}
@@ -30,7 +30,7 @@ class TabfileTestCase(TestCase):
         # we don't test that here).
         self.assertEquals(
             expected,
-            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount_point))
+            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount_point)[0])
 
     def test_fstab_with_duplicate_mount(self):
         expected = {'/some/mount1': '//someserver/somewhere',
@@ -39,27 +39,26 @@ class TabfileTestCase(TestCase):
         # returned. A warning is logged, but we don't test that here).
         self.assertEquals(
             expected,
-            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount))
+            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount)[0])
 
     def test_mtab(self):
         expected = {'/some/mount': '//someserver/somewhere'}
         # So: only cifs mounts are returned and commented-out cifs mounts are
         # ignored.
-        self.assertEquals(expected, cifsfixer._cifs_lines(self.mtab))
+        self.assertEquals(expected, cifsfixer._cifs_lines(self.mtab)[0])
 
 
 class CheckerTestCase(TestCase):
+    # Test check_if_mounted()
 
     def test_empty(self):
-        self.assertEquals((0, 0),
-                          cifsfixer.check_if_mounted({}, {}))
+        self.assertEquals(0, cifsfixer.check_if_mounted({}, {}))
 
     def test_matching_mounts(self):
         mounts = {'/some/folder': 'some//cifs'}
         with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked:
             mocked.return_value = True
-            self.assertEquals((0, 0),
-                              cifsfixer.check_if_mounted(mounts, mounts))
+            self.assertEquals(0, cifsfixer.check_if_mounted(mounts, mounts))
 
     def test_mounting_missing_mount(self):
         fstab_mounts = {'/some/folder': 'some//cifs'}
@@ -120,3 +119,16 @@ class UtilsTestCase(TestCase):
             cifsfixer._unmount('something')
             # The only difference with a succesful unmount is a different log
             # message.
+
+    def test_check_unkown_mounts1(self):
+        fstab_mounts = {'/some/folder': 'some//cifs'}
+        mtab_mounts = {}
+        # Additional fstab mounts are not *our* problem.
+        self.assertEquals(0, cifsfixer.check_unknown_mounts(
+            fstab_mounts, mtab_mounts))
+
+    def test_check_unkown_mounts2(self):
+        fstab_mounts = {}
+        mtab_mounts = {'/some/folder': 'some//cifs'}
+        self.assertEquals(1, cifsfixer.check_unknown_mounts(
+            fstab_mounts, mtab_mounts))

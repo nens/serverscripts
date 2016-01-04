@@ -39,8 +39,13 @@ logger = logging.getLogger(__name__)
 
 
 def _cifs_lines(tabfile):
-    """Return cifs share and local folder for cifs mounts in tabfile"""
+    """Return cifs share and local folder for cifs mounts in tabfile
+
+    Also return number of warnings.
+
+    """
     result = {}
+    num_warnings = 0
     for line in open(tabfile):
         line = line.strip()
         match = CIFS_PATTERN.search(line)
@@ -50,12 +55,14 @@ def _cifs_lines(tabfile):
             logger.debug("Found mount in %s: %s (%s)",
                          tabfile, local_folder, cifs_share)
             if local_folder in result:
+                num_warnings += 1
                 logger.warning("local folder %s is a duplicate!", local_folder)
             if cifs_share in result.values():
+                num_warnings += 1
                 logger.warning("cifs share %s is already mounted elsewhere",
                                cifs_share)
             result[local_folder] = cifs_share
-    return result
+    return result, num_warnings
 
 
 def _mount(local_folder):
@@ -114,7 +121,6 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
 
     """
     num_errors = 0
-    num_warnings = 0
     for local_folder, cifs_share in fstab_mounts.items():
         # Check if it is mounted.
         if local_folder not in mtab_mounts:
@@ -135,7 +141,22 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
         time.sleep(3)
         _mount(local_folder)
 
-    return num_errors, num_warnings
+    return num_errors
+
+
+def check_unknown_mounts(fstab_mounts, mtab_mounts):
+    """Return number of unknown cifs mounts"""
+    num_warnings = 0
+    for local_folder, cifs_share in mtab_mounts.items():
+        # Check if it is mounted.
+        if local_folder not in fstab_mounts:
+            logger.warn(
+                "Error: %s is mounted (%s), but not known in /etc/fstab",
+                local_folder,
+                cifs_share)
+            num_warnings += 1
+
+    return num_warnings
 
 
 def main():
@@ -189,9 +210,11 @@ def main():
                     FSTAB)
         sys.exit()
 
-    fstab_mounts = _cifs_lines(FSTAB)
-    mtab_mounts = _cifs_lines(MTAB)
-    num_errors, num_warnings = check_if_mounted(fstab_mounts, mtab_mounts)
+    fstab_mounts, num_warnings1 = _cifs_lines(FSTAB)
+    mtab_mounts, num_warnings2 = _cifs_lines(MTAB)
+    num_warnings3 = check_unknown_mounts(fstab_mounts, mtab_mounts)
+    num_warnings = num_warnings1 + num_warnings2 + num_warnings3
+    num_errors = check_if_mounted(fstab_mounts, mtab_mounts)
     if num_errors == 0:
         logger.info("Everything OK with the mounts: %s",
                     ', '.join(fstab_mounts.keys()))
