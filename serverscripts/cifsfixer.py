@@ -85,7 +85,7 @@ def _is_folder_accessible(local_folder):
     http://unixetc.co.uk/2012/05/20/large-directory-causes-ls-to-hang/
 
     """
-    command = "ls -1 -f %s | head" % local_folder
+    command = "ls -1 -f %s | head > /dev/null" % local_folder
     exit_code = subprocess.call(
         ['/bin/bash', '-c', 'set -o pipefail; ' + command])
     # See http://stackoverflow.com/a/21742965/27401 for the pipefail magic.
@@ -224,9 +224,9 @@ def main():
 
     # Write to files that will be read by zabbix.
     warningsfile = os.path.join(VAR_DIR, 'nens.cifschecker.warnings')
-    open(warningsfile, 'w').write(num_warnings)
+    open(warningsfile, 'w').write(str(num_warnings))
     errorsfile = os.path.join(VAR_DIR, 'nens.cifschecker.errors')
-    open(errorsfile, 'w').write(num_errors)
+    open(errorsfile, 'w').write(str(num_errors))
 
     if num_errors == 0:
         logger.info("Everything OK with the mounts: %s",
