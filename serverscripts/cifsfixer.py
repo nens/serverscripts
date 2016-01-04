@@ -22,6 +22,8 @@ import subprocess
 import sys
 import time
 
+LOGFILE = '/var/log/cifsfixer.log'
+VAR_DIR = '/var/local/serverscripts'
 FSTAB = '/etc/fstab'
 MTAB = '/etc/mtab'
 CIFS_PATTERN = re.compile(r"""
@@ -194,11 +196,15 @@ def main():
                         format="%(levelname)s: %(message)s")
 
     file_handler = logging.handlers.RotatingFileHandler(
-        '/var/log/cifsfixer.log', mode='a', maxBytes=1000000, backupCount=3)
+        LOGFILE, mode='a', maxBytes=1000000, backupCount=3)
     long_formatter = logging.Formatter(
         fmt="%(asctime)s %(levelname)s: %(message)s")
     file_handler.setFormatter(long_formatter)
     logger.addHandler(file_handler)
+
+    if not os.path.exists(VAR_DIR):
+        os.mkdir(VAR_DIR)
+        logger.info("Created %s", VAR_DIR)
 
     # Check fstab modification time. Don't run if edited recently.
     seconds_since_last_edit = time.time() - os.path.getmtime(FSTAB)
@@ -215,10 +221,15 @@ def main():
     num_warnings3 = check_unknown_mounts(fstab_mounts, mtab_mounts)
     num_warnings = num_warnings1 + num_warnings2 + num_warnings3
     num_errors = check_if_mounted(fstab_mounts, mtab_mounts)
+
+    # Write to files that will be read by zabbix.
+    warningsfile = os.path.join(VAR_DIR, 'nens.cifschecker.warnings')
+    open(warningsfile, 'w').write(num_warnings)
+    errorsfile = os.path.join(VAR_DIR, 'nens.cifschecker.errors')
+    open(errorsfile, 'w').write(num_errors)
+
     if num_errors == 0:
         logger.info("Everything OK with the mounts: %s",
                     ', '.join(fstab_mounts.keys()))
     else:
         sys.exit(1)
-
-    # TODO: write exit code to file for zabbix.
