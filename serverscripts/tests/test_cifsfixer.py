@@ -1,6 +1,7 @@
+from mock import patch
 from pkg_resources import resource_filename
-from unittest import TestCase
 from serverscripts import cifsfixer
+from unittest import TestCase
 
 
 class TabfileTestCase(TestCase):
@@ -50,4 +51,19 @@ class TabfileTestCase(TestCase):
 class CheckerTestCase(TestCase):
 
     def test_empty(self):
-        self.assertEquals(0, cifsfixer.check_if_mounted([], []))
+        self.assertEquals(0, cifsfixer.check_if_mounted({}, {}))
+
+
+class UtilsTestCase(TestCase):
+
+    def test_succesful_mount(self):
+        with patch('subprocess.call') as mock_call:
+            mock_call.return_value = 0
+            cifsfixer._mount('something')
+
+    def test_unsuccesful_mount(self):
+        with patch('subprocess.call') as mock_call:
+            mock_call.return_value = 1
+            cifsfixer._mount('something')
+            # The only difference with a succesful mount is a different log
+            # message.
