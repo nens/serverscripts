@@ -25,10 +25,10 @@ import time
 FSTAB = '/etc/fstab'
 MTAB = '/etc/mtab'
 CIFS_PATTERN = re.compile(r"""
-^(?P<file_system>[^#\s]+)  # File system string at start of line
+^(?P<cifs_share>[^#\s]+)   # cifs share string at start of line
                            # (not a # and not whitespace)
 \s+                        # Whitespace
-(?P<mount_point>\S+)       # Second item is the mount point
+(?P<local_folder>\S+)      # Second item is the local folder
 \s+                        # Whitespace
 cifs                       # We're only interested in cifs mounts
 \s+                        # Whitespace
@@ -39,22 +39,22 @@ logger = logging.getLogger(__name__)
 
 
 def _cifs_lines(tabfile):
-    """Return file system and mount point for cifs mounts in tabfile"""
+    """Return cifs share and local folder for cifs mounts in tabfile"""
     result = {}
     for line in open(tabfile):
         line = line.strip()
         match = CIFS_PATTERN.search(line)
         if match:
-            mount_point = match.group('mount_point')
-            file_system = match.group('file_system')
+            local_folder = match.group('local_folder')
+            cifs_share = match.group('cifs_share')
             logger.debug("Found mount in %s: %s (%s)",
-                         tabfile, mount_point, file_system)
-            if mount_point in result:
-                logger.warning("Mount point %s is a duplicate!", mount_point)
-            if file_system in result.values():
-                logger.warning("File system %s is already mounted elsewhere",
-                               file_system)
-            result[mount_point] = file_system
+                         tabfile, local_folder, cifs_share)
+            if local_folder in result:
+                logger.warning("local folder %s is a duplicate!", local_folder)
+            if cifs_share in result.values():
+                logger.warning("cifs share %s is already mounted elsewhere",
+                               cifs_share)
+            result[local_folder] = cifs_share
     return result
 
 
