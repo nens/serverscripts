@@ -114,6 +114,7 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
 
     """
     num_errors = 0
+    num_warnings = 0
     for local_folder, cifs_share in fstab_mounts.items():
         # Check if it is mounted.
         if local_folder not in mtab_mounts:
@@ -134,7 +135,7 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
         time.sleep(3)
         _mount(local_folder)
 
-    return num_errors
+    return num_errors, num_warnings
 
 
 def main():
@@ -190,7 +191,7 @@ def main():
 
     fstab_mounts = _cifs_lines(FSTAB)
     mtab_mounts = _cifs_lines(MTAB)
-    num_errors = check_if_mounted(fstab_mounts, mtab_mounts)
+    num_errors, num_warnings = check_if_mounted(fstab_mounts, mtab_mounts)
     if num_errors == 0:
         logger.info("Everything OK with the mounts: %s",
                     ', '.join(fstab_mounts.keys()))

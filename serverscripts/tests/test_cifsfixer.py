@@ -51,14 +51,15 @@ class TabfileTestCase(TestCase):
 class CheckerTestCase(TestCase):
 
     def test_empty(self):
-        self.assertEquals(0, cifsfixer.check_if_mounted({}, {}))
+        self.assertEquals((0, 0),
+                          cifsfixer.check_if_mounted({}, {}))
 
     def test_matching_mounts(self):
         mounts = {'/some/folder': 'some//cifs'}
         with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked:
             mocked.return_value = True
-            self.assertEquals(0, cifsfixer.check_if_mounted(
-                mounts, mounts))
+            self.assertEquals((0, 0),
+                              cifsfixer.check_if_mounted(mounts, mounts))
 
     def test_mounting_missing_mount(self):
         fstab_mounts = {'/some/folder': 'some//cifs'}
