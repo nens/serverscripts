@@ -60,7 +60,7 @@ class CheckerTestCase(TestCase):
             self.assertEquals(0, cifsfixer.check_if_mounted(
                 mounts, mounts))
 
-    def test_missing_mount(self):
+    def test_mounting_missing_mount(self):
         fstab_mounts = {'/some/folder': 'some//cifs'}
         mtab_mounts = {}
         with patch('serverscripts.cifsfixer._mount') as mocked:
@@ -75,6 +75,17 @@ class CheckerTestCase(TestCase):
             with patch('serverscripts.cifsfixer._mount') as mocked2:
                 cifsfixer.check_if_mounted(fstab_mounts, mtab_mounts)
                 self.assertFalse(mocked2.called)
+
+    def test_re_mounting_if_inaccessible(self):
+        fstab_mounts = {'/some/folder': 'some//cifs'}
+        mtab_mounts = fstab_mounts
+        with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked1:
+            mocked1.return_value = False
+            with patch('serverscripts.cifsfixer._mount') as mocked2:
+                with patch('serverscripts.cifsfixer._unmount') as mocked3:
+                    cifsfixer.check_if_mounted(fstab_mounts, mtab_mounts)
+                    self.assertTrue(mocked2.called)
+                    self.assertTrue(mocked3.called)
 
 
 class UtilsTestCase(TestCase):
@@ -96,3 +107,15 @@ class UtilsTestCase(TestCase):
 
     def test_folder_accessible(self):
         self.assertTrue(cifsfixer._is_folder_accessible('/tmp'))
+
+    def test_succesful_unmount(self):
+        with patch('subprocess.call') as mock_call:
+            mock_call.return_value = 0
+            cifsfixer._unmount('something')
+
+    def test_unsuccesful_unmount(self):
+        with patch('subprocess.call') as mock_call:
+            mock_call.return_value = 1
+            cifsfixer._unmount('something')
+            # The only difference with a succesful unmount is a different log
+            # message.
