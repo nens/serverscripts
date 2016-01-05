@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.4 (unreleased)
+0.4 (2016-01-05)
 ----------------
 
 - Work around weird 'broken pipe' problem on some servers. See
