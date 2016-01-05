@@ -5,7 +5,11 @@ Changelog of serverscripts
 0.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed ``ls`` command to be more friendly for large directories.
+  [reinout]
+
+- Added zabbix integration.
+  [reinout]
 
 
 0.2 (2015-12-29)
