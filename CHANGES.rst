@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.3 (unreleased)
+0.3 (2016-01-05)
 ----------------
 
 - Fixed ``ls`` command to be more friendly for large directories.
