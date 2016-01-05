@@ -18,6 +18,7 @@ import logging.handlers
 import os
 import re
 import serverscripts
+import signal
 import subprocess
 import sys
 import time
@@ -205,6 +206,10 @@ def main():
     if not os.path.exists(VAR_DIR):
         os.mkdir(VAR_DIR)
         logger.info("Created %s", VAR_DIR)
+
+    # Code to work around SIGPIPE-related error on some servers.  See
+    # http://coding.derkeiler.com/Archive/Python/comp.lang.python/2004-06/3823.html
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
     # Check fstab modification time. Don't run if edited recently.
     seconds_since_last_edit = time.time() - os.path.getmtime(FSTAB)

@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Work around weird 'broken pipe' problem on some servers. See
+  http://coding.derkeiler.com/Archive/Python/comp.lang.python/2004-06/3823.html
+  [reinout]
 
 
 0.3 (2016-01-05)
