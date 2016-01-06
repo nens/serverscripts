@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Just listing the directory itself (``ls -d /mnt/something``) as a test
+  whether the mount is readable. Pipes were giving too many problems.
+  [reinout]
 
 
 0.4 (2016-01-05)

@@ -18,7 +18,6 @@ import logging.handlers
 import os
 import re
 import serverscripts
-import signal
 import subprocess
 import sys
 import time
@@ -81,15 +80,10 @@ def _mount(local_folder):
 def _is_folder_accessible(local_folder):
     """Return if the local folder is readable.
 
-    Listing the contents is OK.  ``ls -f -1`` doesn't sort and immediately
-    returns results, so it is safe to use on huge directories. See
-    http://unixetc.co.uk/2012/05/20/large-directory-causes-ls-to-hang/
+    Listing just the directory itself (so: not the contents) is enough.
 
     """
-    command = "ls -1 -f %s | head > /dev/null" % local_folder
-    exit_code = subprocess.call(
-        ['/bin/bash', '-c', 'set -o pipefail; ' + command])
-    # See http://stackoverflow.com/a/21742965/27401 for the pipefail magic.
+    exit_code = subprocess.call(['ls', '-d', local_folder])
     if exit_code == 0:
         logger.debug("Contents of %s can be listed just fine", local_folder)
         return True
@@ -206,10 +200,6 @@ def main():
     if not os.path.exists(VAR_DIR):
         os.mkdir(VAR_DIR)
         logger.info("Created %s", VAR_DIR)
-
-    # Code to work around SIGPIPE-related error on some servers.  See
-    # http://coding.derkeiler.com/Archive/Python/comp.lang.python/2004-06/3823.html
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
     # Check fstab modification time. Don't run if edited recently.
     seconds_since_last_edit = time.time() - os.path.getmtime(FSTAB)
