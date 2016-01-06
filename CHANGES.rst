@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.5 (unreleased)
+0.5 (2016-01-06)
 ----------------
 
 - Just listing the directory itself (``ls -d /mnt/something``) as a test
