@@ -51,6 +51,19 @@ the logfile. If you want to check if the tool runs OK, run it with
 ``--verbose``.
 
 
+Checkout-info
+-------------
+
+``bin/checkout-info`` collects info on git checkouts and saves it as
+``/var/local/serverinfo-facts/checkouts.fact``. This is used by serverinfo. It
+contains information like git repo url, python packages+versions, master or
+tag checkout and so on.
+
+Should be installed in a cronjob. Suggestion for the crontab (note: it needs
+to run as root)::
+
+    */5 * * * * /usr/local/bin/checkout-info > /dev/null 2>&1
+
 
 TODO/ideas
 ----------
