@@ -55,9 +55,9 @@ def git_info(directory):
     sub = subprocess.Popen('git status', cwd=directory, shell=True,
                            stdout=subprocess.PIPE,
                            universal_newlines=True)
-    status_output = sub.communicate()
-    first_line = status_output[0]
-    if 'master' in first_line:
+    output, errors = sub.communicate()
+    output = output.lower()
+    if 'master' in output:
         data['release'] = 'master'
     else:
         sub = subprocess.Popen('git describe', cwd=directory, shell=True,
@@ -65,6 +65,8 @@ def git_info(directory):
                                universal_newlines=True)
         first_line = sub.communicate()[0]
         data['release'] = first_line.strip()
+    data['has_local_modifications'] = ('changes not staged' in output)
+    data['has_untracked_files'] = ('untracked' in output)
     return data
 
 
