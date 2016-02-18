@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix for git url regex so that ``https`` urls (instead of only ``git@`` urls)
+  are also accepted.
 
 
 0.6 (2016-02-18)
