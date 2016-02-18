@@ -21,7 +21,9 @@ SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
     origin           # We want the origin remote.
     \W*              # Whitespace.
-    git@github.com:  # Base github incantation.
+    .*               # git@ or https://
+    github.com       # Base github incantation.
+    [:/]             # : (git@) or / (https)
     (?P<user>.+)     # User/org string.
     /                # Slash.
     (?P<project>.+)  # Project.

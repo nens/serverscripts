@@ -24,3 +24,13 @@ class GitAndEggInfoTestCase(TestCase):
     def test_correct_eggs_info(self):
         output = checkouts.eggs_info(self.dir_with_git)
         self.assertIn('mock', output)
+
+    def test_git_regex(self):
+        line = "origin git@github.com:nens/delfland.git (fetch)"
+        match = checkouts.GIT_URL.search(line)
+        self.assertEquals(match.group('user'), 'nens')
+
+    def test_https_regex(self):
+        line = "origin https://github.com/ddsc/webclient.git (fetch)"
+        match = checkouts.GIT_URL.search(line)
+        self.assertEquals(match.group('user'), 'ddsc')
