@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added ``bin/checkout-info`` that saves info on git checkouts.
+  [reinout]
 
 
 0.5 (2016-01-06)
