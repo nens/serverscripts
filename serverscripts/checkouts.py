@@ -7,8 +7,6 @@ Originally copied from ``buildout.py`` in
 https://github.com/reinout/serverinfo/
 
 """
-from xml.etree import ElementTree
-
 import copy
 import json
 import logging
@@ -19,9 +17,6 @@ import sys
 
 import pkg_resources
 
-from serverinfo import utils
-
-FILENAME = 'buildout___{id}.json'
 SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
     origin           # We want the origin remote.
@@ -33,19 +28,14 @@ GIT_URL = re.compile(r"""
     \.git             # .git
     .*$              # Whatever till the end of line.
     """, re.VERBOSE)
+OUTPUT_DIR = '/var/local/serverinfo-facts'
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'checkouts.fact')
 
 
 logger = logging.getLogger(__name__)
 
 
-def id(directory):
-    """Return id of buildout based on the directory name."""
-    directory = directory.rstrip('/')
-    parts = directory.split('/')
-    return parts[-1]
-
-
-def vcs_info(directory):
+def git_info(directory):
     data = {}
     dir_contents = os.listdir(directory)
     if not '.git' in dir_contents:
@@ -53,7 +43,8 @@ def vcs_info(directory):
         return
 
     sub = subprocess.Popen('git remote -v', cwd=directory, shell=True,
-                           stdout=subprocess.PIPE)
+                           stdout=subprocess.PIPE,
+                           universal_newlines=True)
     for line in sub.communicate():
         if not line:
             continue
@@ -62,13 +53,16 @@ def vcs_info(directory):
             user=match.group('user'),
             project=match.group('project'))
     sub = subprocess.Popen('git status', cwd=directory, shell=True,
-                           stdout=subprocess.PIPE)
-    first_line = sub.communicate()[0]
+                           stdout=subprocess.PIPE,
+                           universal_newlines=True)
+    status_output = sub.communicate()
+    first_line = status_output[0]
     if 'master' in first_line:
         data['release'] = 'master'
     else:
         sub = subprocess.Popen('git describe', cwd=directory, shell=True,
-                               stdout=subprocess.PIPE)
+                               stdout=subprocess.PIPE,
+                               universal_newlines=True)
         first_line = sub.communicate()[0]
         data['release'] = first_line.strip()
     return data
@@ -96,7 +90,7 @@ def eggs_info(directory):
             new_contents.append(line)
         # This is very evil, but cool! Because the __name__ != main the
         # remainder of the script is not executed.
-        exec ''.join(new_contents)
+        exec(''.join(new_contents))
         possible_egg_dirs.update(sys.path)
     # reset sys.path
     sys.path = before
@@ -111,28 +105,26 @@ def eggs_info(directory):
     return eggs
 
 
-def grab_one(directory):
-    """Grab and write info on one buildout."""
-    logger.info("Grabbing buildout info from %s", directory)
+def main():
+    """Installed as bin/checkout-info"""
     result = {}
-    result['directory'] = directory
-    result['eggs'] = eggs_info(directory)
-    result['vcs'] = vcs_info(directory)
-    result['id'] = id(directory)
-    result['hostname'] = utils.hostname()
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+        logger.info("Created %s", OUTPUT_DIR)
+    for name in os.listdir(SRV_DIR):
+        directory = os.path.join(SRV_DIR, name)
+        if not os.path.exists(os.path.join(directory, 'buildout.cfg')):
+            logger.warn("/srv directory without buildout.cfg: %s", directory)
+            continue
+        checkout = {}
+        checkout['name'] = name
+        checkout['directory'] = directory
+        checkout['eggs'] = eggs_info(directory)
+        checkout['git'] = git_info(directory)
 
-    outfile = os.path.join(utils.grabber_dir(),
-                           FILENAME.format(id=id(directory)))
-    open(outfile, 'w').write(
-        json.dumps(result, sort_keys=True, indent=4))
-    logger.debug("Wrote info to %s", outfile)
+        # TODO: diffsettings
+        # TODO: git status
+        # ^^^ Perhaps in separate checker?
 
-
-def grab_all():
-    """Grab and write info on all the buildouts."""
-    buildout_dirs = [os.path.join(SRV_DIR, d)
-                     for d in os.listdir(SRV_DIR)]
-    buildout_dirs = [d for d in buildout_dirs
-                     if os.path.exists(os.path.join(d, 'buildout.cfg'))]
-    for buildout_dir in buildout_dirs:
-        grab_one(buildout_dir)
+        result[name] = checkout
+    open(OUTPUT_FILE, 'w').write(json.dumps(result))
