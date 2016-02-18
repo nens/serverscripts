@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.7 (unreleased)
+0.7 (2016-02-18)
 ----------------
 
 - Fix for git url regex so that ``https`` urls (instead of only ``git@`` urls)
