@@ -7,11 +7,13 @@ Originally copied from ``buildout.py`` in
 https://github.com/reinout/serverinfo/
 
 """
+import argparse
 import copy
 import json
 import logging
 import os
 import re
+import serverscripts
 import subprocess
 import sys
 
@@ -113,6 +115,32 @@ def eggs_info(directory):
 
 def main():
     """Installed as bin/checkout-info"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        default=False,
+        help="Verbose output")
+    parser.add_argument(
+        "-V",
+        "--version",
+        action="store_true",
+        dest="print_version",
+        default=False,
+        help="Print version")
+    options = parser.parse_args()
+    if options.print_version:
+        print(serverscripts.__version__)
+        sys.exit()
+    if options.verbose:
+        loglevel = logging.DEBUG
+    else:
+        loglevel = logging.WARN
+    logging.basicConfig(level=loglevel,
+                        format="%(levelname)s: %(message)s")
+
     result = {}
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)

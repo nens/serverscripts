@@ -14,7 +14,6 @@ Goal copy/pasted from trac (https://office.lizard.net/trac/ticket/4272)::
 """
 import argparse
 import logging
-import logging.handlers
 import os
 import re
 import serverscripts
