@@ -51,6 +51,8 @@ def git_info(directory):
         if not line:
             continue
         match = GIT_URL.search(line)
+        if not match:
+            continue
         data['url'] = 'https://github.com/{user}/{project}'.format(
             user=match.group('user'),
             project=match.group('project'))
