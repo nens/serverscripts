@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-0.9 (unreleased)
-----------------
+0.8.1 (2016-02-25)
+------------------
 
 - Bugfix in bin/nginx-info; json doesn't accept tuples as keys.
   [reinout]
