@@ -124,7 +124,7 @@ def main():
                                                     conf_filename)):
             name = site_info['name']
             protocol = site_info['protocol']  # http or https
-            key = '_'.join(name, protocol)
+            key = '_'.join([name, protocol])
             if key in result:
                 logger.error("Nginx %s site %s from %s is already known",
                              protocol, name, conf_filename)
