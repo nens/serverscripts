@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.9 (unreleased)
+0.9 (2016-02-25)
 ----------------
 
 - Fix for multiple sites within one server section: using ``copy.deepcopy()``,
