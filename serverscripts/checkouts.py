@@ -21,16 +21,18 @@ import pkg_resources
 
 SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
-    origin           # We want the origin remote.
-    \W*              # Whitespace.
-    .*               # git@ or https://
-    github.com       # Base github incantation.
-    [:/]             # : (git@) or / (https)
-    (?P<user>.+)     # User/org string.
-    /                # Slash.
-    (?P<project>.+)  # Project.
-    \.git             # .git
-    .*$              # Whatever till the end of line.
+    origin            # We want the origin remote.
+    \W*               # Whitespace.
+    .*                # git@ or https://
+    github.com        # Base github incantation.
+    [:/]              # : (git@) or / (https)
+    (?P<user>.+)      # User/org string.
+    /                 # Slash.
+    (?P<project>\S+?) # Project.
+    (\.git)?          # Optional '.git'.
+    \W*               # Whitespace.
+    \(                # Opening parentheses.
+    .*$               # Whatever till the end of line.
     """, re.VERBOSE)
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'checkouts.fact')
@@ -55,6 +57,7 @@ def git_info(directory):
         match = GIT_URL.search(line)
         if not match:
             continue
+
         data['url'] = 'https://github.com/{user}/{project}'.format(
             user=match.group('user'),
             project=match.group('project'))

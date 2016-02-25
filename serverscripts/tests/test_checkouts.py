@@ -30,7 +30,17 @@ class GitAndEggInfoTestCase(TestCase):
         match = checkouts.GIT_URL.search(line)
         self.assertEquals(match.group('user'), 'nens')
 
+    def test_git_regex2(self):
+        line = "origin git@github.com:nens/delfland.git (fetch)"
+        match = checkouts.GIT_URL.search(line)
+        self.assertEquals(match.group('project'), 'delfland')
+
     def test_https_regex(self):
         line = "origin https://github.com/ddsc/webclient.git (fetch)"
         match = checkouts.GIT_URL.search(line)
         self.assertEquals(match.group('user'), 'ddsc')
+
+    def test_git_regex_without_dot_git(self):
+        line = "origin	git@github.com:nens/ror-export (fetch)"
+        match = checkouts.GIT_URL.search(line)
+        self.assertEquals(match.group('user'), 'nens')
