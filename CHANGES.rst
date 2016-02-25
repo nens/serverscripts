@@ -5,7 +5,15 @@ Changelog of serverscripts
 0.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix for multiple sites within one server section: using ``copy.deepcopy()``,
+  otherwise we end up with multiple copies of only one site.
+  [reinout]
+
+- Better git url detection: the trailing ``.git`` is not mandatory anymore.
+  [reinout]
+
+- Extracting related local checkout and proxy to local port or remote server.
+  [reinout]
 
 
 0.8.3 (2016-02-25)
