@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.10 (unreleased)
+0.10 (2016-02-25)
 -----------------
 
 - Compatibility with python 2 (which we're installed as as long as we still
