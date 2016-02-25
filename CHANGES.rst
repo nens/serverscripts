@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-0.9 (unreleased)
-----------------
+0.8.3 (2016-02-25)
+------------------
 
 - Supporting lizard5 nginx regex magic.
   [reinout]
