@@ -66,6 +66,12 @@ def extract_sites(filename):
             continue
         if line.startswith('server_name'):
             line = line.replace(',', ' ')
+            if ')$' in line:
+                # lizard 5 regex magic
+                line = line.replace('~(', ' ')
+                line = line.replace(')$', ' ')
+                line = line.replace(r'\.', '.')
+                line = line.replace('|', ' ')
             line = line[len('server_name'):]
             parts = line.split()
             site_names = [part for part in parts if part]
