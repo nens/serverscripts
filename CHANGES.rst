@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Started nginx-info-extractor.
+  [reinout]
 
 
 0.7 (2016-02-18)
@@ -13,6 +14,7 @@ Changelog of serverscripts
 
 - Fix for git url regex so that ``https`` urls (instead of only ``git@`` urls)
   are also accepted.
+  [reinout]
 
 
 0.6 (2016-02-18)
