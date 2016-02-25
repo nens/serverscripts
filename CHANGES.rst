@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Compatibility with python 2 (which we're installed as as long as we still
+  have 12.04 machines...)
+  [reinout]
 
 
 0.9 (2016-02-25)

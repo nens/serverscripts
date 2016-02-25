@@ -9,7 +9,8 @@ import os
 import re
 import serverscripts
 import sys
-import urllib.parse
+
+from six.moves.urllib.parse import urlparse
 
 NGINX_DIR = '/etc/nginx/sites-enabled'
 GIT_URL = re.compile(r"""
@@ -100,7 +101,7 @@ def extract_sites(filename):
             line = line[len('proxy_pass'):]
             line = line.strip()
             proxied_to = line.split()[0]
-            parsed = urllib.parse.urlparse(proxied_to)
+            parsed = urlparse(proxied_to)
             if parsed.hostname == 'localhost':
                 site['proxy_to_local_port'] = str(parsed.port)
             else:
