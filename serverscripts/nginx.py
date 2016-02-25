@@ -86,7 +86,7 @@ def extract_sites(filename):
     if site:
         for site_name in site_names:
             site['name'] = site_name
-            yield site
+            yield copy.deepcopy(site)
 
 
 def main():
