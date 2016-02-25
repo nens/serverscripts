@@ -42,5 +42,6 @@ setup(name='serverscripts',
           'console_scripts': [
               'cifsfixer = serverscripts.cifsfixer:main',
               'checkout-info = serverscripts.checkouts:main',
+              'nginx-info = serverscripts.nginx:main',
           ]},
       )
