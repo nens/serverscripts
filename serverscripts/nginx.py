@@ -8,10 +8,8 @@ import logging
 import os
 import re
 import serverscripts
-import subprocess
 import sys
-
-import pkg_resources
+import urllib.parse
 
 NGINX_DIR = '/etc/nginx/sites-enabled'
 GIT_URL = re.compile(r"""
@@ -75,6 +73,7 @@ def extract_sites(filename):
             line = line[len('server_name'):]
             parts = line.split()
             site_names = [part for part in parts if part]
+
         elif line.startswith('listen'):
             if '80' in line:
                 site['protocol'] = 'http'
@@ -82,6 +81,30 @@ def extract_sites(filename):
                 site['protocol'] = 'https'
             else:
                 logger.error("Listen line without proper port: %s", line)
+
+        elif line.startswith('access_log'):
+            # Assumption: access log is in the buildout directory where our site is,
+            # so something like /srv/DIRNAME/var/log/access.log.
+            line = line[len('access_log'):]
+            line = line.strip()
+            logfilename = line.split()[0]
+            parts = logfilename.split('/')
+            if parts[1] != 'srv':
+                logger.warn("access_log line without a dir inside /srv: %s",
+                            line)
+                continue
+            buildout_directory = parts[2]
+            site['related_checkout'] = buildout_directory
+
+        elif line.startswith('proxy_pass'):
+            line = line[len('proxy_pass'):]
+            line = line.strip()
+            proxied_to = line.split()[0]
+            parsed = urllib.parse.urlparse(proxied_to)
+            if parsed.hostname == 'localhost':
+                site['proxy_to_local_port'] = str(parsed.port)
+            else:
+                site['proxy_to_other_server'] = parsed.hostname
 
     if site:
         for site_name in site_names:

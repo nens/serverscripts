@@ -42,3 +42,16 @@ class GitAndEggInfoTestCase(TestCase):
         result = list(nginx.extract_sites(self.multiple_example))
         print(result)
         self.assertEquals(result[0]['protocol'], 'https')
+
+    def test_proxy_local(self):
+        result = list(nginx.extract_sites(self.single_example))
+        print(result)
+        self.assertEquals(result[0]['proxy_to_local_port'], '9070')
+
+    def test_proxy_remote(self):
+        result = list(nginx.extract_sites(self.multiple_example))
+        print(result)
+        specific_site = [site for site in result
+                         if site['name'] == 'api.ddsc.nl'][0]
+        self.assertEquals(specific_site['proxy_to_other_server'],
+                          '110-haprox-d2.external-nens.local')
