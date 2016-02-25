@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Bugfix in bin/nginx-info; json doesn't accept tuples as keys.
+  [reinout]
 
 
 0.8 (2016-02-25)
