@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Syntax typo fix...
+  [reinout]
 
 
 0.8.1 (2016-02-25)
