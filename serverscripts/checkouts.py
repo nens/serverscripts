@@ -42,6 +42,8 @@ logger = logging.getLogger(__name__)
 
 
 def git_info(directory):
+    """Return git information (like remote repo) for the directory"""
+    logger.debug("Looking in %s...", directory)
     data = {}
     dir_contents = os.listdir(directory)
     if not '.git' in dir_contents:
@@ -56,11 +58,13 @@ def git_info(directory):
             continue
         match = GIT_URL.search(line)
         if not match:
+            logger.warn("Non-recognized 'git remote -v' line: %s", line)
             continue
 
         data['url'] = 'https://github.com/{user}/{project}'.format(
             user=match.group('user'),
             project=match.group('project'))
+        logger.debug("Git repo found: %s", data['url'])
     sub = subprocess.Popen('git status', cwd=directory, shell=True,
                            stdout=subprocess.PIPE,
                            universal_newlines=True)
@@ -68,12 +72,14 @@ def git_info(directory):
     output = output.lower()
     if 'master' in output:
         data['release'] = 'master'
+        logger.debug("It is a master checkout")
     else:
         sub = subprocess.Popen('git describe', cwd=directory, shell=True,
                                stdout=subprocess.PIPE,
                                universal_newlines=True)
         first_line = sub.communicate()[0]
         data['release'] = first_line.strip()
+        logger.debug("We're on a tag or branch: %s", data['release'])
     data['has_local_modifications'] = ('changes not staged' in output)
     data['has_untracked_files'] = ('untracked' in output)
     return data
@@ -90,16 +96,17 @@ def eggs_info(directory):
     for file_ in os.listdir(bin_dir):
         if file_ not in files_of_interest:
             continue
+        logger.debug("Looking in bin/%s for eggs+versions", file_
         new_contents = []
         for line in open(os.path.join(directory, 'bin', file_)):
             # Skipping imports that may be unavailable in the current path.
             if line.strip() != 'import sys':
-                # When we see these lines we have past the sys.path:
+                # When we see these lines we have moved past the sys.path:
                 if 'import ' in line or 'os.chdir' in line or\
                     '__import__' in line or '_interactive = True' in line:
                     break
             new_contents.append(line)
-        # This is very evil, but cool! Because the __name__ != main the
+        # This is very evil, but cool! Because of the __name__ != main the
         # remainder of the script is not executed.
         exec(''.join(new_contents))
         possible_egg_dirs.update(sys.path)
