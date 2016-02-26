@@ -12,7 +12,7 @@ import sys
 
 from six.moves.urllib.parse import urlparse
 
-APACHE_DIR = '/etc/apache/sites-enabled'
+APACHE_DIR = '/etc/apache2/sites-enabled'
 SERVER_START = re.compile(r"""
     ^<virtualhost    # '<virtualhost' at the start of the line.
     .*$              # Whatever till the end of line.
