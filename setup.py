@@ -43,5 +43,6 @@ setup(name='serverscripts',
               'cifsfixer = serverscripts.cifsfixer:main',
               'checkout-info = serverscripts.checkouts:main',
               'nginx-info = serverscripts.nginx:main',
+              'apache-info = serverscripts.apache:main',
           ]},
       )
