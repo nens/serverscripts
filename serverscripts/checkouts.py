@@ -186,4 +186,4 @@ def main():
         # ^^^ Perhaps in separate checker?
 
         result[name] = checkout
-    open(OUTPUT_FILE, 'w').write(json.dumps(result))
+    open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))

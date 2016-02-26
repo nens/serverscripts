@@ -171,4 +171,4 @@ def main():
                 continue
 
             result[key] = site_info
-    open(OUTPUT_FILE, 'w').write(json.dumps(result))
+    open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
