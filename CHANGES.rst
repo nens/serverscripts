@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.11 (unreleased)
+0.11 (2016-02-26)
 -----------------
 
 - Added ``bin/apache-info`` for apache detection. It mostly mimicks the nginx
