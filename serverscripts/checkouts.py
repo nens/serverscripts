@@ -96,9 +96,10 @@ def eggs_info(directory):
     for file_ in os.listdir(bin_dir):
         if file_ not in files_of_interest:
             continue
-        logger.debug("Looking in bin/%s for eggs+versions", file_
+        logger.debug("Looking in bin/%s for eggs+versions", file_)
         new_contents = []
-        for line in open(os.path.join(directory, 'bin', file_)):
+        lines = open(os.path.join(directory, 'bin', file_)).readlines()
+        for line in lines:
             # Skipping imports that may be unavailable in the current path.
             if line.strip() != 'import sys':
                 # When we see these lines we have moved past the sys.path:
@@ -110,6 +111,19 @@ def eggs_info(directory):
         # remainder of the script is not executed.
         exec(''.join(new_contents))
         possible_egg_dirs.update(sys.path)
+        # Detect python executable
+        first_line = lines[0].strip()
+        python_executable = first_line.lstrip('#!')
+        sub = subprocess.Popen('%s --version' % python_executable,
+                               cwd=directory,
+                               shell=True,
+                               stderr=subprocess.PIPE,
+                               universal_newlines=True)
+        output, error = sub.communicate()
+        python_version = error.strip().split()[1]
+        # ^^^ stderr outputs "Python 2.7.10"
+        logger.debug("Python version used: %s", python_version)
+
     # reset sys.path
     sys.path = before
 
@@ -120,6 +134,7 @@ def eggs_info(directory):
             continue
         info = info[0]
         eggs[info.project_name] = info.version
+    eggs['python'] = python_version
     return eggs
 
 

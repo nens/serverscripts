@@ -3,6 +3,7 @@ from serverscripts import checkouts
 from unittest import TestCase
 
 import os
+import sys
 
 
 class GitAndEggInfoTestCase(TestCase):
@@ -24,6 +25,13 @@ class GitAndEggInfoTestCase(TestCase):
     def test_correct_eggs_info(self):
         output = checkouts.eggs_info(self.dir_with_git)
         self.assertIn('mock', output)
+
+    def test_python_version_in_eggs_info(self):
+        output = checkouts.eggs_info(self.dir_with_git)
+        our_python_version = '%s.%s.%s' % (sys.version_info.major,
+                                           sys.version_info.minor,
+                                           sys.version_info.micro)
+        self.assertEquals(output['python'], our_python_version)
 
     def test_git_regex(self):
         line = "origin git@github.com:nens/delfland.git (fetch)"
