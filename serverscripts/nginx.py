@@ -43,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 def extract_sites(filename):
     """Yield info per site found in the nginx config file"""
+    logger.debug("Looking at %s", filename)
     lines = open(filename).readlines()
     lines = [line.strip() for line in lines]
     lines = [line.rstrip(';') for line in lines]
@@ -55,8 +56,11 @@ def extract_sites(filename):
             if site:
                 # Note: keep in sync with last lines in this function!
                 for site_name in site_names:
+                    # Yield one complete site object per name.
                     site['name'] = site_name
+                    logger.debug("Returning site %s", site_name)
                     yield site
+            logger.debug("Starting new site...")
             site = copy.deepcopy(SITE_TEMPLATE)
             site_names = []
             continue
@@ -95,6 +99,8 @@ def extract_sites(filename):
                             line)
                 continue
             buildout_directory = parts[2]
+            logger.debug("Found access_log pointing to a /srv dir: /srv/%s",
+                         buildout_directory)
             site['related_checkout'] = buildout_directory
 
         elif line.startswith('proxy_pass'):
@@ -103,13 +109,17 @@ def extract_sites(filename):
             proxied_to = line.split()[0]
             parsed = urlparse(proxied_to)
             if parsed.hostname == 'localhost':
+                logger.debug("Proxy to localhost port %s", parsed.port)
                 site['proxy_to_local_port'] = str(parsed.port)
             else:
+                logger.debug("Proxy to other server: %s", parsed.hostname)
                 site['proxy_to_other_server'] = parsed.hostname
 
     if site:
         for site_name in site_names:
+            # Yield one complete site object per name.
             site['name'] = site_name
+            logger.debug("Returning site %s", site_name)
             yield copy.deepcopy(site)
 
 
