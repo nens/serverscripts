@@ -13,22 +13,8 @@ import sys
 from six.moves.urllib.parse import urlparse
 
 APACHE_DIR = '/etc/apache/sites-enabled'
-GIT_URL = re.compile(r"""
-    origin           # We want the origin remote.
-    \W*              # Whitespace.
-    .*               # git@ or https://
-    github.com       # Base github incantation.
-    [:/]             # : (git@) or / (https)
-    (?P<user>.+)     # User/org string.
-    /                # Slash.
-    (?P<project>.+)  # Project.
-    \.git             # .git
-    .*$              # Whatever till the end of line.
-    """, re.VERBOSE)
 SERVER_START = re.compile(r"""
-    ^server          # 'server' at the start of the line.
-    \W*              # Optional whitespace.
-    \{               # Starting curly brace
+    ^<virtualhost    # '<virtualhost' at the start of the line.
     .*$              # Whatever till the end of line.
     """, re.VERBOSE)
 OUTPUT_DIR = '/var/local/serverinfo-facts'
@@ -45,8 +31,7 @@ def extract_sites(filename):
     """Yield info per site found in the apache config file"""
     logger.debug("Looking at %s", filename)
     lines = open(filename).readlines()
-    lines = [line.strip() for line in lines]
-    lines = [line.rstrip(';') for line in lines]
+    lines = [line.strip().lower() for line in lines]
     lines = [line for line in lines
              if line and not line.startswith('#')]
     site = None
@@ -63,57 +48,62 @@ def extract_sites(filename):
             logger.debug("Starting new site...")
             site = copy.deepcopy(SITE_TEMPLATE)
             site_names = []
-            continue
-        if not site:
-            # Not ready to start yet.
-            continue
-        if line.startswith('server_name'):
-            line = line.replace(',', ' ')
-            if ')$' in line:
-                # lizard 5 regex magic
-                line = line.replace('~(', ' ')
-                line = line.replace(')$', ' ')
-                line = line.replace(r'\.', '.')
-                line = line.replace('|', ' ')
-            line = line[len('server_name'):]
-            parts = line.split()
-            site_names = [part for part in parts if part]
-
-        elif line.startswith('listen'):
+            # Extract xxxxxxxx
             if '80' in line:
                 site['protocol'] = 'http'
             elif '443' in line:
                 site['protocol'] = 'https'
             else:
-                logger.error("Listen line without proper port: %s", line)
+                logger.error("<Virtualhost> line without proper port: %s", line)
+            continue
 
-        elif line.startswith('access_log'):
-            # Assumption: access log is in the buildout directory where our site is,
-            # so something like /srv/DIRNAME/var/log/access.log.
-            line = line[len('access_log'):]
-            line = line.strip()
-            logfilename = line.split()[0]
-            parts = logfilename.split('/')
-            if parts[1] != 'srv':
-                logger.warn("access_log line without a dir inside /srv: %s",
-                            line)
+        if not site:
+            # Not ready to start yet.
+            continue
+        if line.startswith('servername') or line.startswith('serveralias'):
+            line = line.replace(',', ' ')
+            parts = line.split()
+            site_names += [part for part in parts[1:] if part]
+
+        elif line.startswith('documentroot') or line.startswith('customlog'):
+            # Assumption: doc root or custom log is in the buildout directory
+            # where our site is, so something like
+            # /srv/DIRNAME/var/log/access.log.
+            #
+            # Format is like this:
+            # CustomLog /srv/somewhere/var/log/access.log combined
+            #
+            # DocumentRoot /srv/serverinfo.lizard.net/var/info
+            line_parts = [part for part in line.split() if part]
+            where = line_parts[1]
+            path_parts = where.split('/')
+            if path_parts[1] != 'srv':
+                logger.warn(
+                    "logfile or doc root line without a dir inside /srv: %s",
+                    line)
                 continue
-            buildout_directory = parts[2]
-            logger.debug("Found access_log pointing to a /srv dir: /srv/%s",
-                         buildout_directory)
+            buildout_directory = path_parts[2]
+            logger.debug(
+                "Found log or doc root pointing to a /srv dir: /srv/%s",
+                buildout_directory)
             site['related_checkout'] = buildout_directory
 
-        elif line.startswith('proxy_pass'):
-            line = line[len('proxy_pass'):]
-            line = line.strip()
-            proxied_to = line.split()[0]
-            parsed = urlparse(proxied_to)
-            if parsed.hostname == 'localhost':
-                logger.debug("Proxy to localhost port %s", parsed.port)
-                site['proxy_to_local_port'] = str(parsed.port)
-            else:
-                logger.debug("Proxy to other server: %s", parsed.hostname)
-                site['proxy_to_other_server'] = parsed.hostname
+        elif line.startswith('proxypass'):
+            parts = line.split()
+            something_with_http = [part for part in parts
+                                   if part.startswith('http')]
+            if something_with_http:
+                proxied_to = something_with_http[0]
+                proxied_to = proxied_to.replace('$1', '')
+                parsed = urlparse(proxied_to)
+                if parsed.hostname == 'localhost':
+                    logger.warn(
+                        "Proxy to localhost port %s, we'd expect mod_wsgi...",
+                        parsed.port)
+                    site['proxy_to_local_port'] = str(parsed.port)
+                else:
+                    logger.debug("Proxy to other server: %s", parsed.hostname)
+                    site['proxy_to_other_server'] = parsed.hostname
 
     if site:
         for site_name in site_names:

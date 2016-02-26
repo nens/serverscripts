@@ -11,10 +11,10 @@ class GitAndEggInfoTestCase(TestCase):
         our_dir = os.path.dirname(__file__)
         self.single_example = os.path.join(
             our_dir, 'example_single_apache.conf')
+        self.customlog_example = os.path.join(
+            our_dir, 'example_apache_customlog.conf')
         self.multiple_example = os.path.join(
             our_dir, 'example_multiple_apache_proxy.conf')
-        self.regex_example = os.path.join(
-            our_dir, 'example_regex_apache.conf')
 
     def test_single_count(self):
         result = list(apache.extract_sites(self.single_example))
@@ -22,16 +22,26 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(len(result), 1)
 
     def test_multiple_count(self):
-        # Two server parts, one with a double name.
+        # Four virtualhosts
         result = list(apache.extract_sites(self.multiple_example))
         print(result)
-        self.assertEquals(len(result), 3)
+        self.assertEquals(len(result), 4)
 
-    def test_regex_count(self):
-        # Weird lizard5-only regex magic.
-        result = list(apache.extract_sites(self.regex_example))
+    def test_count_with_alias(self):
+        result = list(apache.extract_sites(self.customlog_example))
         print(result)
-        self.assertEquals(len(result), 3)
+        self.assertEquals(len(result), 2)
+
+    def test_srv_extraction_customlog(self):
+        result = list(apache.extract_sites(self.customlog_example))
+        print(result)
+        self.assertEquals('somewhere', result[0]['related_checkout'])
+
+    def test_srv_extraction_docroot(self):
+        result = list(apache.extract_sites(self.single_example))
+        print(result)
+        self.assertEquals('serverinfo.lizard.net',
+                          result[0]['related_checkout'])
 
     def test_protocol_http(self):
         result = list(apache.extract_sites(self.single_example))
@@ -41,17 +51,20 @@ class GitAndEggInfoTestCase(TestCase):
     def test_protocol_https(self):
         result = list(apache.extract_sites(self.multiple_example))
         print(result)
-        self.assertEquals(result[0]['protocol'], 'https')
+        self.assertEquals(2, len([i for i in result
+                                  if i['protocol'] == 'https']))
 
-    def test_proxy_local(self):
-        result = list(apache.extract_sites(self.single_example))
-        print(result)
-        self.assertEquals(result[0]['proxy_to_local_port'], '9070')
+    # I don't think we use apache for local ports with proxypass.
+    # We still some mod_wsgi somewhere, however.
+    # def test_proxy_local(self):
+    #     result = list(apache.extract_sites(self.single_example))
+    #     print(result)
+    #     self.assertEquals(result[0]['proxy_to_local_port'], '9070')
 
     def test_proxy_remote(self):
         result = list(apache.extract_sites(self.multiple_example))
         print(result)
         specific_site = [site for site in result
-                         if site['name'] == 'api.ddsc.nl'][0]
+                         if site['name'] == 'fewsvecht.controlnext.org'][0]
         self.assertEquals(specific_site['proxy_to_other_server'],
-                          '110-haprox-d2.external-nens.local')
+                          'p-fews-mc-v2-d1.external-nens.local')
