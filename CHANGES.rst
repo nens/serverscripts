@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-0.12 (unreleased)
------------------
+0.11.1 (2016-02-26)
+-------------------
 
 - Fix: /etc/apache2/ instead of /etc/apache/...
   [reinout]
