@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.11.2 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Added apache/nginx redirect detection.
+  [reinout]
 
 
 0.11.1 (2016-02-26)
