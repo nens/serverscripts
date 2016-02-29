@@ -5,7 +5,7 @@ from unittest import TestCase
 import os
 
 
-class GitAndEggInfoTestCase(TestCase):
+class ApacheTestCase(TestCase):
 
     def setUp(self):
         our_dir = os.path.dirname(__file__)
@@ -54,12 +54,14 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(2, len([i for i in result
                                   if i['protocol'] == 'https']))
 
-    # I don't think we use apache for local ports with proxypass.
-    # We still some mod_wsgi somewhere, however.
-    # def test_proxy_local(self):
-    #     result = list(apache.extract_sites(self.single_example))
-    #     print(result)
-    #     self.assertEquals(result[0]['proxy_to_local_port'], '9070')
+    def test_protocol_https_without_portnumber(self):
+        # A servername can be 'portal.ddsc.nl:443', the port number must be
+        # stripped from the servername in this case.
+        result = list(apache.extract_sites(self.multiple_example))
+        print(result)
+        https_sites = [i for i in result if i['protocol'] == 'https']
+        site_names = [i['name'] for i in https_sites]
+        self.assertTrue('portal.ddsc.nl' in site_names)
 
     def test_proxy_remote(self):
         result = list(apache.extract_sites(self.multiple_example))

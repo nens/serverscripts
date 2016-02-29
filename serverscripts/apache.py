@@ -64,6 +64,8 @@ def extract_sites(filename):
             line = line.replace(',', ' ')
             parts = line.split()
             site_names += [part for part in parts[1:] if part]
+            site_names = [site_name.replace(':443', '').replace(':80', '')
+                          for site_name in site_names]
 
         elif line.startswith('documentroot') or line.startswith('customlog'):
             # Assumption: doc root or custom log is in the buildout directory
