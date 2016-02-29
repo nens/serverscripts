@@ -107,6 +107,49 @@ def extract_sites(filename):
                     logger.debug("Proxy to other server: %s", parsed.hostname)
                     site['proxy_to_other_server'] = parsed.hostname
 
+        elif line.startswith('redirect'):
+            parts = line.split()
+            parts = [part for part in parts if part]
+            if len(parts) < 3:
+                logger.warn("Redirect line with fewer than 3 parts: %s", line)
+                continue
+            if ('410'  in parts[1]) or ('gone' in parts[1]):
+                site['redirect_to'] = 'GONE'
+                continue
+            if parts[2] != '/':
+                logger.info("Redirect doesn't redirect the root: %s", line)
+                continue
+            something_with_http = [part for part in parts
+                                   if part.startswith('http')]
+            if something_with_http:
+                site['redirect_to'] = something_with_http[0].rstrip('/')
+            else:
+                logger.warn(
+                    "Redirect without recognizable http(s) target: %s",
+                    line)
+        elif line.startswith('rewriterule'):
+            parts = line.split()
+            parts = [part for part in parts if part]
+            parts = [part.replace('"', '').replace("'", '') for part in parts]
+            if len(parts) < 3:
+                logger.warn("Rewriterule line with fewer than 3 parts: %s",
+                            line)
+                continue
+            if parts[1] != '^(.*)':
+                logger.info("Rewriterule doesn't redirect the root: %s", line)
+                continue
+            something_with_http = [part for part in parts
+                                   if part.startswith('http')]
+            if something_with_http:
+                redirect_to = something_with_http[0]
+                redirect_to = redirect_to.rstrip('$1')
+                redirect_to = redirect_to.rstrip('/')
+                site['redirect_to'] = redirect_to
+            else:
+                logger.warn(
+                    "Redirect without recognizable http(s) target: %s",
+                    line)
+
     if site:
         for site_name in site_names:
             # Yield one complete site object per name.
