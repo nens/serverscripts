@@ -67,4 +67,10 @@ class GitAndEggInfoTestCase(TestCase):
         result = list(nginx.extract_sites(self.redirect_example))
         pprint(result)
         self.assertEquals(result[0]['redirect_to'],
-                          'https://uploadservice.lizard.net')
+                          'uploadservice.lizard.net')
+
+    def test_redirect_protocol(self):
+        result = list(nginx.extract_sites(self.redirect_example))
+        pprint(result)
+        self.assertEquals(result[0]['redirect_to_protocol'],
+                          'https')

@@ -122,7 +122,9 @@ def extract_sites(filename):
             something_with_http = [part for part in parts
                                    if part.startswith('http')]
             if something_with_http:
-                site['redirect_to'] = something_with_http[0].rstrip('/')
+                redirect_to = something_with_http[0]
+                site['redirect_to'] = urlparse(redirect_to).hostname
+                site['redirect_to_protocol'] = urlparse(redirect_to).scheme
             else:
                 logger.warn(
                     "Redirect without recognizable http(s) target: %s",
@@ -143,8 +145,8 @@ def extract_sites(filename):
             if something_with_http:
                 redirect_to = something_with_http[0]
                 redirect_to = redirect_to.rstrip('$1')
-                redirect_to = redirect_to.rstrip('/')
-                site['redirect_to'] = redirect_to
+                site['redirect_to'] = urlparse(redirect_to).hostname
+                site['redirect_to_protocol'] = urlparse(redirect_to).scheme
             else:
                 logger.warn(
                     "Redirect without recognizable http(s) target: %s",

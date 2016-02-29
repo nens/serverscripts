@@ -88,7 +88,7 @@ class ApacheTestCase(TestCase):
         result = list(apache.extract_sites(self.redirect_example))
         pprint(result)
         redirects = [i['redirect_to'] for i in result]
-        self.assertTrue('https://portal.ddsc.nl' in redirects)
+        self.assertTrue('portal.ddsc.nl' in redirects)
 
     def test_redirects2(self):
         result = list(apache.extract_sites(self.redirect_example))
@@ -100,4 +100,10 @@ class ApacheTestCase(TestCase):
         result = list(apache.extract_sites(self.redirect_example))
         pprint(result)
         redirects = [i['redirect_to'] for i in result]
-        self.assertTrue('http://waterschappenlimburg.lizard.net' in redirects)
+        self.assertTrue('waterschappenlimburg.lizard.net' in redirects)
+
+    def test_redirect_protocol(self):
+        result = [site for site in apache.extract_sites(self.redirect_example)
+                  if site['name'] == 'www.portal.ddsc.nl'][0]
+        pprint(result)
+        self.assertEquals(result['redirect_to_protocol'], 'https')

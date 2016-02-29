@@ -126,8 +126,8 @@ def extract_sites(filename):
                 # https://uploadservice.lizard.net$request_uri
                 redirect_to = something_with_http[0]
                 redirect_to = redirect_to.split('$')[0]
-                redirect_to = redirect_to.rstrip('/')
-                site['redirect_to'] = redirect_to
+                site['redirect_to'] = urlparse(redirect_to).hostname
+                site['redirect_to_protocol'] = urlparse(redirect_to).scheme
 
     if site:
         for site_name in site_names:
