@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.13 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Extracting protocol (http/https) for redirects, too.
+  [reinout]
 
 
 0.12 (2016-02-29)
