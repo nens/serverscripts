@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.13 (unreleased)
+0.13 (2016-02-29)
 -----------------
 
 - Extracting protocol (http/https) for redirects, too.
