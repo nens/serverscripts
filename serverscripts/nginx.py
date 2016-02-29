@@ -115,6 +115,20 @@ def extract_sites(filename):
                 logger.debug("Proxy to other server: %s", parsed.hostname)
                 site['proxy_to_other_server'] = parsed.hostname
 
+        elif line.startswith('return'):
+            if not ('301' in line) and not ('302' in line):
+                logger.info("Return line without 301/302 code: %s", line)
+                continue
+            parts = line.split()
+            something_with_http = [part for part in parts
+                                   if part.startswith('http')]
+            if something_with_http:
+                # https://uploadservice.lizard.net$request_uri
+                redirect_to = something_with_http[0]
+                redirect_to = redirect_to.split('$')[0]
+                redirect_to = redirect_to.rstrip('/')
+                site['redirect_to'] = redirect_to
+
     if site:
         for site_name in site_names:
             # Yield one complete site object per name.
