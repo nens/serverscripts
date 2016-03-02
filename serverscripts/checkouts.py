@@ -19,6 +19,7 @@ import sys
 
 import pkg_resources
 
+
 SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
     origin            # We want the origin remote.
@@ -52,6 +53,7 @@ def git_info(directory):
 
     sub = subprocess.Popen('git remote -v', cwd=directory, shell=True,
                            stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
                            universal_newlines=True)
     for line in sub.communicate():
         if not line:
@@ -67,6 +69,7 @@ def git_info(directory):
         logger.debug("Git repo found: %s", data['url'])
     sub = subprocess.Popen('git status', cwd=directory, shell=True,
                            stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
                            universal_newlines=True)
     output, errors = sub.communicate()
     output = output.lower()
@@ -76,6 +79,7 @@ def git_info(directory):
     else:
         sub = subprocess.Popen('git describe', cwd=directory, shell=True,
                                stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
                                universal_newlines=True)
         first_line = sub.communicate()[0]
         data['release'] = first_line.strip()
@@ -117,11 +121,16 @@ def eggs_info(directory):
         sub = subprocess.Popen('%s --version' % python_executable,
                                cwd=directory,
                                shell=True,
+                               stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                universal_newlines=True)
         output, error = sub.communicate()
-        python_version = error.strip().split()[1]
-        # ^^^ stderr outputs "Python 2.7.10"
+        output = output + error
+        try:
+            python_version = output.strip().split()[1]
+            # ^^^ stdout (3) / stderr (2) outputs "Python 2.7.10"
+        except IndexError:
+            python_version = 'UNKNOWN'
         logger.debug("Python version used: %s", python_version)
 
     # reset sys.path
