@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.15 (unreleased)
+0.15 (2016-03-02)
 -----------------
 
 - Deleting 'Python' key from the returned eggs. It is set, somehow, to the
