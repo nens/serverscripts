@@ -5,7 +5,10 @@ Changelog of serverscripts
 0.15 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Deleting 'Python' key from the returned eggs. It is set, somehow, to the
+  version we run serverscripts with. Instead of the python version we want to
+  detect. This last one is stored under the lowercase 'python' key.
+  [reinout]
 
 
 0.14 (2016-03-02)
