@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.14 (unreleased)
+0.14 (2016-03-02)
 -----------------
 
 - Better python version detection. It doesn't crash anymore when there's no
