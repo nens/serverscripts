@@ -143,6 +143,8 @@ def eggs_info(directory):
             continue
         info = info[0]
         eggs[info.project_name] = info.version
+    if 'Python' in eggs:
+        del eggs['Python']  # This is the version we run with, it seems.
     eggs['python'] = python_version
     return eggs
 
