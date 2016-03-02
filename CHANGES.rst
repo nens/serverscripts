@@ -5,7 +5,10 @@ Changelog of serverscripts
 0.14 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Better python version detection. It doesn't crash anymore when there's no
+  result. And it reads both stderr and stdout. Python 2 and 3 differ which
+  stream they output their version to...
+  [reinout]
 
 
 0.13 (2016-02-29)
