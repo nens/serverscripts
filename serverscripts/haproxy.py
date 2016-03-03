@@ -13,15 +13,30 @@ import sys
 from six.moves.urllib.parse import urlparse
 
 HAPROXY_CFG = '/etc/haproxy/haproxy.cfg'
-SERVER_START = re.compile(r"""
-    ^<virtualhost    # '<virtualhost' at the start of the line.
-    .*$              # Whatever till the end of line.
+SITE = re.compile(r"""
+    ^acl                   # 'acl' at the start of the line.
+    \s+                    # Whitespace.
+    host_(?P<backend>\S+)  # 'host_nxt' returns 'nxt' as backend.
+    \s+                    # Whitespace.
+    .*                     # Whatever.
+    \s+                    # Whitespace.
+    (?P<sitename>\S+)$     # Sitename at the end of the line.
     """, re.VERBOSE)
+BACKEND_START = re.compile(r"""
+    ^backend                  # 'backend' at the start of the line.
+    \s+                       # Whitespace.
+    (?P<backend>\S+)_cluster$ # 'nxt_cluster' returns 'nxt' as backend.
+    """, re.VERBOSE)
+SERVER = re.compile(r"""
+    ^server                # 'server' at the start of the line.
+    \s+                    # Whitespace.
+    (?P<server>\S+)        # Server name.
+    \s+                    # Whitespace.
+    .*$                    # Whatever till the end of the line.
+    """, re.VERBOSE)
+
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'haproxys.fact')
-SITE_TEMPLATE = {'name': '',
-                 'protocol': 'http',
-}
 
 
 logger = logging.getLogger(__name__)
@@ -34,130 +49,51 @@ def extract_sites(filename):
     lines = [line.strip().lower() for line in lines]
     lines = [line for line in lines
              if line and not line.startswith('#')]
-    site = None
-    site_names = []
+
+    # First grab the {sitename: backend} info
+    sitenames_with_backend = {}
     for line in lines:
-        if SERVER_START.match(line):
-            if site:
+        if SITE.match(line):
+            match = SITE.search(line)
+            sitenames_with_backend[
+                match.group('sitename')] = match.group('backend')
+
+    # Then collect {backend: [servers]} info
+    backends_with_servers = {}
+    backend = None
+    servers = []
+    for line in lines:
+        if BACKEND_START.match(line):
+            match = BACKEND_START.search(line)
+            if backend:
+                # First store existing one.
                 # Note: keep in sync with last lines in this function!
-                for site_name in site_names:
-                    # Yield one complete site object per name.
-                    site['name'] = site_name
-                    logger.debug("Returning site %s", site_name)
-                    yield site
-            logger.debug("Starting new site...")
-            site = copy.deepcopy(SITE_TEMPLATE)
-            site_names = []
-            # Extract xxxxxxxx
-            if '80' in line:
-                site['protocol'] = 'http'
-            elif '443' in line:
-                site['protocol'] = 'https'
-            else:
-                logger.error("<Virtualhost> line without proper port: %s", line)
+                backends_with_servers[backend] = servers
+
+            backend = match.group('backend')
+            servers = []
+            logger.debug("Starting new backend' %s'", backend)
             continue
 
-        if not site:
+        if not backend:
             # Not ready to start yet.
             continue
-        if line.startswith('servername') or line.startswith('serveralias'):
-            line = line.replace(',', ' ')
-            parts = line.split()
-            site_names += [part for part in parts[1:] if part]
-            site_names = [site_name.replace(':443', '').replace(':80', '')
-                          for site_name in site_names]
 
-        elif line.startswith('documentroot') or line.startswith('customlog'):
-            # Assumption: doc root or custom log is in the buildout directory
-            # where our site is, so something like
-            # /srv/DIRNAME/var/log/access.log.
-            #
-            # Format is like this:
-            # CustomLog /srv/somewhere/var/log/access.log combined
-            #
-            # DocumentRoot /srv/serverinfo.lizard.net/var/info
-            line_parts = [part for part in line.split() if part]
-            where = line_parts[1]
-            path_parts = where.split('/')
-            if path_parts[1] != 'srv':
-                logger.warn(
-                    "logfile or doc root line without a dir inside /srv: %s",
-                    line)
-                continue
-            buildout_directory = path_parts[2]
-            logger.debug(
-                "Found log or doc root pointing to a /srv dir: /srv/%s",
-                buildout_directory)
-            site['related_checkout'] = buildout_directory
+        match = SERVER.search(line)
+        if match:
+            servers.append(match.group('server'))
 
-        elif line.startswith('proxypass'):
-            parts = line.split()
-            something_with_http = [part for part in parts
-                                   if part.startswith('http')]
-            if something_with_http:
-                proxied_to = something_with_http[0]
-                proxied_to = proxied_to.replace('$1', '')
-                parsed = urlparse(proxied_to)
-                if parsed.hostname == 'localhost':
-                    logger.warn(
-                        "Proxy to localhost port %s, we'd expect mod_wsgi...",
-                        parsed.port)
-                    site['proxy_to_local_port'] = str(parsed.port)
-                else:
-                    logger.debug("Proxy to other server: %s", parsed.hostname)
-                    site['proxy_to_other_server'] = parsed.hostname
+        if line.startswith('listen'):
+            # We're done!
+            backends_with_servers[backend] = servers
+            break
 
-        elif line.startswith('redirect'):
-            parts = line.split()
-            parts = [part for part in parts if part]
-            if len(parts) < 3:
-                logger.warn("Redirect line with fewer than 3 parts: %s", line)
-                continue
-            if ('410'  in parts[1]) or ('gone' in parts[1]):
-                site['redirect_to'] = 'GONE'
-                continue
-            if parts[2] != '/':
-                logger.info("Redirect doesn't redirect the root: %s", line)
-                continue
-            something_with_http = [part for part in parts
-                                   if part.startswith('http')]
-            if something_with_http:
-                redirect_to = something_with_http[0]
-                site['redirect_to'] = urlparse(redirect_to).hostname
-                site['redirect_to_protocol'] = urlparse(redirect_to).scheme
-            else:
-                logger.warn(
-                    "Redirect without recognizable http(s) target: %s",
-                    line)
-        elif line.startswith('rewriterule'):
-            parts = line.split()
-            parts = [part for part in parts if part]
-            parts = [part.replace('"', '').replace("'", '') for part in parts]
-            if len(parts) < 3:
-                logger.warn("Rewriterule line with fewer than 3 parts: %s",
-                            line)
-                continue
-            if parts[1] != '^(.*)':
-                logger.info("Rewriterule doesn't redirect the root: %s", line)
-                continue
-            something_with_http = [part for part in parts
-                                   if part.startswith('http')]
-            if something_with_http:
-                redirect_to = something_with_http[0]
-                redirect_to = redirect_to.rstrip('$1')
-                site['redirect_to'] = urlparse(redirect_to).hostname
-                site['redirect_to_protocol'] = urlparse(redirect_to).scheme
-            else:
-                logger.warn(
-                    "Redirect without recognizable http(s) target: %s",
-                    line)
-
-    if site:
-        for site_name in site_names:
-            # Yield one complete site object per name.
-            site['name'] = site_name
-            logger.debug("Returning site %s", site_name)
-            yield copy.deepcopy(site)
+    # Now we're ready to return sites. One site per backend.
+    for sitename, backend in sitenames_with_backend.items():
+        for server in backends_with_servers[backend]:
+            yield {'name': sitename,
+                   'protocol': 'http',  # Hardcoded
+                   'proxy_to_other_server': server}
 
 
 def main():

@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.16 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Extracting info from haproxy.
+  [reinout]
 
 
 0.15 (2016-03-02)
