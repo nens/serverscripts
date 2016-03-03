@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.16 (unreleased)
+0.16 (2016-03-03)
 -----------------
 
 - Extracting info from haproxy.
