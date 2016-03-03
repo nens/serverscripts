@@ -44,5 +44,6 @@ setup(name='serverscripts',
               'checkout-info = serverscripts.checkouts:main',
               'nginx-info = serverscripts.nginx:main',
               'apache-info = serverscripts.apache:main',
+              'haproxy-info = serverscripts.haproxy:main',
           ]},
       )
