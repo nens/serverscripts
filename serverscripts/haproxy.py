@@ -192,21 +192,17 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
         logger.info("Created %s", OUTPUT_DIR)
-    if not os.path.exists(HAPROXY_DIR):
+    if not os.path.exists(HAPROXY_CFG):
         return
-    for conf_filename in os.listdir(HAPROXY_DIR):
-        if conf_filename.startswith('.'):
+    for site_info in extract_sites(HAPROXY_CFG):
+        name = site_info['name']
+        protocol = site_info['protocol']  # http or https
+        key = '_'.join([name, protocol])
+        if key in result:
+            logger.error("Haproxy %s site %s from %s is already known",
+                         protocol, name, HAPROXY_CFG)
+            # TODO: record this as an error for zabbix
             continue
-        for site_info in extract_sites(os.path.join(HAPROXY_DIR,
-                                                    conf_filename)):
-            name = site_info['name']
-            protocol = site_info['protocol']  # http or https
-            key = '_'.join([name, protocol])
-            if key in result:
-                logger.error("Haproxy %s site %s from %s is already known",
-                             protocol, name, conf_filename)
-                # TODO: record this as an error for zabbix
-                continue
 
-            result[key] = site_info
+        result[key] = site_info
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
