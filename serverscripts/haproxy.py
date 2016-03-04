@@ -55,20 +55,25 @@ def extract_sites(filename):
     for line in lines:
         if SITE.match(line):
             match = SITE.search(line)
-            sitenames_with_backend[
-                match.group('sitename')] = match.group('backend')
+            sitename = match.group('sitename')
+            backend_name = match.group('backend')
+            logger.debug("Found site %s with backend %s",
+                         sitename, backend_name)
+            sitenames_with_backend[sitename] = backend_name
 
     # Then collect {backend: [servers]} info
     backends_with_servers = {}
     backend = None
     servers = []
     for line in lines:
-        if BACKEND_START.match(line):
-            match = BACKEND_START.search(line)
+        match = BACKEND_START.search(line)
+        if match:
             if backend:
                 # First store existing one.
                 # Note: keep in sync with last lines in this function!
                 backends_with_servers[backend] = servers
+                logger.debug("Adding servers %s to backend %s",
+                             servers, backend)
 
             backend = match.group('backend')
             servers = []
@@ -86,6 +91,8 @@ def extract_sites(filename):
         if line.startswith('listen'):
             # We're done!
             backends_with_servers[backend] = servers
+            logger.debug("Adding servers %s to backend %s",
+                         servers, backend)
             break
 
     # Now we're ready to return sites. One site per backend.
