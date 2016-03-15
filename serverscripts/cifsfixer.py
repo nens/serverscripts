@@ -12,6 +12,8 @@ Goal copy/pasted from trac (https://office.lizard.net/trac/ticket/4272)::
         unmount plaatsvinden en daarna weer een mount.
 
 """
+from logging.handlers import RotatingFileHandler
+
 import argparse
 import logging
 import os
@@ -229,7 +231,7 @@ def main():
     logging.basicConfig(level=loglevel,
                         format="%(levelname)s: %(message)s")
 
-    file_handler = logging.RotatingFileHandler(
+    file_handler = RotatingFileHandler(
         LOGFILE, mode='a', maxBytes=1000000, backupCount=3)
     long_formatter = logging.Formatter(
         fmt="%(asctime)s %(levelname)s: %(message)s")
