@@ -155,7 +155,8 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
 
     """
     num_errors = 0
-    for local_folder, cifs_share in fstab_mounts.items():
+    for local_folder, share_info in fstab_mounts.items():
+        cifs_share = share_info['cifs_share']
         # Check if it is mounted.
         if local_folder not in mtab_mounts:
             logger.error("Error: %s is not mounted (%s), mounting it...",
@@ -181,7 +182,8 @@ def check_if_mounted(fstab_mounts, mtab_mounts):
 def check_unknown_mounts(fstab_mounts, mtab_mounts):
     """Return number of unknown cifs mounts"""
     num_warnings = 0
-    for local_folder, cifs_share in mtab_mounts.items():
+    for local_folder, share_info in mtab_mounts.items():
+        cifs_share = share_info['cifs_share']
         # Check if it is mounted.
         if local_folder not in fstab_mounts:
             logger.warn(
