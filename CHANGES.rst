@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.17 (unreleased)
+0.17 (2016-03-15)
 -----------------
 
 - Including ``six.py``. We don't want **any** external dependency.
