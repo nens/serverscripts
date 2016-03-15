@@ -183,14 +183,14 @@ def main():
         logger.info("Created %s", OUTPUT_DIR)
     for name in os.listdir(SRV_DIR):
         directory = os.path.join(SRV_DIR, name)
-        if not os.path.exists(os.path.join(directory, 'buildout.cfg')):
-            logger.warn("/srv directory without buildout.cfg: %s", directory)
-            continue
         checkout = {}
         checkout['name'] = name
         checkout['directory'] = directory
-        checkout['eggs'] = eggs_info(directory)
         checkout['git'] = git_info(directory)
+        if not os.path.exists(os.path.join(directory, 'buildout.cfg')):
+            logger.warn("/srv directory without buildout.cfg: %s", directory)
+            continue
+        checkout['eggs'] = eggs_info(directory)
 
         # TODO: diffsettings
         # TODO: git status
