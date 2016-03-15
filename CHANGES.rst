@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.19 (unreleased)
+0.19 (2016-03-15)
 -----------------
 
 - Cifsfixer now additionally outputs its cifs knowledge as a fact file for
