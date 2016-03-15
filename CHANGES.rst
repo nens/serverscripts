@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.19 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Cifsfixer now additionally outputs its cifs knowledge as a fact file for
+  serverinfo.
+  [reinout]
 
 
 0.18 (2016-03-15)
