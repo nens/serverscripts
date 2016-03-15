@@ -5,7 +5,12 @@ Changelog of serverscripts
 0.17 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Including ``six.py``. We don't want **any** external dependency.
+  [reinout]
+
+- Extracting git info from ``/srv/`` directories even when there's no
+  ``buildout.cfg``.
+  [reinout]
 
 
 0.16 (2016-03-03)
