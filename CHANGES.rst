@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.18 (unreleased)
+0.18 (2016-03-15)
 -----------------
 
 - Working RotatingFileHandler import...
