@@ -65,20 +65,20 @@ class CheckerTestCase(TestCase):
         self.assertEquals(0, cifsfixer.check_if_mounted({}, {}))
 
     def test_matching_mounts(self):
-        mounts = {'/some/folder': 'some//cifs'}
+        mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked:
             mocked.return_value = True
             self.assertEquals(0, cifsfixer.check_if_mounted(mounts, mounts))
 
     def test_mounting_missing_mount(self):
-        fstab_mounts = {'/some/folder': 'some//cifs'}
+        fstab_mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         mtab_mounts = {}
         with patch('serverscripts.cifsfixer._mount') as mocked:
             cifsfixer.check_if_mounted(fstab_mounts, mtab_mounts)
             self.assertTrue(mocked.called)
 
     def test_not_mounting_if_ok(self):
-        fstab_mounts = {'/some/folder': 'some//cifs'}
+        fstab_mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         mtab_mounts = fstab_mounts
         with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked1:
             mocked1.return_value = True
@@ -87,7 +87,7 @@ class CheckerTestCase(TestCase):
                 self.assertFalse(mocked2.called)
 
     def test_re_mounting_if_inaccessible(self):
-        fstab_mounts = {'/some/folder': 'some//cifs'}
+        fstab_mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         mtab_mounts = fstab_mounts
         with patch('serverscripts.cifsfixer._is_folder_accessible') as mocked1:
             mocked1.return_value = False
@@ -131,7 +131,7 @@ class UtilsTestCase(TestCase):
             # message.
 
     def test_check_unkown_mounts1(self):
-        fstab_mounts = {'/some/folder': 'some//cifs'}
+        fstab_mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         mtab_mounts = {}
         # Additional fstab mounts are not *our* problem.
         self.assertEquals(0, cifsfixer.check_unknown_mounts(
@@ -139,6 +139,6 @@ class UtilsTestCase(TestCase):
 
     def test_check_unkown_mounts2(self):
         fstab_mounts = {}
-        mtab_mounts = {'/some/folder': 'some//cifs'}
+        mtab_mounts = {'/some/folder': {'cifs_share': 'some//cifs'}}
         self.assertEquals(1, cifsfixer.check_unknown_mounts(
             fstab_mounts, mtab_mounts))
