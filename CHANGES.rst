@@ -12,6 +12,10 @@ Changelog of serverscripts
   ``buildout.cfg``.
   [reinout]
 
+- Extracting cifs options, for instance the username from the cifs credentials
+  file, if available.
+  [reinout]
+
 
 0.16 (2016-03-03)
 -----------------
