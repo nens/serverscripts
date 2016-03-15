@@ -229,7 +229,7 @@ def main():
     logging.basicConfig(level=loglevel,
                         format="%(levelname)s: %(message)s")
 
-    file_handler = logging.handlers.RotatingFileHandler(
+    file_handler = logging.RotatingFileHandler(
         LOGFILE, mode='a', maxBytes=1000000, backupCount=3)
     long_formatter = logging.Formatter(
         fmt="%(asctime)s %(levelname)s: %(message)s")
