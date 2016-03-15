@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.18 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Working RotatingFileHandler import...
+  [reinout]
 
 
 0.17 (2016-03-15)
