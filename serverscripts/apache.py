@@ -10,7 +10,7 @@ import re
 import serverscripts
 import sys
 
-from six.moves.urllib.parse import urlparse
+from serverscripts.six.moves.urllib.parse import urlparse
 
 APACHE_DIR = '/etc/apache2/sites-enabled'
 SERVER_START = re.compile(r"""

@@ -10,7 +10,7 @@ import re
 import serverscripts
 import sys
 
-from six.moves.urllib.parse import urlparse
+from serverscripts.six.moves.urllib.parse import urlparse
 
 NGINX_DIR = '/etc/nginx/sites-enabled'
 GIT_URL = re.compile(r"""
