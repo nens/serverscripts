@@ -15,6 +15,7 @@ Goal copy/pasted from trac (https://office.lizard.net/trac/ticket/4272)::
 from logging.handlers import RotatingFileHandler
 
 import argparse
+import json
 import logging
 import os
 import re
@@ -25,6 +26,8 @@ import time
 
 LOGFILE = '/var/log/cifsfixer.log'
 VAR_DIR = '/var/local/serverscripts'
+OUTPUT_DIR = '/var/local/serverinfo-facts'
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'cifss.fact')
 FSTAB = '/etc/fstab'
 MTAB = '/etc/mtab'
 CIFS_PATTERN = re.compile(r"""
@@ -263,6 +266,13 @@ def main():
     open(warningsfile, 'w').write(str(num_warnings))
     errorsfile = os.path.join(VAR_DIR, 'nens.cifschecker.errors')
     open(errorsfile, 'w').write(str(num_errors))
+
+    # Write facts for serverinfo.
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+        logger.info("Created %s", OUTPUT_DIR)
+    open(OUTPUT_FILE, 'w').write(json.dumps(
+        fstab_mounts, sort_keys=True, indent=4))
 
     if num_errors == 0:
         logger.info("Everything OK with the mounts: %s",
