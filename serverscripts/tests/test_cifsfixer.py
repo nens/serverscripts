@@ -17,35 +17,45 @@ class TabfileTestCase(TestCase):
             'example_fstab_with_duplicate_mount')
         self.mtab = resource_filename('serverscripts.tests',
                                       'example_mtab')
+        self.credentials = resource_filename(
+            'serverscripts.tests', 'example_cifs_credentials')
 
     def test_fstab(self):
-        expected = {'/some/mount': '//someserver/somewhere'}
+        expected = {'/some/mount': {
+            'cifs_share': '//someserver/somewhere',
+            'options': {'credentials': '/etc/blabla.txt',
+                        'iocharset': 'utf8'}}}
         # So: only cifs mounts are returned and commented-out cifs mounts are
         # ignored.
         self.assertEquals(expected, cifsfixer._cifs_lines(self.fstab)[0])
 
     def test_fstab_with_duplicate_mount_point(self):
-        expected = {'/some/mount': '//someserver/something'}
+        result = cifsfixer._cifs_lines(
+            self.fstab_with_duplicate_mount_point)[0]
         # In case of duplicates, the second one wins. A warning is logged (but
         # we don't test that here).
-        self.assertEquals(
-            expected,
-            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount_point)[0])
+        self.assertEquals(result['/some/mount']['cifs_share'],
+                          '//someserver/something')
 
     def test_fstab_with_duplicate_mount(self):
-        expected = {'/some/mount1': '//someserver/somewhere',
-                    '/some/mount2': '//someserver/somewhere'}
+        expected_keys = ['/some/mount1', '/some/mount2']
         # In case of a file system that is mounted in two places, both are
         # returned. A warning is logged, but we don't test that here).
         self.assertEquals(
-            expected,
-            cifsfixer._cifs_lines(self.fstab_with_duplicate_mount)[0])
+            expected_keys,
+            sorted(
+                cifsfixer._cifs_lines(
+                    self.fstab_with_duplicate_mount)[0].keys()))
 
     def test_mtab(self):
-        expected = {'/some/mount': '//someserver/somewhere'}
+        expected = {'/some/mount': {'cifs_share': '//someserver/somewhere'}}
         # So: only cifs mounts are returned and commented-out cifs mounts are
         # ignored.
         self.assertEquals(expected, cifsfixer._cifs_lines(self.mtab)[0])
+
+    def test_username_extraction(self):
+        self.assertEquals('some_user',
+                          cifsfixer._extract_username(self.credentials))
 
 
 class CheckerTestCase(TestCase):

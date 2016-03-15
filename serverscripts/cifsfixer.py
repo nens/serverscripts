@@ -33,7 +33,7 @@ CIFS_PATTERN = re.compile(r"""
 \s+                        # Whitespace
 cifs                       # We're only interested in cifs mounts
 \s+                        # Whitespace
-.+$                        # Rest of the line until the end.
+(?P<rest>.+)$              # Rest of the line until the end.
 """, re.VERBOSE)
 
 logger = logging.getLogger(__name__)
@@ -51,8 +51,19 @@ def _cifs_lines(tabfile):
         line = line.strip()
         match = CIFS_PATTERN.search(line)
         if match:
+            share = {}
             local_folder = match.group('local_folder')
             cifs_share = match.group('cifs_share')
+            share['cifs_share'] = cifs_share
+            rest = match.group('rest')
+            options_part = rest.split()[0]
+            options = _extract_options(options_part)
+            if options:
+                share['options'] = options
+            if 'credentials' in options:
+                username = _extract_username(options['credentials'])
+                if username:
+                    share['username'] = username
             logger.debug("Found mount in %s: %s (%s)",
                          tabfile, local_folder, cifs_share)
             if local_folder in result:
@@ -62,8 +73,35 @@ def _cifs_lines(tabfile):
                 num_warnings += 1
                 logger.warning("cifs share %s is already mounted elsewhere",
                                cifs_share)
-            result[local_folder] = cifs_share
+            result[local_folder] = share
     return result, num_warnings
+
+
+def _extract_options(line_part):
+    """Return k/v options found in the part of the line
+
+    The part of the line looks like k=v,k=v,k=2 ."""
+    result = {}
+    pairs = line_part.split(',')
+    for pair in pairs:
+        if '=' not in pair:
+            continue
+        parts = pair.split('=')
+        key = parts[0].strip()
+        value = parts[1].strip()
+        result[key] = value
+    return result
+
+
+def _extract_username(filename):
+    """Return username (if found) from the credentials"""
+    if not os.path.exists(filename):
+        logger.warn("Cifs credentials file %s does not exist", filename)
+        return
+    for line in open(filename):
+        if ('username' in line) and ('=' in line):
+            username = line.split('=')[1]
+            return username.strip()
 
 
 def _mount(local_folder):
