@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.20 (unreleased)
+0.20 (2016-03-17)
 -----------------
 
 - Added ``bin/gather-all-info script`` so that we only need one cronjob
