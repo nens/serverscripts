@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.22 (unreleased)
+0.22 (2016-03-17)
 -----------------
 
 - Writing string to file (instead of an int).
