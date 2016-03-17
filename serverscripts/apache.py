@@ -213,4 +213,4 @@ def main():
             result[key] = site_info
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
     zabbix_file = os.path.join(VAR_DIR, 'nens.duplicate_apache_sites.warnings')
-    open(zabbix_file, 'w').write(num_errors)
+    open(zabbix_file, 'w').write(str(num_errors))

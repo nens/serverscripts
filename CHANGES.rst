@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.22 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Writing string to file (instead of an int).
+  [reinout]
 
 
 0.21 (2016-03-17)
