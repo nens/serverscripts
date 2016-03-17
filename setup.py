@@ -13,6 +13,9 @@ install_requires = [
     #
     # We're being installed on servers and we don't want to pollute the
     # system-wide python lib directory with dependencies.
+    #
+    # Not even 'six' or 'requests' is allowed. (Note: six.py is included as a
+    # file!)
     ],
 
 tests_require = [
