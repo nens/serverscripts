@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.21 (unreleased)
+0.21 (2016-03-17)
 -----------------
 
 - Writing number of duplicate apache/ngix sites to a zabbix-readable file.
