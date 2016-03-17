@@ -48,5 +48,7 @@ setup(name='serverscripts',
               'nginx-info = serverscripts.nginx:main',
               'apache-info = serverscripts.apache:main',
               'haproxy-info = serverscripts.haproxy:main',
+              # The one below runs all above ones, except for cifsfixer
+              'gather-all-info = serverscripts.script:main',
           ]},
       )
