@@ -12,6 +12,7 @@ import sys
 
 from serverscripts.six.moves.urllib.parse import urlparse
 
+VAR_DIR = '/var/local/serverscripts'
 APACHE_DIR = '/etc/apache2/sites-enabled'
 SERVER_START = re.compile(r"""
     ^<virtualhost    # '<virtualhost' at the start of the line.
@@ -194,6 +195,7 @@ def main():
         logger.info("Created %s", OUTPUT_DIR)
     if not os.path.exists(APACHE_DIR):
         return
+    num_errors = 0
     for conf_filename in os.listdir(APACHE_DIR):
         if conf_filename.startswith('.'):
             continue
@@ -205,7 +207,10 @@ def main():
             if key in result:
                 logger.error("Apache %s site %s from %s is already known",
                              protocol, name, conf_filename)
+                num_errors += 1
                 continue
 
             result[key] = site_info
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    zabbix_file = os.path.join(VAR_DIR, 'nens.duplicate_apache_sites.warnings')
+    open(zabbix_file, 'w').write(num_errors)
