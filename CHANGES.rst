@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.21 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Writing number of duplicate apache/ngix sites to a zabbix-readable file.
+  [reinout]
 
 
 0.20 (2016-03-17)
