@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.28 (unreleased)
+0.28 (2016-03-21)
 -----------------
 
 - Return database size in bytes. That looks way better in zabbix. Otherwise
