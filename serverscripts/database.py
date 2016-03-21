@@ -36,7 +36,7 @@ def _postgres_version():
 
 def _database_sizes():
     """Return dict with {database name: database size}"""
-    query = ("select datname, pg_database_size(datname)/1024/1024 "
+    query = ("select datname, pg_database_size(datname) "
              "from pg_database;")
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
     sub = subprocess.Popen(command,
@@ -59,7 +59,8 @@ def _database_sizes():
             continue
         size = int(size)
         result[name] = size
-        logger.info("Found database %s with size %s MB", name, size)
+        logger.info("Found database %s with size %s (%s MB)",
+                    name, size, size / 1024 / 1024)
     return result
 
 
