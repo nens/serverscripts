@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.26 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- More fixing.
 
 
 0.25 (2016-03-21)
