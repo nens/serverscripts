@@ -1,4 +1,3 @@
-from mock import patch
 from serverscripts import checkouts
 from unittest import TestCase
 

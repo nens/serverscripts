@@ -2,15 +2,12 @@
 
 """
 import argparse
-import copy
 import json
 import logging
 import os
 import re
 import serverscripts
 import sys
-
-from serverscripts.six.moves.urllib.parse import urlparse
 
 HAPROXY_CFG = '/etc/haproxy/haproxy.cfg'
 SITE = re.compile(r"""
