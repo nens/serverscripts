@@ -1,9 +1,7 @@
-from pprint import pprint
 from serverscripts import database
 from unittest import TestCase
 
 import mock
-import os
 
 
 class DatabaseTestCase(TestCase):

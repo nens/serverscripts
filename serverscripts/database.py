@@ -5,22 +5,14 @@ import argparse
 import json
 import logging
 import os
-import re
 import serverscripts
 import subprocess
 import sys
 
 VAR_DIR = '/var/local/serverscripts'
 POSTGRES_DIR = '/etc/postgres/sites-enabled'
-SERVER_START = re.compile(r"""
-    ^<virtualhost    # '<virtualhost' at the start of the line.
-    .*$              # Whatever till the end of line.
-    """, re.VERBOSE)
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'databases.fact')
-SITE_TEMPLATE = {'name': '',
-                 'protocol': 'http',
-}
 
 
 logger = logging.getLogger(__name__)
