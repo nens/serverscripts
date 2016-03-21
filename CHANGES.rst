@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.28 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Return database size in bytes. That looks way better in zabbix. Otherwise
+  you get ``20.4 kMB`` or something like that.
+  [reinout]
 
 
 0.27 (2016-03-21)
