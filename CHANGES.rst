@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.24 (unreleased)
+0.24 (2016-03-21)
 -----------------
 
 - Added bin/database-info script.
