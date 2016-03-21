@@ -20,6 +20,7 @@ def main():
     for module in [serverscripts.checkouts,
                    serverscripts.nginx,
                    serverscripts.apache,
+                   serverscripts.database,
                    serverscripts.haproxy]:
         try:
             module.main()
