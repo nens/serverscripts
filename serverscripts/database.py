@@ -38,15 +38,17 @@ def _database_sizes():
     """Return dict with {database name: database size}"""
     query = ("select datname, pg_database_size(datname)/1024/1024 "
              "from pg_database;")
-    command = "sudo -u postgres psql -c '%s' --tuples_only" % query
+    command = "sudo -u postgres psql -c '%s' --tuples-only" % query
     sub = subprocess.Popen(command,
                            shell=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,
                            universal_newlines=True)
     output, error = sub.communicate()
+    if error:
+        logger.warn("Error output from psql command: %s", error)
     result = {}
-    for line in (output + error).split('\n'):
+    for line in output.split('\n'):
         if not '|' in line:
             continue
         parts = line.split('|')
