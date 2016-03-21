@@ -5,19 +5,22 @@ Changelog of serverscripts
 0.27 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fixed actual error: wrongly-named option.
+  [reinout]
 
 
 0.26 (2016-03-21)
 -----------------
 
 - More fixing.
+  [reinout]
 
 
 0.25 (2016-03-21)
 -----------------
 
 - More logging.
+  [reinout]
 
 
 0.24 (2016-03-21)
