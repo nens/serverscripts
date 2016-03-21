@@ -46,7 +46,7 @@ def _database_sizes():
                            universal_newlines=True)
     output, error = sub.communicate()
     result = {}
-    for line in output.split('\n'):
+    for line in (output + error).split('\n'):
         if not '|' in line:
             continue
         parts = line.split('|')
@@ -67,10 +67,11 @@ def all_info():
     result['version'] = _postgres_version()
     result['databases'] = _database_sizes()
 
-    # Info for zabbix.
-    result['num_databases'] = len(result['databases'])
-    result['total_databases_size'] = sum(result['databases'].values())
-    result['biggest_database_size'] = max(result['databases'].values() or 0)
+    if result['databases']:
+        # Info for zabbix.
+        result['num_databases'] = len(result['databases'])
+        result['total_databases_size'] = sum(result['databases'].values())
+        result['biggest_database_size'] = max(result['databases'].values())
 
     return result
 
