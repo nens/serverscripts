@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.27 (unreleased)
+0.27 (2016-03-21)
 -----------------
 
 - Fixed actual error: wrongly-named option.
