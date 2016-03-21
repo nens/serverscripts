@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.24 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added bin/database-info script.
+  [reinout]
 
 
 0.23 (2016-03-21)
