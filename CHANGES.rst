@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.23 (unreleased)
+0.23 (2016-03-21)
 -----------------
 
 - Extracting databases info from postgres, including postgres version and
