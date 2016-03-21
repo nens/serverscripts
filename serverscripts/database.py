@@ -42,12 +42,45 @@ def _postgres_version():
     return parts[0]
 
 
+def _database_sizes():
+    """Return dict with {database name: database size}"""
+    query = ("select datname, pg_database_size(datname)/1024/1024 "
+             "from pg_database;")
+    command = "sudo -u postgres psql -c '%s' --tuples_only" % query
+    sub = subprocess.Popen(command,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           universal_newlines=True)
+    output, error = sub.communicate()
+    result = {}
+    for line in output.split('\n'):
+        if not '|' in line:
+            continue
+        parts = line.split('|')
+        name = parts[0].strip()
+        size = parts[1].strip()  # in MB
+        if name.startswith('template') or name == 'postgres':
+            logger.debug("Omitting database %s", name)
+            continue
+        size = int(size)
+        result[name] = size
+    return result
+
+
 def all_info():
     """Return the info we want to extract from postgres + its databases"""
     result = {}
     result['version'] = _postgres_version()
+    result['databases'] = _database_sizes()
+
+    # Info for zabbix.
+    result['num_databases'] = len(result['databases'])
+    result['total_databases_size'] = sum(result['databases'].values())
+    result['biggest_database_size'] = max(result['databases'].values())
 
     return result
+
 
 def main():
     """Installed as bin/checkout-info"""
