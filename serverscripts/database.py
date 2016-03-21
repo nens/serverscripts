@@ -57,6 +57,7 @@ def _database_sizes():
             continue
         size = int(size)
         result[name] = size
+        logger.info("Found database %s with size %s MB", name, size)
     return result
 
 
@@ -69,7 +70,7 @@ def all_info():
     # Info for zabbix.
     result['num_databases'] = len(result['databases'])
     result['total_databases_size'] = sum(result['databases'].values())
-    result['biggest_database_size'] = max(result['databases'].values())
+    result['biggest_database_size'] = max(result['databases'].values() or 0)
 
     return result
 
