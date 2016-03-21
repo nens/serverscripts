@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.23 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Extracting databases info from postgres, including postgres version and
+  database sizes.
+  [reinout]
 
 
 0.22 (2016-03-17)
