@@ -4,6 +4,7 @@ Better than having 5 different cronjobs :-)"""
 
 import serverscripts.apache
 import serverscripts.checkouts
+import serverscripts.database
 import serverscripts.haproxy
 import serverscripts.nginx
 
