@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.30 (unreleased)
+0.30 (2016-03-22)
 -----------------
 
 - Returning databases as dict instead of only a number (=size).
