@@ -1,6 +1,7 @@
 from serverscripts import checkouts
 from unittest import TestCase
 
+import mock
 import os
 import sys
 
@@ -10,6 +11,8 @@ class GitAndEggInfoTestCase(TestCase):
     def setUp(self):
         self.our_dir = os.path.dirname(__file__)
         self.dir_with_git = os.path.join(self.our_dir, '..', '..')
+        self.example_diffsettings_output = open(os.path.join(
+            self.our_dir, 'example_diffsettings.txt')).read()
 
     def test_no_git_dir(self):
         self.assertEquals(checkouts.git_info(self.our_dir), None)
@@ -51,3 +54,10 @@ class GitAndEggInfoTestCase(TestCase):
         line = "origin	git@github.com:nens/ror-export (fetch)"
         match = checkouts.GIT_URL.search(line)
         self.assertEquals(match.group('user'), 'nens')
+
+    def test_django_info(self):
+        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
+            mock_communicate.return_value = (self.example_diffsettings_output,
+                                             "")
+            result = checkouts.django_info('some/bin/django')
+            self.assertEquals(len(result['databases']), 2)

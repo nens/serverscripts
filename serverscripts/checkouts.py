@@ -12,12 +12,12 @@ import copy
 import json
 import logging
 import os
+import pkg_resources
 import re
 import serverscripts
 import subprocess
 import sys
-
-import pkg_resources
+import tempfile
 
 
 SRV_DIR = '/srv/'
@@ -149,6 +149,33 @@ def eggs_info(directory):
     return eggs
 
 
+def django_info(bin_django):
+    result = {'databases': []}
+    command = "sudo -u buildout %s diffsettings" % bin_django
+    sub = subprocess.Popen(command,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           universal_newlines=True)
+    output, error = sub.communicate()
+    if error:
+        logger.warn("Error output from psql command: %s", error)
+    dont_care, tempfile_name = tempfile.mkstemp()
+    open(tempfile_name, 'w').write(output)
+    global_env = {}
+    settings = {}
+    execfile(tempfile_name, global_env, settings)
+    for database in settings.get('DATABASES', {}).values():
+        result['databases'].append({'name': database.get('NAME'),
+                                    'host': database.get('HOST'),
+                                    'user': database.get('USER'),
+                                    'engine': database.get('ENGINE')})
+    result['debug_mode'] = ('DEBUG' in settings)
+    result['settings_module'] = settings['SETTINGS_MODULE']
+    os.remove(tempfile_name)
+    return result
+
+
 def main():
     """Installed as bin/checkout-info"""
     parser = argparse.ArgumentParser()
@@ -187,14 +214,16 @@ def main():
         checkout['name'] = name
         checkout['directory'] = directory
         checkout['git'] = git_info(directory)
-        if not os.path.exists(os.path.join(directory, 'buildout.cfg')):
+        if os.path.exists(os.path.join(directory, 'buildout.cfg')):
+            checkout['eggs'] = eggs_info(directory)
+        else:
             logger.warn("/srv directory without buildout.cfg: %s", directory)
-            continue
-        checkout['eggs'] = eggs_info(directory)
 
-        # TODO: diffsettings
-        # TODO: git status
-        # ^^^ Perhaps in separate checker?
+        bin_django = os.path.join(directory, 'bin', 'django')
+        if os.path.exists(bin_django):
+            checkout['django'] = django_info(bin_django)
+        else:
+            logger.debug("No django script found: %s", bin_django)
 
         result[name] = checkout
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
