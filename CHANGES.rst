@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.31 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Extracting DB info from django sites.
+  [reinout]
 
 
 0.30 (2016-03-22)
