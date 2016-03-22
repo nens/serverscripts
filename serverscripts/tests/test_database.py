@@ -8,19 +8,19 @@ class DatabaseTestCase(TestCase):
 
     def setUp(self):
         self.sizes_output = """
-        template1                  |        6
-        template0                  |        6
-        postgres                   |        6
-        lizard_nxt                 |     2207
-        template_postgis           |       11
-        efcis_site2                |     1781
-        uploadserver_site_redesign |       88
-        bluegold-staging           |       22
-        lizard5-staging-default    |       22
-        deltaportaal2              |       49
-        efcis_site                 |      575
-        uploadserver_site          |      118
-        flooding                   |      731"""
+        template1                  |        6000000
+        template0                  |        6000000
+        postgres                   |        6000000
+        lizard_nxt                 |     2207000000
+        template_postgis           |       11000000
+        efcis_site2                |     1781000000
+        uploadserver_site_redesign |       88000000
+        bluegold-staging           |       22000000
+        lizard5-staging-default    |       22000000
+        deltaportaal2              |       49000000
+        efcis_site                 |      575000000
+        uploadserver_site          |      118000000
+        flooding                   |      731000000"""
 
     def test_available(self):
         database.is_postgres_available()
@@ -32,27 +32,30 @@ class DatabaseTestCase(TestCase):
                                              "")
             self.assertEquals("9.3", database._postgres_version())
 
-    def test_database_sizes1(self):
+    def test_database_info(self):
         with mock.patch('subprocess.Popen.communicate') as mock_communicate:
             mock_communicate.return_value = (self.sizes_output,
                                              "")
-            self.assertEquals(9, len(database._database_sizes()))
+            self.assertEquals(9, len(database._database_infos()))
 
-    def test_database_sizes2(self):
+    def test_database_info(self):
         with mock.patch('subprocess.Popen.communicate') as mock_communicate:
             mock_communicate.return_value = (self.sizes_output,
                                              "")
-            self.assertEquals(database._database_sizes()['lizard_nxt'],
-                              2207)
+            self.assertEquals(
+                database._database_infos()['lizard_nxt']['size'],
+                2207000000)
 
     def test_all_info(self):
         with mock.patch(
                 'serverscripts.database._postgres_version') as mock_version:
             with mock.patch(
-                    'serverscripts.database._database_sizes') as mock_sizes:
+                    'serverscripts.database._database_infos') as mock_infos:
                 mock_version.return_value = '2.0'
-                mock_sizes.return_value = {'reinout': 20,
-                                           'alexandr': 40}
+                mock_infos.return_value = {'reinout': {'name': 'reinout',
+                                                       'size': 20},
+                                           'alexandr': {'name': 'reinout',
+                                                        'size': 40}}
                 result = database.all_info()
                 self.assertEquals(result['version'], '2.0')
                 self.assertEquals(result['num_databases'], 2)

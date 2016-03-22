@@ -2,6 +2,7 @@
 
 """
 import argparse
+import copy
 import json
 import logging
 import os
@@ -13,7 +14,8 @@ VAR_DIR = '/var/local/serverscripts'
 POSTGRES_DIR = '/etc/postgres/sites-enabled'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'databases.fact')
-
+DATABASE_TEMPLATE = {'name': '',
+                     'size': 0}
 
 logger = logging.getLogger(__name__)
 
@@ -34,8 +36,8 @@ def _postgres_version():
     return parts[0]
 
 
-def _database_sizes():
-    """Return dict with {database name: database size}"""
+def _database_infos():
+    """Return dict with info about the databases {database name: info}"""
     query = ("select datname, pg_database_size(datname) "
              "from pg_database;")
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
@@ -58,7 +60,10 @@ def _database_sizes():
             logger.debug("Omitting database %s", name)
             continue
         size = int(size)
-        result[name] = size
+        database_info = copy.deepcopy(DATABASE_TEMPLATE)
+        database_info['name'] = name
+        database_info['size'] = size
+        result[name] = database_info
         logger.info("Found database %s with size %s (%s MB)",
                     name, size, size / 1024 / 1024)
     return result
@@ -68,13 +73,14 @@ def all_info():
     """Return the info we want to extract from postgres + its databases"""
     result = {}
     result['version'] = _postgres_version()
-    result['databases'] = _database_sizes()
+    result['databases'] = _database_infos()
 
     if result['databases']:
         # Info for zabbix.
         result['num_databases'] = len(result['databases'])
-        result['total_databases_size'] = sum(result['databases'].values())
-        result['biggest_database_size'] = max(result['databases'].values())
+        sizes = [info['size'] for info in result['databases'].values()]
+        result['total_databases_size'] = sum(sizes)
+        result['biggest_database_size'] = max(sizes)
 
     return result
 
