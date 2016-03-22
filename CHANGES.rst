@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.31 (unreleased)
+0.31 (2016-03-22)
 -----------------
 
 - Extracting DB info from django sites.
