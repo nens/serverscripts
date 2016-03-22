@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.32 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Bugfix for undefined variable.
+  [reinout]
 
 
 0.31 (2016-03-22)
