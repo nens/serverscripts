@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.29 (unreleased)
+0.29 (2016-03-22)
 -----------------
 
 - Added missing import so that database info is gathered on all servers.
