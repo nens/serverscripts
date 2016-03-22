@@ -92,6 +92,7 @@ def git_info(directory):
 def eggs_info(directory):
     files_of_interest = ['python', 'django', 'test']
     possible_egg_dirs = set()
+    python_version = None
     before = copy.copy(sys.path)
     bin_dir = os.path.join(directory, 'bin')
     if not os.path.exists(bin_dir):
