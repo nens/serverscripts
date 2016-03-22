@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.32 (unreleased)
+0.32 (2016-03-22)
 -----------------
 
 - Bugfix for undefined variable.
