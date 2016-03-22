@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.29 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added missing import so that database info is gathered on all servers.
+  [reinout]
 
 
 0.28 (2016-03-21)
