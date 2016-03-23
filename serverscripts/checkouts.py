@@ -90,7 +90,7 @@ def git_info(directory):
 
 
 def eggs_info(directory):
-    files_of_interest = ['python', 'django', 'test']
+    files_of_interest = ['django', 'test', 'python']
     possible_egg_dirs = set()
     python_version = None
     before = copy.copy(sys.path)
@@ -98,8 +98,12 @@ def eggs_info(directory):
     if not os.path.exists(bin_dir):
         return
 
-    for file_ in os.listdir(bin_dir):
-        if file_ not in files_of_interest:
+    bin_dir_contents = os.listdir(bin_dir)
+    for file_ in files_of_interest:
+        if file_ not in bin_dir_contents:
+            continue
+        if possible_egg_dirs:
+            logger.debug("Omitting bin/%s, we already have our info", file_)
             continue
         logger.debug("Looking in bin/%s for eggs+versions", file_)
         new_contents = []
@@ -153,6 +157,7 @@ def eggs_info(directory):
 def django_info(bin_django):
     result = {'databases': []}
     command = "sudo -u buildout %s diffsettings" % bin_django
+    logger.debug("Running %s diffsettings...", bin_django)
     sub = subprocess.Popen(command,
                            shell=True,
                            stdout=subprocess.PIPE,
@@ -160,17 +165,30 @@ def django_info(bin_django):
                            universal_newlines=True)
     output, error = sub.communicate()
     if error:
-        logger.warn("Error output from psql command: %s", error)
+        logger.warn("Error output from diffsettings command: %s", error)
     dont_care, tempfile_name = tempfile.mkstemp()
     open(tempfile_name, 'w').write(output)
     global_env = {}
     settings = {}
-    execfile(tempfile_name, global_env, settings)
+    try:
+        execfile(tempfile_name, global_env, settings)
+    except Exception:
+        logger.exception("'%s diffsettings' output could not be parsed:\n%s",
+                         bin_django, output)
+        return
     for database in settings.get('DATABASES', {}).values():
-        result['databases'].append({'name': database.get('NAME'),
-                                    'host': database.get('HOST'),
-                                    'user': database.get('USER'),
-                                    'engine': database.get('ENGINE')})
+        engine = database.get('ENGINE')
+        if 'spatialite' in engine or 'sqlite' in engine:
+            result['databases'].append(
+                {'name': 'local sqlite/spatialite file',
+                 'host': 'localhost'})
+        elif 'post' in engine:
+            result['databases'].append(
+                {'name': database.get('NAME'),
+                 'host': database.get('HOST', 'localhost'),
+                 'user': database.get('USER')})
+        else:
+            logger.warn("Unkown db engine %s")
     result['debug_mode'] = ('DEBUG' in settings)
     result['settings_module'] = settings['SETTINGS_MODULE']
     os.remove(tempfile_name)
