@@ -5,7 +5,12 @@ Changelog of serverscripts
 0.33 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Better spatialite handling.
+  [reinout]
+
+- Don't run both bin/django, bin/python *and* bin/test if one of them is
+  enough. Prefer ``bin/django``, then ``bin/test`` and last ``bin/python``.
+  [reinout]
 
 
 0.32 (2016-03-22)
