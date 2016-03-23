@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.38 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Excluding datetime lines from diffsettings, too.
+  [reinout]
 
 
 0.37 (2016-03-23)
