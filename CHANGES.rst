@@ -5,7 +5,10 @@ Changelog of serverscripts
 0.35 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Compensating for possible "syntax error" warnings when parsing the
+  diffsettings output. Lizard-ui used to add "layout.Action()" objects to the
+  settings and the output thereof isn't parseable.
+  [reinout]
 
 
 0.34 (2016-03-23)
