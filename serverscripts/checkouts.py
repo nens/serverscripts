@@ -192,7 +192,7 @@ def django_info(bin_django):
                  'host': database.get('HOST', 'localhost'),
                  'user': database.get('USER')})
         else:
-            logger.warn("Unkown db engine %s")
+            logger.warn("Unkown db engine %s", engine)
     result['debug_mode'] = ('DEBUG' in settings)
     result['settings_module'] = settings['SETTINGS_MODULE']
     os.remove(tempfile_name)
