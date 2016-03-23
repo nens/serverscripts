@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.37 (unreleased)
+0.37 (2016-03-23)
 -----------------
 
 - More broad exclusion: '<' handles '<lambda>', '<unbound ...>' and so on.
