@@ -5,7 +5,11 @@ Changelog of serverscripts
 0.36 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Logging bugfix.
+  [reinout]
+
+- Also ignoring "<lambda>" functions in diffsettings output.
+  [reinout]
 
 
 0.35 (2016-03-23)
