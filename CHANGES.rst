@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.36 (unreleased)
+0.36 (2016-03-23)
 -----------------
 
 - Logging bugfix.
