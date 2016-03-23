@@ -35,6 +35,7 @@ GIT_URL = re.compile(r"""
     \(                # Opening parentheses.
     .*$               # Whatever till the end of line.
     """, re.VERBOSE)
+VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'checkouts.fact')
 
@@ -224,6 +225,7 @@ def main():
                         format="%(levelname)s: %(message)s")
 
     result = {}
+    num_bin_django_failures = 0
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
         logger.info("Created %s", OUTPUT_DIR)
@@ -241,8 +243,12 @@ def main():
         bin_django = os.path.join(directory, 'bin', 'django')
         if os.path.exists(bin_django):
             checkout['django'] = django_info(bin_django)
+            if not checkout['django']:
+                num_bin_django_failures += 1
         else:
             logger.debug("No django script found: %s", bin_django)
 
         result[name] = checkout
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    zabbix_file = os.path.join(VAR_DIR, 'nens.bin_django_failures.errors')
+    open(zabbix_file, 'w').write(str(num_bin_django_failures))
