@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.35 (unreleased)
+0.35 (2016-03-23)
 -----------------
 
 - Compensating for possible "syntax error" warnings when parsing the
