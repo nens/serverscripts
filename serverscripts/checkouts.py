@@ -168,9 +168,9 @@ def django_info(bin_django):
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
     dont_care, tempfile_name = tempfile.mkstemp()
+    wanted = ['DATABASES', 'DEBUG', 'SETTINGS_MODULE']
     output = '\n'.join([line for line in output.split('\n')
-                        if '<' not in line])
-    # ^^^ This filters out ancient lizard-ui layout.Action objects...
+                        if line.split()[0] in wanted])
     open(tempfile_name, 'w').write(output)
     global_env = {}
     settings = {}
