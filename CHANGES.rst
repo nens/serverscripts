@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.34 (unreleased)
+0.34 (2016-03-23)
 -----------------
 
 - Recording number of failures of running 'bin/django' for zabbix.
