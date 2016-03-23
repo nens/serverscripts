@@ -169,8 +169,7 @@ def django_info(bin_django):
         logger.warn("Error output from diffsettings command: %s", error)
     dont_care, tempfile_name = tempfile.mkstemp()
     output = '\n'.join([line for line in output.split('\n')
-                        if 'object at' not in line
-                        and 'function <lambda>' not in line])
+                        if '<' not in line])
     # ^^^ This filters out ancient lizard-ui layout.Action objects...
     open(tempfile_name, 'w').write(output)
     global_env = {}
