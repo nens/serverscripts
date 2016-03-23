@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.38 (unreleased)
+0.38 (2016-03-23)
 -----------------
 
 - Excluding datetime lines from diffsettings, too.
