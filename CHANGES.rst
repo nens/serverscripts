@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.33 (unreleased)
+0.33 (2016-03-23)
 -----------------
 
 - Better spatialite handling.
