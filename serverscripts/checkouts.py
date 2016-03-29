@@ -199,6 +199,29 @@ def django_info(bin_django):
     return result
 
 
+def supervisorctl_warnings(bin_supervisorctl):
+    """Return number of not-running processes inside supervisorctl"""
+    command = "sudo -u buildout %s status" % bin_supervisorctl
+    logger.debug("Running %s status...", bin_supervisorctl)
+    sub = subprocess.Popen(command,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           universal_newlines=True)
+    output, error = sub.communicate()
+    if error:
+        logger.warn("Error output from supervisorctl command: %s", error)
+    lines = [line.strip() for line in output.split('\n')]
+    lines = [line for line in lines if line]
+    not_running = [line for line in lines if 'running' not in line.lower()]
+    num_not_running = len(not_running)
+    if num_not_running:
+        logger.warn("Some processes in %s aren't running:", bin_supervisorctl)
+        for line in not_running:
+            logger.warn("    %s", line)
+    return num_not_running
+
+
 def main():
     """Installed as bin/checkout-info"""
     parser = argparse.ArgumentParser()
@@ -229,6 +252,7 @@ def main():
 
     result = {}
     num_bin_django_failures = 0
+    num_not_running = 0
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
         logger.info("Created %s", OUTPUT_DIR)
@@ -254,7 +278,18 @@ def main():
         else:
             logger.debug("No django script found: %s", bin_django)
 
+        bin_supervisorctl = os.path.join(directory, 'bin', 'supervisorctl')
+        if os.path.exists(bin_supervisorctl):
+            try:
+                num_not_running += supervisorctl_warnings(bin_supervisorctl)
+            except:  # Bare except.
+                logger.exception("Error calling %s", bin_supervisorctl)
+        else:
+            logger.debug("No supervisorctl script found: %s", bin_supervisorctl)
+
         result[name] = checkout
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
     zabbix_file = os.path.join(VAR_DIR, 'nens.bin_django_failures.errors')
     open(zabbix_file, 'w').write(str(num_bin_django_failures))
+    zabbix_file2 = os.path.join(VAR_DIR, 'nens.num_not_running.warnings')
+    open(zabbix_file2, 'w').write(str(num_not_running))

@@ -61,3 +61,14 @@ class GitAndEggInfoTestCase(TestCase):
                                              "")
             result = checkouts.django_info('some/bin/django')
             self.assertEquals(len(result['databases']), 2)
+
+    def test_supervisorctl_warnings(self):
+        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
+            mock_communicate.return_value = """
+gunicorn                         RUNNING   pid 1418, uptime 0:39:04
+something                        STOPPED
+
+            """, ""
+            result = checkouts.supervisorctl_warnings(
+                'some/bin/supervisorctl')
+            self.assertEquals(result, 1)
