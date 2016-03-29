@@ -234,6 +234,9 @@ def main():
         logger.info("Created %s", OUTPUT_DIR)
     for name in os.listdir(SRV_DIR):
         directory = os.path.join(SRV_DIR, name)
+        if os.path.islink(directory):
+            logger.info("Ignoring %s, it is a symlink", directory)
+            continue
         checkout = {}
         checkout['name'] = name
         checkout['directory'] = directory
