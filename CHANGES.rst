@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.43 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Typo fix.
 
 
 0.42 (2016-03-29)
