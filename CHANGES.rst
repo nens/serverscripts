@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.42 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Working around matplotlib issue.
+  [reinout]
 
 
 0.41 (2016-03-29)

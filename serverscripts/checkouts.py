@@ -157,7 +157,10 @@ def eggs_info(directory):
 
 def django_info(bin_django):
     result = {'databases': []}
-    command = "sudo -u buildout %s diffsettings" % bin_django
+    matplotlibenv = 'MPLCONFIGDIR=/tmp'
+    # Corner case when something needs matplotlib in django's settings.
+    command = "sudo -u %s buildout %s diffsettings" % (matplotlibenv,
+                                                       bin_django)
     logger.debug("Running %s diffsettings...", bin_django)
     sub = subprocess.Popen(command,
                            shell=True,
