@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.42 (unreleased)
+0.42 (2016-03-29)
 -----------------
 
 - Working around matplotlib issue.
