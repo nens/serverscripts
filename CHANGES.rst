@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.39 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Ignoring symlinks in ``/srv/``.
+  [reinout]
 
 
 0.38 (2016-03-23)
