@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.40 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Returning from "diffsettings" command if there's an error (and no output).
+  [reinout]
 
 
 0.39 (2016-03-29)
