@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.40 (unreleased)
+0.40 (2016-03-29)
 -----------------
 
 - Returning from "diffsettings" command if there's an error (and no output).
