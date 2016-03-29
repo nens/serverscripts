@@ -5,7 +5,8 @@ Changelog of serverscripts
 0.41 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- More robust 'diffsettings' handling.
+  [reinout]
 
 
 0.40 (2016-03-29)

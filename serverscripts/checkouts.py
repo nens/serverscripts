@@ -170,9 +170,17 @@ def django_info(bin_django):
         if not output:
             return
     dont_care, tempfile_name = tempfile.mkstemp()
-    output = '\n'.join([line for line in output.split('\n')
-                        if '<' not in line
-                        and 'datetime' not in line])
+    interesting = ['DEBUG',
+                   'DATABASES',
+                   'SETTINGS_MODULE',]
+    lines = [line for line in output.split('\n')
+             if '<' not in line
+             and 'datetime' not in line
+             and line]
+    lines = [line for line in lines
+             if line.split()[0] in interesting]
+    output = '\n'.join(lines)
+
     open(tempfile_name, 'w').write(output)
     global_env = {}
     settings = {}
