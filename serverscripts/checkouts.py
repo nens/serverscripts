@@ -167,6 +167,8 @@ def django_info(bin_django):
     output, error = sub.communicate()
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
+        if not output:
+            return
     dont_care, tempfile_name = tempfile.mkstemp()
     output = '\n'.join([line for line in output.split('\n')
                         if '<' not in line
