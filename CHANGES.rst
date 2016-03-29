@@ -8,6 +8,10 @@ Changelog of serverscripts
 - Ignoring symlinks in ``/srv/``.
   [reinout]
 
+- Extracting number of not-running processes out of supervisorctl (both inside
+  ``/srv/sitename`` as the global one (if present).
+  [reinout]
+
 
 0.38 (2016-03-23)
 -----------------
