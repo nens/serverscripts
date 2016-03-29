@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.41 (unreleased)
+0.41 (2016-03-29)
 -----------------
 
 - More robust 'diffsettings' handling.
