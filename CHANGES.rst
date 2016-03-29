@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.39 (unreleased)
+0.39 (2016-03-29)
 -----------------
 
 - Ignoring symlinks in ``/srv/``.
