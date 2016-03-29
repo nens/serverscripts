@@ -201,8 +201,8 @@ def django_info(bin_django):
 
 def supervisorctl_warnings(bin_supervisorctl):
     """Return number of not-running processes inside supervisorctl"""
-    command = "sudo -u buildout %s status" % bin_supervisorctl
-    logger.debug("Running %s status...", bin_supervisorctl)
+    command = "%s status" % bin_supervisorctl
+    logger.debug("Running '%s'...", command)
     sub = subprocess.Popen(command,
                            shell=True,
                            stdout=subprocess.PIPE,
@@ -288,6 +288,17 @@ def main():
             logger.debug("No supervisorctl script found: %s", bin_supervisorctl)
 
         result[name] = checkout
+
+    # Global supervisorctl
+    if os.path.exists('/etc/supervisor/'):
+        logger.debug("Global supervisor detected. Asking it for processes...")
+        try:
+            num_not_running += supervisorctl_warnings('supervisorctl')
+        except:  # Bare except.
+            logger.exception("Error calling global supervisorctl")
+    else:
+        logger.debug("No global supervisor found")
+
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
     zabbix_file = os.path.join(VAR_DIR, 'nens.bin_django_failures.errors')
     open(zabbix_file, 'w').write(str(num_bin_django_failures))
