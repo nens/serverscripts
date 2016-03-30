@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.44 (unreleased)
+0.44 (2016-03-30)
 -----------------
 
 - Added try/except around apache/nginx config file reading. Catches
