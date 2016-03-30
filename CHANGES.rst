@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.44 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added try/except around apache/nginx config file reading. Catches
+  non-working symlinks, for instance.
+  [reinout]
 
 
 0.43 (2016-03-29)
