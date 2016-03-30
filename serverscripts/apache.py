@@ -199,18 +199,23 @@ def main():
     for conf_filename in os.listdir(APACHE_DIR):
         if conf_filename.startswith('.'):
             continue
-        for site_info in extract_sites(os.path.join(APACHE_DIR,
-                                                    conf_filename)):
-            name = site_info['name']
-            protocol = site_info['protocol']  # http or https
-            key = '_'.join([name, protocol])
-            if key in result:
-                logger.error("Apache %s site %s from %s is already known",
-                             protocol, name, conf_filename)
-                num_errors += 1
-                continue
+        fullpath = os.path.join(APACHE_DIR, conf_filename)
+        try:
+            for site_info in extract_sites(fullpath):
+                name = site_info['name']
+                protocol = site_info['protocol']  # http or https
+                key = '_'.join([name, protocol])
+                if key in result:
+                    logger.error("Apache %s site %s from %s is already known",
+                                 protocol, name, conf_filename)
+                    num_errors += 1
+                    continue
 
-            result[key] = site_info
+                result[key] = site_info
+        except:  # Bare except
+            num_errors += 1
+            logger.exception("Something went wrong when reading %s", fullpath)
+
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
-    zabbix_file = os.path.join(VAR_DIR, 'nens.duplicate_apache_sites.warnings')
+    zabbix_file = os.path.join(VAR_DIR, 'nens.apache_sites.warnings')
     open(zabbix_file, 'w').write(str(num_errors))
