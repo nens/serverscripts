@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.45 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Ignoring supervisor lines with 'cron' in them. They don't need to be
+  running, they are just there to keep cronjobs from running into each other.
+  (Convention worked out with Alexandr for two 'flooding' servers).
 
 
 0.44 (2016-03-30)
