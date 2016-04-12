@@ -226,6 +226,9 @@ def supervisorctl_warnings(bin_supervisorctl):
         logger.warn("Error output from supervisorctl command: %s", error)
     lines = [line.strip() for line in output.split('\n')]
     lines = [line for line in lines if line]
+    lines = [line for line in lines if 'cron' not in line]
+    # cronjobs that are run as supervisor tasks to prevent them from running
+    # into each other. Convention (since 2016-04-12...) to put 'cron' in their name.
     not_running = [line for line in lines if 'running' not in line.lower()]
     num_not_running = len(not_running)
     if num_not_running:
