@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.45 (unreleased)
+0.45 (2016-04-12)
 -----------------
 
 - Ignoring supervisor lines with 'cron' in them. They don't need to be
