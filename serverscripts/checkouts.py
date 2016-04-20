@@ -38,6 +38,15 @@ GIT_URL = re.compile(r"""
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'checkouts.fact')
+SUPERVISOR_CRONJOB_EXCEPTIONS = [
+    'cron',
+    # p-3di-model-d1
+    'process_uploaded_model_files',
+    # p-web-ws-00-d6
+    'calculate_province_statistics_script',
+    'check_result_zip_files',
+    'create_province_excel_script',
+]
 
 
 logger = logging.getLogger(__name__)
@@ -226,9 +235,8 @@ def supervisorctl_warnings(bin_supervisorctl):
         logger.warn("Error output from supervisorctl command: %s", error)
     lines = [line.strip() for line in output.split('\n')]
     lines = [line for line in lines if line]
-    lines = [line for line in lines if 'cron' not in line]
-    # cronjobs that are run as supervisor tasks to prevent them from running
-    # into each other. Convention (since 2016-04-12...) to put 'cron' in their name.
+    for exception in SUPERVISOR_CRONJOB_EXCEPTIONS:
+        lines = [line for line in lines if exception not in line]
     not_running = [line for line in lines if 'running' not in line.lower()]
     num_not_running = len(not_running)
     if num_not_running:
