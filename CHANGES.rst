@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.46 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Added a couple more cronjob-type exceptions for supervisor.
 
 
 0.45 (2016-04-12)
