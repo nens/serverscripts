@@ -9,6 +9,7 @@ import re
 import serverscripts
 import sys
 import subprocess
+import operator
 
 
 VAR_DIR = '/var/local/serverscripts'
@@ -25,10 +26,10 @@ logger = logging.getLogger(__name__)
 
 def parse_queues_stdout(queues_stdout):
     """
-    Retrieve the amount of messages in queues.
-    queues_stdout attribute contains the shell output of 
-    rabbitmqctl list_queues command like:
-    
+    Retrieve the amount of messages per queues.
+    queues_stdout attribute contains the shell output of
+    'rabbitmqctl list_queues' command like:
+
     Listing queues ...
     queuename1     0
     queuename1     4
@@ -36,29 +37,43 @@ def parse_queues_stdout(queues_stdout):
 
     The second column contains amount of massages in the queue.
     """
-    messages = []
+    queues = {}
     for line in queues_stdout.split('\n'):
-        line_attrs = line.split('\t')
-        if len(line_attrs) > 1:
-            messages.append(int(line_attrs[1]))
-    return messages
+        line_attrs = line.split()
+        print(line_attrs)
+        if len(line_attrs) == 2:
+            queues[line_attrs[0]] = int(line_attrs[1])
+    return queues
 
 
 def retrieve_queues(vhost):
     """Run shell command en return the queues."""
-    process = subprocess.Popen(
-        ['rabbitmqctl', 'list_queues', '-p', vhost],
-        stdout=subprocess.PIPE)
-    status, stdout = process.communicate()
-    if status:
-        return stdout
+    # process = subprocess.Popen(
+    #     ['rabbitmqctl', 'list_queues', '-p', vhost],
+    #     stdout=subprocess.PIPE)
+    # status, stdout = process.communicate()
+    result = subprocess.check_output(
+        ['rabbitmqctl', 'list_queues', '-p', str(vhost)])
+    if result:
+        return result
     else:
         logger.warn("%s vhost is not available or has not any queue.")
         return ''
 
 
+def get_max_queue(queues):
+    """Retrieve a queue with max messages as tulp."""
+    return max(queues.iteritems(), key=operator.itemgetter(1))
+
+
+def load_config(config_file_path):
+    with open(config_file_path, 'r') as config_file:
+        return json.loads(config_file.read())
+
+
 def main():
     """Installed as bin/rabbitmq-info"""
+    import pdb; pdb.set_trace()
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-v",
@@ -74,7 +89,7 @@ def main():
         dest="print_version",
         default=False,
         help="Print version")
-    
+
     options = parser.parse_args()
     if options.print_version:
         print(serverscripts.__version__)
@@ -93,14 +108,22 @@ def main():
     if not os.path.exists(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
         logger.info("Created %s", CONFIG_DIR)
-    if not os.path.isfile(CONFIG_FILE)
+    if not os.path.isfile(CONFIG_FILE):
         return
-    
-    rabbitmq_config = json.loads(CONFIG_FILE)
-    vhosts = rabbitmq_config.keys()
-    for vhost in vhosts
-    for paramee
 
+    rabbitmq_config = load_config(CONFIG_FILE)
+    logger.info("VHOST to check %d" % len(rabbitmq_config))
+    vhosts = rabbitmq_config.keys()
+    result = {}
+    for vhost in vhosts:
+        queues_stdout = retrieve_queues(vhost)
+        logger.debug("Queues stdout: %s" % queues_stdout)
+        queues = parse_queues_stdout(queues_stdout)
+        max_queue = get_max_queue(queues)
+        if max_queue[1] >= rabbitmq_config[vhost]['messages']:
+            result[vhost] = {max_queue[0]: max_queue[1]}
+        else:
+            continue
+
+    logger.info("Check results to dump: %d." % len(result))
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
-    zabbix_file = os.path.join(VAR_DIR, 'nens.nginx_sites.warnings')
-    open(zabbix_file, 'w').write(str(num_errors))

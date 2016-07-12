@@ -1,0 +1,19 @@
+Listing queues ...
+celery  32
+celery@worker1.p-web-task-d5.celery.pidbox      0
+celery@worker2.p-web-task-d5.celery.pidbox      0
+celery@worker3.p-web-task-d5.celery.pidbox      0
+celery@worker4.p-web-task-d5.celery.pidbox      0
+celery@worker5.p-web-task-d5.celery.pidbox      0
+celeryev.198dba74-3d5c-42bc-b3fe-c09f35de64cb   0
+celeryev.1dd5598a-1fd1-420b-b65f-cb1c73bbb671   0
+celeryev.8be19bc8-9307-429b-b8cb-802a5a489ed5   0
+celeryev.9b0d338b-7482-4202-9fc6-2475e1bb7774   0
+celeryev.ab42a385-0653-4a48-be80-d4670568a701   0
+celeryev.d776831a-c662-46ea-a1c8-db8339fef7a6   0
+celeryev.ec44f3a2-15f3-40a5-b248-8c32469539dd   0
+lmw     0
+low_priority    0
+single_worker   0
+threedi 0
+...done.
