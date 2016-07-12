@@ -69,7 +69,6 @@ def load_config(config_file_path):
 
 def main():
     """Installed as bin/rabbitmq-info"""
-    import pdb; pdb.set_trace()
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-v",
