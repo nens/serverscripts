@@ -1,4 +1,4 @@
-"""Extract information from nginx config files.
+"""Extract information from rabbitmq.
 
 """
 import argparse
@@ -17,7 +17,7 @@ VAR_DIR = '/var/local/serverscripts'
 CONFIG_DIR = '/etc/serverscripts'
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'rabbitmq_zabbix.json')
 
-OUTPUT_DIR = '/var/local/rabbitmq-facts'
+OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'rabbitmq.fact')
 
 
@@ -48,10 +48,6 @@ def parse_queues_stdout(queues_stdout):
 
 def retrieve_queues(vhost):
     """Run shell command en return the queues."""
-    # process = subprocess.Popen(
-    #     ['rabbitmqctl', 'list_queues', '-p', vhost],
-    #     stdout=subprocess.PIPE)
-    # status, stdout = process.communicate()
     result = subprocess.check_output(
         ['rabbitmqctl', 'list_queues', '-p', str(vhost)])
     if result:
