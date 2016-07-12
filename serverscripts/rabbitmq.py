@@ -127,3 +127,5 @@ def main():
 
     logger.info("Check results to dump: %d." % len(result))
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    zabbix_file = os.path.join(VAR_DIR, 'nens.rabbitmq.warnings')
+    open(zabbix_file, 'w').write(len(results))
