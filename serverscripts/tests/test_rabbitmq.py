@@ -44,6 +44,7 @@ class GitAndEggInfoTestCase(TestCase):
     def test_rabbitmqctl_not_exists(self):
         vhost = 'asdasda'
         status, result = rabbitmq.retrieve_queues(vhost)
+        pprint("Status %s, result %s" % (status, result))
         self.assertEquals(status, rabbitmq.FAILED)
 
     def test_validate_configuration_empty(self):
