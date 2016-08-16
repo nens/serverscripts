@@ -113,11 +113,11 @@ def validate_configuration(configuration):
             logger.error("%s: vhost '%s' has not '%s' item.",
                          error_type, vhost, MESSAGES_LIMIT)
             return False
-        if not cast_to_int(queues_limit_value):
+        if cast_to_int(queues_limit_value) is None:
             logger.error("%s: '%s'.'%s' is not an integer.",
                          error_type, vhost, QUEUES_LIMIT)
             return False
-        if not cast_to_int(messages_limit_value):
+        if cast_to_int(messages_limit_value) is None:
             logger.error("%s: '%s'.'%s' is not an integer.",
                          error_type, vhost, MESSAGES_LIMIT)            
             return False
