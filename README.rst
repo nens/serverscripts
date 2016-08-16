@@ -1,6 +1,5 @@
-========================================================================
- Serverscripts: python scripts for sysadmin tasks on every linux server
-========================================================================
+Serverscripts: python scripts for sysadmin tasks on every linux server
+======================================================================
 
 This is a dependency-less python package that should be installed on all the
 N&S linux servers. It contains python scripts for sysadmin tasks.
@@ -10,7 +9,7 @@ All scripts should be reasonably well-behaved including ``-h/--help``,
 
 
 Installation
-============
+------------
 
 TODO. Build python package locally. Scp somewhere. As root, ``pip install
 URL``.
@@ -35,7 +34,7 @@ Prerequisite: ``apt-get install python-pip``.
 
 
 Cifsfixer
-=========
+---------
 
 Script that monitors the cifs mounts. If one isn't mounted, it mounts it. If
 one isn't listable, it unmounts it (lazily if needed) and later tries to
@@ -53,7 +52,7 @@ the logfile. If you want to check if the tool runs OK, run it with
 
 
 Checkout-info
-=============
+-------------
 
 ``bin/checkout-info`` collects info on git checkouts and saves it as
 ``/var/local/serverinfo-facts/checkouts.fact``. This is used by serverinfo. It
@@ -67,22 +66,22 @@ to run as root)::
 
 
 Rabbitmq-checker
-=================
+----------------
 
-``bin/rabbitmq-checker`` The script checks the length of messages per queue and 
-amount of the queues per vhost. When the limit of queues or messages is reached it 
+``bin/rabbitmq-checker`` The script checks the length of messages per queue and
+amount of the queues per vhost. When the limit of queues or messages is reached it
 saves warnings in ``/var/local/serverinfo-facts/rabbitmq.fact`` and a number of
-warnings to ``/var/local/serverscripts/nens.rabbitmg.warnings``. The limits are 
+warnings to ``/var/local/serverscripts/nens.rabbitmg.warnings``. The limits are
 expected in ``/etc/serverscripts/rabbitmq_zabbix.json``, for example see
-``tests/example_rabbitmq_zabbix.json``. 
+``tests/example_rabbitmq_zabbix.json``.
 
 configuration::
 
   {
     'lizard-nxt': { // vhost in rabbitmq
-        'queues_limit': 10, 
-	'messages_limit': 300
-	},
+        'queues_limit': 10,
+        'messages_limit': 300
+        },
     ...
   }
 
@@ -94,16 +93,11 @@ Retrieve vhosts on rabbitmq-server::
 Before the taking it in production run the file manually in debug mode like::
 
     $ sudo bin/rabbitmq-checker -v
- 
 
-Should be installed in a cronjob. Suggestion for the crontab (note: it needs
-to run as root)::
-
-    */5 * * * * /usr/local/bin/checkout-info > /dev/null 2>&1
 
 
 TODO/ideas
-==========
+----------
 
 - Jenkins integration, test coverage.
 
