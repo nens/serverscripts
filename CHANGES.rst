@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.47 (unreleased)
+0.47 (2016-08-17)
 -----------------
 
 - Added rabbitmq queue size checker.
