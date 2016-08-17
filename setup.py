@@ -49,6 +49,7 @@ setup(name='serverscripts',
               'apache-info = serverscripts.apache:main',
               'haproxy-info = serverscripts.haproxy:main',
               'database-info = serverscripts.database:main',
+              'rabbitmq-checker = serverscripts.rabbitmq:main',
               # The one below runs all above ones, except for cifsfixer
               'gather-all-info = serverscripts.script:main',
           ]},

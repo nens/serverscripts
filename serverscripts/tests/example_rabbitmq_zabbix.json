@@ -1,0 +1,10 @@
+{
+    "lizard-nxt": {
+        "queues_limit": 100,
+        "messages_limit": 150
+    },
+    "flooding": {
+        "queues_limit": 100,
+        "messages_limit": 2
+    }
+}

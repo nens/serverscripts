@@ -65,6 +65,38 @@ to run as root)::
     */5 * * * * /usr/local/bin/checkout-info > /dev/null 2>&1
 
 
+Rabbitmq-checker
+----------------
+
+``bin/rabbitmq-checker`` The script checks the length of messages per queue and
+amount of the queues per vhost. When the limit of queues or messages is reached it
+saves warnings in ``/var/local/serverscripts/nens.rabbitmq.message`` and a number of
+warnings to ``/var/local/serverscripts/nens.num_rabbitmg_too_big.warnings``.
+The configuration file is optionally in ``/etc/serverscripts/rabbitmq_zabbix.json``,
+for example see ``tests/example_rabbitmq_zabbix.json``. If configuration is not 
+specified the scritp uses defaults values, queues=100 and messages=200.
+
+configuration::
+
+  {
+    'lizard-nxt': { // vhost in rabbitmq
+        'queues_limit': 10,
+        'messages_limit': 300
+        },
+    ...
+  }
+
+Retrieve vhosts on rabbitmq-server::
+
+    $ sudo rabbitmqctl list_vhosts
+
+
+Before the taking it in production run the file manually in debug mode like::
+
+    $ sudo bin/rabbitmq-checker -v
+
+
+
 TODO/ideas
 ----------
 

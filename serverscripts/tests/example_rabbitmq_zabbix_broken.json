@@ -1,0 +1,9 @@
+    "lizard-nxt": {
+        "queues": 100,
+        "messages": 150
+    },
+    "flooding": {
+        "queues": 100,
+        "messages": 2
+    }
+}
