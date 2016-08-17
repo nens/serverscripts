@@ -192,7 +192,7 @@ def main():
         logger.info("Created %s", CONFIG_DIR)
 
     configuration = load_config(CONFIG_FILE)
-    num_to_big = 0
+    num_too_big = 0
     wrong_vhosts = []
 
     for vhost in vhosts:
@@ -209,20 +209,20 @@ def main():
             queue_num_messages = vhost_configuration.get(MESSAGES_LIMIT)
         if len(queues) >= vhost_num_queues:
             wrong_vhosts.append(vhost)
-            num_to_big = num_to_big + 1
+            num_too_big = num_too_big + 1
             continue
         # check the allowed amount of messages in the largest queue 
         queue_name, queue_value = get_max_queue(queues)
         if queue_value >= queue_num_messages:
             wrong_vhosts.append(vhost)
-            num_to_big = num_to_big + 1
+            num_too_big = num_too_big + 1
 
-    logger.info("Write check results to files: %d." % num_to_big)
+    logger.info("Write check results to files: %d." % num_too_big)
     zabbix_message_file = os.path.join(VAR_DIR, 'nens.rabbitmq.message')
-    if num_to_big:
+    if num_too_big:
         open(zabbix_message_file, 'w').write(
-            "Number queues/messages to big by: %s" % ", ".join(wrong_vhosts))
+            "Number queues/messages too big by: %s" % ", ".join(wrong_vhosts))
     else:
         open(zabbix_message_file, 'w').write("")
-    zabbix_rmq_count_file = os.path.join(VAR_DIR, 'nens.num_rabbitmq_to_big.warnings')
-    open(zabbix_rmq_count_file, 'w').write('%d' % num_to_big)
+    zabbix_rmq_count_file = os.path.join(VAR_DIR, 'nens.num_rabbitmq_too_big.warnings')
+    open(zabbix_rmq_count_file, 'w').write('%d' % num_too_big)

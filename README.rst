@@ -70,10 +70,11 @@ Rabbitmq-checker
 
 ``bin/rabbitmq-checker`` The script checks the length of messages per queue and
 amount of the queues per vhost. When the limit of queues or messages is reached it
-saves warnings in ``/var/local/serverinfo-facts/rabbitmq.fact`` and a number of
-warnings to ``/var/local/serverscripts/nens.rabbitmg.warnings``. The limits are
-expected in ``/etc/serverscripts/rabbitmq_zabbix.json``, for example see
-``tests/example_rabbitmq_zabbix.json``.
+saves warnings in ``/var/local/serverscripts/nens.rabbitmq.message`` and a number of
+warnings to ``/var/local/serverscripts/nens.num_rabbitmg_too_big.warnings``.
+The configuration file is optionally in ``/etc/serverscripts/rabbitmq_zabbix.json``,
+for example see ``tests/example_rabbitmq_zabbix.json``. If configuration is not 
+specified the scritp uses defaults values, queues=100 and messages=200.
 
 configuration::
 
