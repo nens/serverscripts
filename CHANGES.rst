@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.48 (unreleased)
+0.48 (2016-08-17)
 -----------------
 
 - Improved rabbitmq logging.
