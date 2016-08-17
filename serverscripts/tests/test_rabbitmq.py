@@ -1,4 +1,3 @@
-import json
 from pprint import pprint
 from serverscripts import rabbitmq
 from unittest import TestCase
@@ -16,6 +15,24 @@ class GitAndEggInfoTestCase(TestCase):
             our_dir, 'example_rabbitmq_zabbix_broken.json')
         self.queues_stdout_example = os.path.join(
             our_dir, 'example_queues_stdout_example.txt')
+        self.vhosts_stdout_example = os.path.join(
+            our_dir, 'example_vhosts_stdout_example.txt')
+
+    def test_parse_vhosts_stdout(self):
+        vhosts_stdout = ''
+        with open(self.vhosts_stdout_example, 'r') as vhosts_file:
+            vhosts_stdout = vhosts_file.read()
+            pprint(vhosts_stdout)
+            
+        vhosts = rabbitmq.parse_vhosts_stdout(vhosts_stdout)
+        pprint(vhosts)
+        self.assertGreater(len(vhosts), 1)
+
+    def test_parse_vhosts_stdout_empty(self):
+        vhosts_stdout = ''
+        vhosts = rabbitmq.parse_vhosts_stdout(vhosts_stdout)
+        pprint(vhosts)
+        self.assertEquals(len(vhosts), 0)
 
     def test_parse_queues_stdout(self):
         queues_stdout = ''
@@ -34,18 +51,23 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(result, test_case)
 
     def test_load_config_file(self):
-        status, content = rabbitmq.load_config(self.config_example)
-        self.assertEquals((status, isinstance(content, dict)), (rabbitmq.SUCCEEDED, True))
+        configuration = rabbitmq.load_config(self.config_example)
+        self.assertGreater(len(configuration), 0)
 
     def test_load_config_file_broken_content(self):
-        status, content = rabbitmq.load_config(self.broken_config_example)
-        self.assertEquals(status, rabbitmq.FAILED)
+        configuration = rabbitmq.load_config(self.broken_config_example)
+        self.assertEquals(len(configuration), 0)
 
     def test_rabbitmqctl_not_exists(self):
         vhost = 'asdasda'
-        status, result = rabbitmq.retrieve_queues(vhost)
-        pprint("Status %s, result %s" % (status, result))
-        self.assertEquals(status, rabbitmq.FAILED)
+        queues = rabbitmq.retrieve_queues(vhost)
+        pprint("'%s' contains '%d' queues." % (vhost, len(queues)))
+        self.assertEquals(len(queues), 0)
+
+    def test_rabbitmqctl_vhosts(self):
+        vhosts = rabbitmq.retrieve_vhosts()
+        pprint("broker contains '%d' vhosts." % len(vhosts))
+        self.assertEquals(len(vhosts), 0)
 
     def test_validate_configuration_empty(self):
         configuration = {}

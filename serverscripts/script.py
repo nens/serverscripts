@@ -22,7 +22,8 @@ def main():
                    serverscripts.nginx,
                    serverscripts.apache,
                    serverscripts.database,
-                   serverscripts.haproxy]:
+                   serverscripts.haproxy,
+                   serverscripts.rabbitmq]:
         try:
             module.main()
         except Exception, e:
