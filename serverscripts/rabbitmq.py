@@ -74,52 +74,39 @@ def parse_vhosts_stdout(vhosts_stdout):
 def retrieve_vhosts():
     """Run shell command 'rabbitmqctl list_vhosts', parse stdout, return vhosts."""
     stdout = ''
-    vhosts = []
     try:
         stdout = subprocess.check_output(
             ['rabbitmqctl', 'list_vhosts'])
     except OSError:
         logger.info("rabbitmqctl is not available.")
+        return
     except subprocess.CalledProcessError:
-        stdout = logger.info("'rabbitmqctl list_vhosts' returns non-zero exit status.")
-    
-    if stdout:
-        vhosts = parse_vhosts_stdout(stdout)
-    else:
-        logger.info("stdout of list_vhosts contains any vhosts or None.")
-    return vhosts
+        logger.info("'rabbitmqctl list_vhosts' returns non-zero exit status.")
+        return
+
+    return parse_vhosts_stdout(stdout)
 
 
 def retrieve_queues(vhost):
     """Run shell command, parse stdout, returtn queues."""
-    queues = {}
     stdout = ''
     try:
         stdout = subprocess.check_output(
             ['rabbitmqctl', 'list_queues', '-p', str(vhost)])
     except OSError:
         logger.warn("rabbitmqctl is not available.")
+        return
     except subprocess.CalledProcessError:
         logger.warn("'rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
-    
-    if stdout:
-        queues = parse_queues_stdout(stdout)
-    else:
-        logger.info("stdout of 'list_queues %s' contains any queues or none." % vhost)
-    return queues
+        return
+
+    return parse_queues_stdout(stdout)
 
 
 def get_max_queue(queues):
     """Retrieve a queue with max messages as tuple."""
     queue, value = max(queues.iteritems(), key=operator.itemgetter(1))
     return (queue, value)
-
-
-def cast_to_int(value):
-    try:
-        return int(value)
-    except:
-        return None
 
 
 def validate_configuration(configuration):
@@ -143,15 +130,15 @@ def validate_configuration(configuration):
             logger.error("%s: vhost '%s' has not '%s' item.",
                          error_type, vhost, MESSAGES_LIMIT)
             return False
-        if cast_to_int(queues_limit_value) is None:
-            logger.error("%s: '%s'.'%s' is not an integer.",
-                         error_type, vhost, QUEUES_LIMIT)
-            return False
-        if cast_to_int(messages_limit_value) is None:
-            logger.error("%s: '%s'.'%s' is not an integer.",
-                         error_type, vhost, MESSAGES_LIMIT)            
+        try:
+            int(queues_limit_value)
+            int(messages_limit_value)
+        except:
+            logger.error("%s: '%s' one of the values is not an integer.",
+                         error_type, vhost)
             return False
     return True
+
 
 def load_config(config_file_path):
     """Retrieve conriguration, return a {} when
@@ -166,6 +153,7 @@ def load_config(config_file_path):
     if validate_configuration(content):
         return content
     return {}
+
 
 def main():
     """Installed as bin/rabbitmq-info"""
@@ -212,7 +200,7 @@ def main():
         queue_num_messages = ALLOWED_NUM_MESSAGES
         queues = retrieve_queues(vhost)
         # check or the vhost has a queue
-        if len(queues) <= 0:
+        if not queues:
             continue
         # check the allowed amount of queues per vhost
         vhost_configuration = configuration.get(vhost)

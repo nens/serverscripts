@@ -61,13 +61,13 @@ class GitAndEggInfoTestCase(TestCase):
     def test_rabbitmqctl_not_exists(self):
         vhost = 'asdasda'
         queues = rabbitmq.retrieve_queues(vhost)
-        pprint("'%s' contains '%d' queues." % (vhost, len(queues)))
-        self.assertEquals(len(queues), 0)
+        pprint("'%s' contains '%s' queues." % (vhost, queues))
+        self.assertEquals(queues, None)
 
     def test_rabbitmqctl_vhosts(self):
         vhosts = rabbitmq.retrieve_vhosts()
-        pprint("broker contains '%d' vhosts." % len(vhosts))
-        self.assertEquals(len(vhosts), 0)
+        pprint("broker contains '%s' vhosts." % vhosts)
+        self.assertEquals(vhosts, None)
 
     def test_validate_configuration_empty(self):
         configuration = {}
