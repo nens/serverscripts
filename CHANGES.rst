@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.48 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Improved rabbitmq logging.
 
 
 0.47 (2016-08-17)
