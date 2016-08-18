@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.49 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Import rabbitmq module.
 
 
 0.48 (2016-08-17)
