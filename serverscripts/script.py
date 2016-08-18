@@ -7,6 +7,7 @@ import serverscripts.checkouts
 import serverscripts.database
 import serverscripts.haproxy
 import serverscripts.nginx
+import serverscripts.rabbitmq
 
 
 def main():
