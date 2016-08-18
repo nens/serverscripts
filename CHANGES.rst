@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.50 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Set path to rabbitmqctl.
 
 
 0.49 (2016-08-18)
