@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.49 (unreleased)
+0.49 (2016-08-18)
 -----------------
 
 - Import rabbitmq module.
