@@ -76,12 +76,12 @@ def retrieve_vhosts():
     stdout = ''
     try:
         stdout = subprocess.check_output(
-            ['rabbitmqctl', 'list_vhosts'])
+            ['/usr/sbin/rabbitmqctl', 'list_vhosts'])
     except OSError:
         logger.info("/usr/sbin/rabbitmqctl is not available.")
         return
     except subprocess.CalledProcessError:
-        logger.info("'rabbitmqctl list_vhosts' returns non-zero exit status.")
+        logger.info("'/usr/sbin/rabbitmqctl list_vhosts' returns non-zero exit status.")
         return
 
     return parse_vhosts_stdout(stdout)
@@ -94,10 +94,10 @@ def retrieve_queues(vhost):
         stdout = subprocess.check_output(
             ['/usr/sbin/rabbitmqctl', 'list_queues', '-p', str(vhost)])
     except OSError:
-        logger.warn("rabbitmqctl is not available.")
+        logger.warn("/usr/sbin/rabbitmqctl is not available.")
         return
     except subprocess.CalledProcessError:
-        logger.warn("'rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
+        logger.warn("'/usr/sbin/rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
         return
 
     return parse_queues_stdout(stdout)
