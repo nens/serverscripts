@@ -144,6 +144,8 @@ def load_config(config_file_path):
     """Retrieve conriguration, return a {} when
     the content is invalid"""
     content = {}
+    if not os.path.exists(config_file_path):
+        return {}
     with open(config_file_path, 'r') as config_file:
         try:
             content = json.loads(config_file.read())
