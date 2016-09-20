@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.52 (unreleased)
+0.52 (2016-09-20)
 -----------------
 
 - Don't crash when the rabbitmq config file doesn't exist.
