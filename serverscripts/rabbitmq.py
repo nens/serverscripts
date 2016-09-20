@@ -187,6 +187,8 @@ def main():
                         format="%(levelname)s: %(message)s")
 
     vhosts = retrieve_vhosts()
+    if vhosts is None:
+        vhosts = []
     if not os.path.exists(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
         logger.info("Created %s", CONFIG_DIR)
