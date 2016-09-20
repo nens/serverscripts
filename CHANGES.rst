@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.53 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fixing vhosts=None case.
 
 
 0.52 (2016-09-20)
