@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.53 (unreleased)
+0.53 (2016-09-20)
 -----------------
 
 - Fixing vhosts=None case.
