@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.51 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Rabbitmq check now always writes to the output files.
 
 
 0.50 (2016-08-18)
