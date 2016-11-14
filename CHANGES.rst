@@ -5,7 +5,9 @@ Changelog of serverscripts
 0.54 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Zapped check of global supervisor: this is handled differently now and
+  really needs a change in the supervisorrecipe. The current checks only lead
+  to false positives.
 
 
 0.53 (2016-09-20)
