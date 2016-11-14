@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-0.54 (unreleased)
+0.54 (2016-11-14)
 -----------------
 
 - Zapped check of global supervisor: this is handled differently now and
