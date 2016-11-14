@@ -313,16 +313,6 @@ def main():
 
         result[name] = checkout
 
-    # Global supervisorctl
-    if os.path.exists('/etc/supervisor/'):
-        logger.debug("Global supervisor detected. Asking it for processes...")
-        try:
-            num_not_running += supervisorctl_warnings('supervisorctl')
-        except:  # Bare except.
-            logger.exception("Error calling global supervisorctl")
-    else:
-        logger.debug("No global supervisor found")
-
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
     zabbix_file = os.path.join(VAR_DIR, 'nens.bin_django_failures.errors')
     open(zabbix_file, 'w').write(str(num_bin_django_failures))
