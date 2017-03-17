@@ -285,6 +285,13 @@ def main():
         if os.path.islink(directory):
             logger.info("Ignoring %s, it is a symlink", directory)
             continue
+        if os.path.isfile(directory):
+            logger.info("Ignoring %s, it is a file (*.tgz, for instance)",
+                        directory)
+            continue
+        if name == 'lost+found':
+            logger.info("Ignoring /srv/lost+found dir")
+            continue
         checkout = {}
         checkout['name'] = name
         checkout['directory'] = directory
