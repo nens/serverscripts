@@ -5,7 +5,7 @@ Changelog of serverscripts
 0.55 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Ignoring files and lost+found dir in /srv now.
 
 
 0.54 (2016-11-14)
