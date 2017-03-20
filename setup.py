@@ -45,6 +45,7 @@ setup(name='serverscripts',
           'console_scripts': [
               'cifsfixer = serverscripts.cifsfixer:main',
               'checkout-info = serverscripts.checkouts:main',
+              'docker-info = serverscripts.docker:main',
               'nginx-info = serverscripts.nginx:main',
               'apache-info = serverscripts.apache:main',
               'haproxy-info = serverscripts.haproxy:main',
