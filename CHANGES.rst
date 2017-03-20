@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- More corner cases.
 
 
 1.0.2 (2017-03-20)
