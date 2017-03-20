@@ -12,15 +12,9 @@ import sys
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'docker.fact')
-DOCKER_TEMPLATE = {'images': 0,
-                   'active_images': 0,
-                   'images_size': 0,
-                   'containers': 0,
+DOCKER_TEMPLATE = {'active_images': 0,
                    'active_containers': 0,
-                   'containers_size': 0,
-                   'volumes': 0,
                    'active_volumes': 0,
-                   'volumes_size': 0,
 }
 
 
@@ -34,16 +28,47 @@ def is_docker_available():
 def all_info():
     """Return the info we want to extract from docker.
 
-    $ docker system df
+    The output looks like this::
 
-    TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
-    Images              50                  2                   16.66 GB            16.13 GB (96%)
-    Containers          2                   2                   70 B                0 B (0%)
-    Local Volumes       3                   3                   123 MB              0 B (0%)
+      $ docker system df
+
+      TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+      Images              50                  2                   16.66 GB            16.13 GB (96%)
+      Containers          2                   2                   70 B                0 B (0%)
+      Local Volumes       3                   3                   123 MB              0 B (0%)
 
     """
-    result = {}
-    # TODO
+    result = DOCKER_TEMPLATE.copy()
+    command = "docker system df"
+    logger.debug("Running '%s'...", command)
+    sub = subprocess.Popen(command,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           universal_newlines=True)
+    output, error = sub.communicate()
+    if error:
+        logger.warn("Error output from docker command: %s", error)
+    lines = [line.strip() for line in output.split('\n')]
+    lines = [line.lower() for line in lines if line]
+    if 'active' not in lines[0]:
+        return
+    start_column = lines[0].find('active')
+    for line in lines[1:]:
+        count = line[start_column:start_column + 4].strip()
+        try:
+            count = int(count)
+        except:
+            count = 'unknown'
+            logger.exception("Couldn't parse int: %r", count)
+            continue
+        if 'images' in line:
+            result['active_images'] = count
+        if 'containers' in line:
+            result['active_containers'] = count
+        if 'volumes' in line:
+            result['active_volumes'] = count
+    logger.info("Found the following info on docker: %r", result)
     return result
 
 
@@ -83,4 +108,5 @@ def main():
         return
 
     result = all_info()
-    open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    if result:
+        open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
