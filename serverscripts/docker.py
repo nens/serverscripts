@@ -10,7 +10,7 @@ import sys
 
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'dockers.fact')
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'docker.fact')
 DOCKER_TEMPLATE = {'active_images': 0,
                    'active_containers': 0,
                    'active_volumes': 0,
@@ -50,7 +50,7 @@ def all_info():
         logger.warn("Error output from docker command: %s", error)
     lines = [line.strip() for line in output.split('\n')]
     lines = [line.lower() for line in lines if line]
-    if 'active' not in lines[0]:
+    if not lines or 'active' not in lines[0]:
         return
     start_column = lines[0].find('active')
     for line in lines[1:]:
