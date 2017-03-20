@@ -51,7 +51,7 @@ def all_info():
     lines = [line.strip() for line in output.split('\n')]
     lines = [line.lower() for line in lines if line]
     if not lines or 'active' not in lines[0]:
-        return
+        return {}
     start_column = lines[0].find('active')
     for line in lines[1:]:
         count = line[start_column:start_column + 4].strip()
@@ -114,9 +114,10 @@ def main():
                                             sort_keys=True,
                                             indent=4))
 
-    zabbix_file1 = os.path.join(VAR_DIR, 'nens.num_active_docker_images.info')
-    open(zabbix_file1, 'w').write(str(info_on_docker['active_images']))
-    zabbix_file2 = os.path.join(VAR_DIR, 'nens.num_active_docker_containers.info')
-    open(zabbix_file2, 'w').write(str(info_on_docker['active_containers']))
-    zabbix_file3 = os.path.join(VAR_DIR, 'nens.num_active_docker_volumes.info')
-    open(zabbix_file3, 'w').write(str(info_on_docker['active_volumes']))
+    if 'active_images' in info_on_docker:
+        zabbix_file1 = os.path.join(VAR_DIR, 'nens.num_active_docker_images.info')
+        open(zabbix_file1, 'w').write(str(info_on_docker['active_images']))
+        zabbix_file2 = os.path.join(VAR_DIR, 'nens.num_active_docker_containers.info')
+        open(zabbix_file2, 'w').write(str(info_on_docker['active_containers']))
+        zabbix_file3 = os.path.join(VAR_DIR, 'nens.num_active_docker_volumes.info')
+        open(zabbix_file3, 'w').write(str(info_on_docker['active_volumes']))
