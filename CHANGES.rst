@@ -5,7 +5,11 @@ Changelog of serverscripts
 0.55 (unreleased)
 -----------------
 
-- Ignoring files and lost+found dir in /srv now.
+- Ignoring files (instead of the expected directories) and lost+found dir
+  in /srv now.
+
+- Added docker detection (number of active images/volumes/containers).
+
 
 
 0.54 (2016-11-14)
