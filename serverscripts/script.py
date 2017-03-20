@@ -20,6 +20,7 @@ def main():
 
     """
     for module in [serverscripts.checkouts,
+                   serverscripts.docker,
                    serverscripts.nginx,
                    serverscripts.apache,
                    serverscripts.database,
