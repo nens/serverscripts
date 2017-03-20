@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.0.2 (unreleased)
+1.0.2 (2017-03-20)
 ------------------
 
 - Bugfix (corner case).
