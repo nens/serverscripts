@@ -1,6 +1,5 @@
 """Extract info on docker."""
 import argparse
-import copy
 import json
 import logging
 import os
@@ -107,6 +106,17 @@ def main():
     if not is_docker_available():
         return
 
-    result = all_info()
-    if result:
-        open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    info_on_docker = all_info()
+    docker_is_active = any(info_on_docker.values())
+    result_for_serverinfo = {'available': True,
+                             'active': docker_is_active}
+    open(OUTPUT_FILE, 'w').write(json.dumps(result_for_serverinfo,
+                                            sort_keys=True,
+                                            indent=4))
+
+    zabbix_file1 = os.path.join(VAR_DIR, 'nens.num_active_docker_images.info')
+    open(zabbix_file1, 'w').write(str(info_on_docker['active_images']))
+    zabbix_file2 = os.path.join(VAR_DIR, 'nens.num_active_docker_containers.info')
+    open(zabbix_file2, 'w').write(str(info_on_docker['active_containers']))
+    zabbix_file3 = os.path.join(VAR_DIR, 'nens.num_active_docker_volumes.info')
+    open(zabbix_file3, 'w').write(str(info_on_docker['active_volumes']))
