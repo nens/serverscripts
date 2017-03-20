@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-0.55 (unreleased)
------------------
+1.0 (2017-03-20)
+----------------
 
 - Ignoring files (instead of the expected directories) and lost+found dir
   in /srv now.
