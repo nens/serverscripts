@@ -10,7 +10,7 @@ import sys
 
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'docker.fact')
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'dockers.fact')
 DOCKER_TEMPLATE = {'active_images': 0,
                    'active_containers': 0,
                    'active_volumes': 0,

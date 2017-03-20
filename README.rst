@@ -32,7 +32,6 @@ You could also copy the tgz directly to the server and ``pip install the/file.tg
 Prerequisite: ``apt-get install python-pip``.
 
 
-
 Cifsfixer
 ---------
 
@@ -97,6 +96,22 @@ Before the taking it in production run the file manually in debug mode like::
 
 
 
+Docker-info
+------------
+
+``bin/docker-info`` collects info on dockers and saves availability/activity to
+``/var/local/serverinfo-facts/dockers.fact``. This is used by the serverinfo
+website.
+
+It also prepares info for zabbix: the number of active images, containers and
+volumes.
+
+Should be installed in a cronjob. Suggestion for the crontab (note: it needs
+to run as root)::
+
+    */5 * * * * /usr/local/bin/docker-info > /dev/null 2>&1
+
+
 TODO/ideas
 ----------
 
@@ -104,10 +119,3 @@ TODO/ideas
 
 - zest.releaser plugin (google for it first!) for uploading the sdist
   somewhere non-vanrees-like.
-
-- nginx info grabber, /srv django info grabber. Resurrect it from ye olde
-  serverinfo tool.
-
-- Figure out how to feed it to ansible's info collection machinery.
-
-- Prepare info for zabbix.
