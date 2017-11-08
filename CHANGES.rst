@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added database bloat logging.
 
 
 1.0.3 (2017-03-20)
