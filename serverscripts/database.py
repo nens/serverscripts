@@ -81,22 +81,22 @@ WITH btree_index_atts AS (
         indrelid, indexrelid,
         indexclass.relam,
         tableclass.relname as tablename,
-        regexp_split_to_table(indkey::text, " ")::smallint AS attnum,
+        regexp_split_to_table(indkey::text, ' ')::smallint AS attnum,
         indexrelid as index_oid
     FROM pg_index
     JOIN pg_class AS indexclass ON pg_index.indexrelid = indexclass.oid
     JOIN pg_class AS tableclass ON pg_index.indrelid = tableclass.oid
     JOIN pg_namespace ON pg_namespace.oid = indexclass.relnamespace
     JOIN pg_am ON indexclass.relam = pg_am.oid
-    WHERE pg_am.amname = "btree" and indexclass.relpages > 0
-         AND nspname NOT IN ("pg_catalog","information_schema")
+    WHERE pg_am.amname = 'btree' and indexclass.relpages > 0
+         AND nspname NOT IN ('pg_catalog','information_schema')
     ),
 index_item_sizes AS (
     SELECT
     ind_atts.nspname, ind_atts.index_name,
     ind_atts.reltuples, ind_atts.relpages, ind_atts.relam,
     indrelid AS table_oid, index_oid,
-    current_setting("block_size")::numeric AS bs,
+    current_setting('block_size')::numeric AS bs,
     8 AS maxalign,
     24 AS pagehdr,
     CASE WHEN max(coalesce(pg_stats.null_frac,0)) = 0
@@ -172,7 +172,7 @@ ORDER BY bloat_mb DESC;
     """
     result = []
     for database_name in database_names:
-        command = "sudo -u postgres psql -c '%s' --tuples-only %s" % (
+        command = 'sudo -u postgres psql -c "%s" --tuples-only %s' % (
             query,
             database_name)
 
