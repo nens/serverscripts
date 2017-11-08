@@ -199,7 +199,7 @@ def all_info():
     result = {}
     result['version'] = _postgres_version()
     result['databases'] = _database_infos()
-    database_names = [item['name'] for item in result['databases']]
+    database_names = result['databases'].keys()
     result['bloated_tables'] = _table_bloat(database_names)
 
     if result['databases']:
