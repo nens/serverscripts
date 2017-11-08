@@ -195,6 +195,9 @@ ORDER BY bloat_mb DESC;
             result.append({'name': name,
                            'percentage': percentage,
                            'mb': mb})
+            logger.info("Table %s has %s%% bloat (%sMB)",
+                        name, percentage, mb)
+
     return result
 
 
