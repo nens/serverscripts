@@ -4,10 +4,11 @@ Better than having 5 different cronjobs :-)"""
 
 import serverscripts.apache
 import serverscripts.checkouts
-import serverscripts.docker
 import serverscripts.database
+import serverscripts.docker
 import serverscripts.haproxy
 import serverscripts.nginx
+import serverscripts.pbis
 import serverscripts.rabbitmq
 
 
@@ -20,13 +21,16 @@ def main():
     is run separately by another cronjob.
 
     """
-    for module in [serverscripts.checkouts,
-                   serverscripts.docker,
-                   serverscripts.nginx,
-                   serverscripts.apache,
-                   serverscripts.database,
-                   serverscripts.haproxy,
-                   serverscripts.rabbitmq]:
+    for module in [
+            serverscripts.apache,
+            serverscripts.checkouts,
+            serverscripts.database,
+            serverscripts.docker,
+            serverscripts.haproxy,
+            serverscripts.nginx,
+            serverscripts.pbis,
+            serverscripts.rabbitmq,
+    ]:
         try:
             module.main()
         except Exception, e:
