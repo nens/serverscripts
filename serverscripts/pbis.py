@@ -31,8 +31,10 @@ def check_pbis():
     online = [line for line in lines if 'online' in line]
     nens_local = [line for line in lines if 'nens.local' in line]
     if online and nens_local:
+        logger.info("Both 'online' and 'nens.local' found")
         return OK
     else:
+        logger.error("Not both of 'online' and 'nens.local' found")
         return ERROR
 
 
