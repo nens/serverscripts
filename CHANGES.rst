@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.2 (unreleased)
+1.2 (2017-11-09)
 ----------------
 
 - Added bin/pbis-info script which checks the pbis status for zabbix.
