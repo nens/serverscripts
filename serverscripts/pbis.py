@@ -2,14 +2,11 @@
 
 """
 import argparse
-import json
 import logging
 import os
 import serverscripts
 import sys
 import subprocess
-import operator
-
 
 VAR_DIR = '/var/local/serverscripts'
 PBIS_EXECUTABLE = '/usr/bin/pbis'
@@ -75,4 +72,4 @@ def main():
         logger.info("No %s found, skipping the pbis check", PBIS_EXECUTABLE)
 
     zabbix_errors_file = os.path.join(VAR_DIR, 'nens.pbis.errors')
-    open(zabbix_errors_file, 'w').write(status)
+    open(zabbix_errors_file, 'w').write(str(status))
