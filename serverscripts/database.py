@@ -6,6 +6,7 @@ import copy
 import json
 import logging
 import os
+import re
 import serverscripts
 import subprocess
 import sys
@@ -16,6 +17,13 @@ OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'databases.fact')
 DATABASE_TEMPLATE = {'name': '',
                      'size': 0}
+POSTGRES_VERSION = re.compile(r"""
+    .*
+    /usr/lib/postgresql/     # Start of path to binary
+    (?P<version>[0-9\.]+)    # dotted version
+    /bin/postgres            # end of path to binary
+    .*
+    """, re.VERBOSE)
 
 logger = logging.getLogger(__name__)
 
@@ -25,15 +33,19 @@ def is_postgres_available():
 
 
 def _postgres_version():
-    sub = subprocess.Popen('service postgresql status',
+    sub = subprocess.Popen('ps ax',
                            shell=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,
                            universal_newlines=True)
     output, error = sub.communicate()
-    # Output is something like "9.3/main (port 5432): online"
-    parts = output.split('/')
-    return parts[0]
+    lines = output.splitlines()
+    for line in lines:
+        if POSTGRES_VERSION.match(line):
+            match = POSTGRES_VERSION.search(line)
+            version = match.group('version')
+            return version
+    return ''
 
 
 def _database_infos():
