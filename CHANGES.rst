@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fixed database version detection for postgres 9.5.
 
 
 1.2 (2017-11-09)
