@@ -2,6 +2,7 @@
 
 """
 import argparse
+import json
 import logging
 import os
 import serverscripts
@@ -9,6 +10,8 @@ import sys
 import subprocess
 
 VAR_DIR = '/var/local/serverscripts'
+OUTPUT_DIR = '/var/local/serverinfo-facts'
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'pbis.fact')
 PBIS_EXECUTABLE = '/usr/bin/pbis'
 OK = 0
 ERROR = 1
@@ -68,10 +71,18 @@ def main():
                         format="%(levelname)s: %(message)s")
 
     status = OK
-    if os.path.exists(PBIS_EXECUTABLE):
+    pbis_exists = os.path.exists(PBIS_EXECUTABLE)
+    if pbis_exists:
         status = check_pbis()
     else:
         logger.info("No %s found, skipping the pbis check", PBIS_EXECUTABLE)
+
+    # Write facts for serverinfo.
+    if not os.path.exists(OUTPUT_DIR):
+        os.mkdir(OUTPUT_DIR)
+        logger.info("Created %s", OUTPUT_DIR)
+    open(OUTPUT_FILE, 'w').write(json.dumps(
+        {'exists': pbis_exists}, sort_keys=True, indent=4))
 
     zabbix_errors_file = os.path.join(VAR_DIR, 'nens.pbis.errors')
     open(zabbix_errors_file, 'w').write(str(status))
