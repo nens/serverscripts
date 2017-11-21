@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.4 (unreleased)
+1.4 (2017-11-21)
 ----------------
 
 - Pbis info (whether it exists only, though) is exported to the serverinfo
