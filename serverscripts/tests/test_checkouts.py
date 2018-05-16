@@ -11,6 +11,8 @@ class GitAndEggInfoTestCase(TestCase):
     def setUp(self):
         self.our_dir = os.path.dirname(__file__)
         self.dir_with_git = os.path.join(self.our_dir, '..', '..')
+        self.dir_with_buildout = os.path.join(self.our_dir,
+                                              'example_buildout_project')
         self.example_diffsettings_output = open(os.path.join(
             self.our_dir, 'example_diffsettings.txt')).read()
 
@@ -25,11 +27,11 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(checkouts.eggs_info(self.our_dir), None)
 
     def test_correct_eggs_info(self):
-        output = checkouts.eggs_info(self.dir_with_git)
-        self.assertIn('mock', output)
+        output = checkouts.eggs_info(self.dir_with_buildout)
+        self.assertIn('serverscripts', output)
 
     def test_python_version_in_eggs_info(self):
-        output = checkouts.eggs_info(self.dir_with_git)
+        output = checkouts.eggs_info(self.dir_with_buildout)
         our_python_version = '%s.%s.%s' % (sys.version_info.major,
                                            sys.version_info.minor,
                                            sys.version_info.micro)
