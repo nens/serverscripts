@@ -46,3 +46,4 @@ local*settings*.py
 bower_components/
 
 .idea
+.venv
