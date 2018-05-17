@@ -233,7 +233,6 @@ def pipenv_info(directory):
 
 
 def django_info(bin_django):
-    result = {'databases': []}
     matplotlibenv = 'MPLCONFIGDIR=/tmp'
     # Corner case when something needs matplotlib in django's settings.
     command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
@@ -249,6 +248,11 @@ def django_info(bin_django):
         logger.warn("Error output from diffsettings command: %s", error)
         if not output:
             return
+    return parse_django_info(output)
+
+
+def parse_django_info(output):
+    result = {'databases': []}
     dont_care, tempfile_name = tempfile.mkstemp()
     interesting = ['DEBUG',
                    'DATABASES',
