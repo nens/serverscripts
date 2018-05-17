@@ -35,6 +35,27 @@ GIT_URL = re.compile(r"""
     \(                # Opening parentheses.
     .*$               # Whatever till the end of line.
     """, re.VERBOSE)
+EDITABLE_PKG = re.compile(r"""
+    -e                # editable
+    \W*               # Whitespace.
+    .*                # git@ or https://
+    github.com        # Base github incantation.
+    [:/]              # : (git@) or / (https)
+    (?P<user>.+)      # User/org string.
+    /                 # Slash.
+    (?P<project>\S+?) # Project.
+    (\.git)?          # Optional '.git'.
+    @(?P<ref>.+)      # Branch or revision
+    \#egg=            # Opening parentheses.
+    (?P<module>.+)$   # Module name
+    """, re.VERBOSE)
+PYTHON_VERSION = re.compile(r"""
+    .*                # anything
+    Python            # what we are looking for
+    \W*               # Whitespace.
+    (?P<version>.[0-9.]+)  # version
+    .*$               # anything until the end
+    """, re.VERBOSE)
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'checkouts.fact')
@@ -162,6 +183,53 @@ def eggs_info(directory):
         del eggs['Python']  # This is the version we run with, it seems.
     eggs['python'] = python_version
     return eggs
+
+
+def run_in_dir(command, directory):
+    logger.debug("Running %s...", command)
+    sub = subprocess.Popen(command,
+                           shell=True,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           universal_newlines=True,
+                           cwd=directory)
+    output, error = sub.communicate()
+    return output, error
+
+
+def pipenv_info(directory):
+    directory = os.path.abspath(directory)
+    output, error = run_in_dir("pipenv --where", directory)
+
+    if output.strip() != directory:
+        logger.error("No pipenv found in %s", directory)
+        return
+
+    output, error = run_in_dir("pipenv run python --version", directory)
+    match = PYTHON_VERSION.match((output + error).replace('\n', ''))
+    if match is None:
+        python_version = 'UNKNOWN'
+    else:
+        python_version = match.group('version')
+    logger.debug("Python version used: %s", python_version)
+
+    output, error = run_in_dir("pipenv run pip freeze", directory)
+
+    pkgs = dict()
+    for pkg in output.split('\n'):
+        if len(pkg) == 0:
+            continue
+        if pkg.startswith('-e'):
+            match = EDITABLE_PKG.match(pkg)
+            pkgs[match.group('project')] = match.group('ref')
+        pkg = pkg.split('==')  # name==version
+        if len(pkg) != 2:
+            # invalid spec
+            continue
+        pkgs[pkg[0]] = pkg[1]
+
+    pkgs['python'] = python_version
+    return pkgs
 
 
 def django_info(bin_django):

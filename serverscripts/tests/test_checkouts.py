@@ -4,6 +4,34 @@ from unittest import TestCase
 import mock
 import os
 import sys
+import tempfile
+
+
+class PipenvTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.our_dir = os.path.dirname(__file__)
+        cls.dir_outside_proj = tempfile.mkdtemp()
+        cls.dir_with_pipenv = os.path.join(cls.our_dir, '..', '..')
+
+    @classmethod
+    def tearDownClass(cls):
+        os.rmdir(cls.dir_outside_proj)
+
+    def test_no_pipenv(self):
+        # a subdirectory of the project
+        self.assertIsNone(checkouts.pipenv_info(self.our_dir))
+        # an empty directory in /tmp
+        self.assertIsNone(checkouts.pipenv_info(self.dir_outside_proj))
+
+    def test_correct_pipenv_info(self):
+        output = checkouts.pipenv_info(self.dir_with_pipenv)
+        self.assertIn('serverscripts', output)
+        self.assertEquals(output['mock'], mock.__version__)
+        our_python_version = '%s.%s.%s' % (sys.version_info.major,
+                                           sys.version_info.minor,
+                                           sys.version_info.micro)
+        self.assertEquals(output['python'], our_python_version)
 
 
 class GitAndEggInfoTestCase(TestCase):
