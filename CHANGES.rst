@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added checkout-info support for pipenv projects.
 
 
 1.4 (2017-11-21)
