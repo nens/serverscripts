@@ -232,7 +232,7 @@ def pipenv_info(directory):
     return pkgs
 
 
-def django_info(bin_django):
+def django_info_buildout(bin_django):
     matplotlibenv = 'MPLCONFIGDIR=/tmp'
     # Corner case when something needs matplotlib in django's settings.
     command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
@@ -244,6 +244,24 @@ def django_info(bin_django):
                            stderr=subprocess.PIPE,
                            universal_newlines=True)
     output, error = sub.communicate()
+    if error:
+        logger.warn("Error output from diffsettings command: %s", error)
+        if not output:
+            return
+    return parse_django_info(output)
+
+
+def django_info(directory, pipenv=False):
+    if pipenv:
+        django_script = 'pipenv run python manage.py'
+    else:
+        django_script = 'python manage.py'
+
+    matplotlibenv = 'MPLCONFIGDIR=/tmp'
+    # Corner case when something needs matplotlib in django's settings.
+    command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
+                                                       django_script)
+    output, error = run_in_dir(command, directory)
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
         if not output:
@@ -271,8 +289,8 @@ def parse_django_info(output):
     try:
         execfile(tempfile_name, global_env, settings)
     except Exception:
-        logger.exception("'%s diffsettings' output could not be parsed:\n%s",
-                         bin_django, output)
+        logger.exception("'diffsettings' output could not be parsed:\n%s",
+                         output)
         return
     for database in settings.get('DATABASES', {}).values():
         engine = database.get('ENGINE')
@@ -368,18 +386,27 @@ def main():
         checkout['name'] = name
         checkout['directory'] = directory
         checkout['git'] = git_info(directory)
+        pipenv = False
         if os.path.exists(os.path.join(directory, 'buildout.cfg')):
             checkout['eggs'] = eggs_info(directory)
+        elif os.path.exists(os.path.join(directory, 'Pipfile')):
+            checkout['eggs'] = pipenv_info(directory)
+            pipenv = checkout['eggs'] is not None
         else:
-            logger.warn("/srv directory without buildout.cfg: %s", directory)
+            logger.warn("/srv directory without buildout.cfg or "
+                        "Pipfile: %s", directory)
 
         bin_django = os.path.join(directory, 'bin', 'django')
         if os.path.exists(bin_django):
-            checkout['django'] = django_info(bin_django)
+            checkout['django'] = django_info_buildout(bin_django)
+            if not checkout['django']:
+                num_bin_django_failures += 1
+        elif os.path.exists(os.path.join(directory, 'manage.py')):
+            checkout['django'] = django_info(directory, pipenv=pipenv)
             if not checkout['django']:
                 num_bin_django_failures += 1
         else:
-            logger.debug("No django script found: %s", bin_django)
+            logger.debug("No django script found in %s", directory)
 
         bin_supervisorctl = os.path.join(directory, 'bin', 'supervisorctl')
         if os.path.exists(bin_supervisorctl):
