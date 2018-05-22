@@ -7,6 +7,8 @@ Changelog of serverscripts
 
 - Added checkout-info support for pipenv projects.
 
+- Support 'access_log off;' in nginx configs.
+
 
 1.4 (2017-11-21)
 ----------------
