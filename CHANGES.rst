@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-1.6 (unreleased)
-----------------
+1.5.1 (2018-05-22)
+------------------
 
 - Fix support 'access_log off;' in nginx configs.
 
