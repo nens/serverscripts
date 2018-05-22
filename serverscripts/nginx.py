@@ -34,8 +34,9 @@ SERVER_START = re.compile(r"""
     """, re.VERBOSE)
 OUTPUT_DIR = '/var/local/serverinfo-facts'
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'nginxs.fact')
-SITE_TEMPLATE = {'name': '',
-                 'protocol': 'http',
+SITE_TEMPLATE = {
+    'name': '',
+    'protocol': 'http',
 }
 
 
@@ -87,10 +88,13 @@ def extract_sites(filename):
                 site['protocol'] = 'https'
             else:
                 logger.error("Listen line without proper port: %s", line)
-
+        elif re.compile(r'access_log\s+off;').match(line):
+            # Logging may be disabled (favicon.ico, robots.txt, etc.).
+            # http://nginx.org/en/docs/http/ngx_http_log_module.html
+            continue
         elif line.startswith('access_log'):
-            # Assumption: access log is in the buildout directory where our site is,
-            # so something like /srv/DIRNAME/var/log/access.log.
+            # Assumption: access log is in the buildout directory where our
+            # site is, so something like /srv/DIRNAME/var/log/access.log.
             line = line[len('access_log'):]
             line = line.strip()
             logfilename = line.split()[0]
