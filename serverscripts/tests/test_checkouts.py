@@ -4,6 +4,51 @@ from unittest import TestCase
 import mock
 import os
 import sys
+import tempfile
+
+
+class PipenvTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.our_dir = os.path.dirname(__file__)
+        cls.dir_outside_proj = tempfile.mkdtemp()
+        cls.dir_with_pipenv = os.path.join(cls.our_dir, '..', '..')
+        cls.example_diffsettings_output = open(os.path.join(
+            cls.our_dir, 'example_diffsettings.txt')).read()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.rmdir(cls.dir_outside_proj)
+
+    def test_no_pipenv(self):
+        # a subdirectory of the project
+        self.assertIsNone(checkouts.pipenv_info(self.our_dir))
+        # an empty directory in /tmp
+        self.assertIsNone(checkouts.pipenv_info(self.dir_outside_proj))
+
+    def test_correct_pipenv_info(self):
+        output = checkouts.pipenv_info(self.dir_with_pipenv)
+        self.assertIn('serverscripts', output)
+        self.assertEquals(output['mock'], mock.__version__)
+        our_python_version = '%s.%s.%s' % (sys.version_info.major,
+                                           sys.version_info.minor,
+                                           sys.version_info.micro)
+        self.assertEquals(output['python'], our_python_version)
+
+    def test_django_info_no_pipenv(self):
+        result = checkouts.django_info(self.dir_outside_proj)
+        self.assertIsNone(result)
+
+    def test_django_info_pipenv(self):
+        result = checkouts.django_info(self.dir_with_pipenv)
+        self.assertIsNone(result)
+
+    def test_django_info(self):
+        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
+            mock_communicate.return_value = (self.example_diffsettings_output,
+                                             "")
+            result = checkouts.django_info(self.dir_outside_proj)
+            self.assertEquals(len(result['databases']), 2)
 
 
 class GitAndEggInfoTestCase(TestCase):
@@ -11,6 +56,8 @@ class GitAndEggInfoTestCase(TestCase):
     def setUp(self):
         self.our_dir = os.path.dirname(__file__)
         self.dir_with_git = os.path.join(self.our_dir, '..', '..')
+        self.dir_with_buildout = os.path.join(self.our_dir,
+                                              'example_buildout_project')
         self.example_diffsettings_output = open(os.path.join(
             self.our_dir, 'example_diffsettings.txt')).read()
 
@@ -25,11 +72,11 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(checkouts.eggs_info(self.our_dir), None)
 
     def test_correct_eggs_info(self):
-        output = checkouts.eggs_info(self.dir_with_git)
-        self.assertIn('mock', output)
+        output = checkouts.eggs_info(self.dir_with_buildout)
+        self.assertIn('serverscripts', output)
 
     def test_python_version_in_eggs_info(self):
-        output = checkouts.eggs_info(self.dir_with_git)
+        output = checkouts.eggs_info(self.dir_with_buildout)
         our_python_version = '%s.%s.%s' % (sys.version_info.major,
                                            sys.version_info.minor,
                                            sys.version_info.micro)
@@ -59,7 +106,7 @@ class GitAndEggInfoTestCase(TestCase):
         with mock.patch('subprocess.Popen.communicate') as mock_communicate:
             mock_communicate.return_value = (self.example_diffsettings_output,
                                              "")
-            result = checkouts.django_info('some/bin/django')
+            result = checkouts.django_info_buildout('some/bin/django')
             self.assertEquals(len(result['databases']), 2)
 
     def test_supervisorctl_warnings(self):
