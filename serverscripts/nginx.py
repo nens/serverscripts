@@ -88,7 +88,7 @@ def extract_sites(filename):
                 site['protocol'] = 'https'
             else:
                 logger.error("Listen line without proper port: %s", line)
-        elif re.compile(r'access_log\s+off;').match(line):
+        elif re.compile(r'access_log\s+off').match(line):
             # Logging may be disabled (favicon.ico, robots.txt, etc.).
             # http://nginx.org/en/docs/http/ngx_http_log_module.html
             continue
