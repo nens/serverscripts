@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.5.2 (unreleased)
+1.5.2 (2018-05-23)
 ------------------
 
 - Added checkout-info support for supervisorctl in pipenv projects.
