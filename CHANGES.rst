@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.5.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Skip virtualenv-managed projects (temporary fix).
 
 
 1.5.2 (2018-05-23)

@@ -78,7 +78,7 @@ def git_info(directory):
     logger.debug("Looking in %s...", directory)
     data = {}
     dir_contents = os.listdir(directory)
-    if not '.git' in dir_contents:
+    if '.git' not in dir_contents:
         logger.warn("No .git directory found in %s", directory)
         return
 
@@ -143,8 +143,10 @@ def eggs_info(directory):
             # Skipping imports that may be unavailable in the current path.
             if line.strip() != 'import sys':
                 # When we see these lines we have moved past the sys.path:
-                if 'import ' in line or 'os.chdir' in line or\
-                    '__import__' in line or '_interactive = True' in line:
+                if (
+                    'import ' in line or 'os.chdir' in line or
+                    '__import__' in line or '_interactive = True' in line
+                ):
                     break
             new_contents.append(line)
         # This is very evil, but cool! Because of the __name__ != main the
@@ -274,7 +276,7 @@ def parse_django_info(output):
     dont_care, tempfile_name = tempfile.mkstemp()
     interesting = ['DEBUG',
                    'DATABASES',
-                   'SETTINGS_MODULE',]
+                   'SETTINGS_MODULE', ]
     lines = [line for line in output.split('\n')
              if '<' not in line
              and 'datetime' not in line
@@ -330,7 +332,8 @@ def supervisorctl_warnings(supervisorctl_command):
     not_running = [line for line in lines if 'running' not in line.lower()]
     num_not_running = len(not_running)
     if num_not_running:
-        logger.warn("Some processes in %s aren't running:", bin_supervisorctl)
+        logger.warn(
+            "Some processes in %s aren't running:", supervisorctl_command)
         for line in not_running:
             logger.warn("    %s", line)
     return num_not_running
@@ -401,7 +404,7 @@ def main():
             checkout['django'] = django_info_buildout(bin_django)
             if not checkout['django']:
                 num_bin_django_failures += 1
-        elif os.path.exists(os.path.join(directory, 'manage.py')):
+        elif pipenv and os.path.exists(os.path.join(directory, 'manage.py')):
             checkout['django'] = django_info(directory, pipenv=pipenv)
             if not checkout['django']:
                 num_bin_django_failures += 1
