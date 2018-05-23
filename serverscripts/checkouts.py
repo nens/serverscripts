@@ -426,12 +426,14 @@ def main():
                 except:  # Bare except.
                     logger.exception("Error calling %s", svc_command)
             elif len(confs) == 0:
-                logger.exception("No supervisorctl configuration found")
+                logger.exception("No supervisorctl configuration found in %s",
+                                 etc_directory)
             else:
-                logger.exception("Multiple ({}) supervisorctl configurations "
-                                 "found".format(len(confs)))
+                logger.exception("Multiple supervisorctl configurations "
+                                 "found in %s", etc_directory)
         else:
-            logger.debug("No supervisorctl script found in %s", directory)
+            logger.debug("No supervisorctl script or etc directory found in "
+                         "%s", directory)
 
         result[name] = checkout
 
