@@ -311,9 +311,9 @@ def parse_django_info(output):
     return result
 
 
-def supervisorctl_warnings(bin_supervisorctl):
+def supervisorctl_warnings(supervisorctl_command):
     """Return number of not-running processes inside supervisorctl"""
-    command = "%s status" % bin_supervisorctl
+    command = "%s status" % supervisorctl_command
     logger.debug("Running '%s'...", command)
     sub = subprocess.Popen(command,
                            shell=True,
@@ -409,13 +409,29 @@ def main():
             logger.debug("No django script found in %s", directory)
 
         bin_supervisorctl = os.path.join(directory, 'bin', 'supervisorctl')
+        etc_directory = os.path.join(directory, 'etc')
         if os.path.exists(bin_supervisorctl):
             try:
                 num_not_running += supervisorctl_warnings(bin_supervisorctl)
             except:  # Bare except.
                 logger.exception("Error calling %s", bin_supervisorctl)
+        elif os.path.exists(etc_directory):
+            confs = [fn for fn in os.listdir(etc_directory)
+                     if 'supervisor' in fn and fn.endswith('.conf')]
+            if len(confs) == 1:
+                conf_path = os.path.join(etc_directory, confs[0])
+                svc_command = "supervisorctl -c '{}'".format(conf_path)
+                try:
+                    num_not_running += supervisorctl_warnings(svc_command)
+                except:  # Bare except.
+                    logger.exception("Error calling %s", svc_command)
+            elif len(confs) == 0:
+                logger.exception("No supervisorctl configuration found")
+            else:
+                logger.exception("Multiple ({}) supervisorctl configurations "
+                                 "found".format(len(confs)))
         else:
-            logger.debug("No supervisorctl script found: %s", bin_supervisorctl)
+            logger.debug("No supervisorctl script found in %s", directory)
 
         result[name] = checkout
 
