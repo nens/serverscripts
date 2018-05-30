@@ -199,9 +199,14 @@ def run_in_dir(command, directory):
     return output, error
 
 
-def get_executable(name):
-    """ Cron is not aware of the PATH, so we need to look for some scripts. """
-    paths = ['/usr/local/bin', '/usr/bin', '/bin']
+def whereis(name):
+    """ Find the first available path to an executable script. If the PATH
+    variable is not set (cronjobs), look inside some default bin folders."""
+    paths = os.environ.get("PATH")
+    if paths:
+        paths = paths.split(':')
+    else:  # cronjobs have no PATH, set some defaults here
+        paths = ['/usr/local/bin', '/usr/bin', '/bin']
     for path in paths:
         executable = os.path.join(path, name)
         if os.access(executable, os.X_OK):
@@ -210,7 +215,7 @@ def get_executable(name):
 
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    pipenv_exe = get_executable('pipenv')
+    pipenv_exe = whereis('pipenv')
     output, error = run_in_dir("%s --where" % pipenv_exe, directory)
 
     if output.strip() != directory:
@@ -265,7 +270,7 @@ def django_info_buildout(bin_django):
 
 
 def django_info_pipenv(directory):
-    pipenv_exe = get_executable('pipenv')
+    pipenv_exe = whereis('pipenv')
     django_script = '%s run python manage.py' % pipenv_exe
 
     matplotlibenv = 'MPLCONFIGDIR=/tmp'
@@ -401,7 +406,7 @@ def main():
 
         # determine the type of installation (buildout or pipenv)
         if os.path.exists(os.path.join(directory, 'Pipfile')) and \
-                get_executable('pipenv'):
+                whereis('pipenv'):
             mode = 'pipenv'
         elif os.path.exists(os.path.join(directory, 'buildout.cfg')):
             mode = 'buildout'
@@ -446,7 +451,7 @@ def main():
                     logger.exception("Error calling %s", bin_supervisor)
             else:
                 logger.debug("bin/supervisorctl not found in %s", directory)
-        elif mode == 'pipenv' and get_executable('supervisorctl'):
+        elif mode == 'pipenv' and whereis('supervisorctl'):
             # expect the supervisor conf file in the etc directory
             etc_directory = os.path.join(directory, 'etc')
             if os.path.exists(etc_directory):
@@ -454,7 +459,7 @@ def main():
                          if 'supervisor' in fn and fn.endswith('.conf')]
                 if len(confs) == 1:
                     svc_command = "{0} -c '{1}'".format(
-                        get_executable('supervisorctl'),
+                        whereis('supervisorctl'),
                         os.path.join(etc_directory, confs[0]),
                     )
                     try:
