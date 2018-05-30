@@ -36,18 +36,18 @@ class PipenvTestCase(TestCase):
         self.assertEquals(output['python'], our_python_version)
 
     def test_django_info_no_pipenv(self):
-        result = checkouts.django_info(self.dir_outside_proj)
+        result = checkouts.django_info_pipenv(self.dir_outside_proj)
         self.assertIsNone(result)
 
     def test_django_info_pipenv(self):
-        result = checkouts.django_info(self.dir_with_pipenv)
+        result = checkouts.django_info_pipenv(self.dir_with_pipenv)
         self.assertIsNone(result)
 
     def test_django_info(self):
         with mock.patch('subprocess.Popen.communicate') as mock_communicate:
             mock_communicate.return_value = (self.example_diffsettings_output,
                                              "")
-            result = checkouts.django_info(self.dir_outside_proj)
+            result = checkouts.django_info_pipenv(self.dir_outside_proj)
             self.assertEquals(len(result['databases']), 2)
 
 

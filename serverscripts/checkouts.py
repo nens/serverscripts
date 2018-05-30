@@ -199,15 +199,26 @@ def run_in_dir(command, directory):
     return output, error
 
 
+def get_executable(name):
+    """ Cron is not aware of the PATH, so we need to look for some scripts. """
+    paths = ['/usr/local/bin', '/usr/bin', '/bin']
+    for path in paths:
+        executable = os.path.join(path, name)
+        if os.access(executable, os.X_OK):
+            return executable
+
+
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    output, error = run_in_dir("pipenv --where", directory)
+    pipenv_exe = get_executable('pipenv')
+    output, error = run_in_dir("%s --where" % pipenv_exe, directory)
 
     if output.strip() != directory:
         logger.error("No pipenv found in %s", directory)
         return
 
-    output, error = run_in_dir("pipenv run python --version", directory)
+    output, error = run_in_dir("%s run python --version" % pipenv_exe,
+                               directory)
     match = PYTHON_VERSION.match((output + error).replace('\n', ''))
     if match is None:
         python_version = 'UNKNOWN'
@@ -215,7 +226,7 @@ def pipenv_info(directory):
         python_version = match.group('version')
     logger.debug("Python version used: %s", python_version)
 
-    output, error = run_in_dir("pipenv run pip freeze", directory)
+    output, error = run_in_dir("%s run pip freeze" % pipenv_exe, directory)
 
     pkgs = dict()
     for pkg in output.split('\n'):
@@ -253,11 +264,9 @@ def django_info_buildout(bin_django):
     return parse_django_info(output)
 
 
-def django_info(directory, pipenv=False):
-    if pipenv:
-        django_script = 'pipenv run python manage.py'
-    else:
-        django_script = 'python manage.py'
+def django_info_pipenv(directory):
+    pipenv_exe = get_executable('pipenv')
+    django_script = '%s run python manage.py' % pipenv_exe
 
     matplotlibenv = 'MPLCONFIGDIR=/tmp'
     # Corner case when something needs matplotlib in django's settings.
@@ -389,55 +398,75 @@ def main():
         checkout['name'] = name
         checkout['directory'] = directory
         checkout['git'] = git_info(directory)
-        pipenv = False
-        if os.path.exists(os.path.join(directory, 'buildout.cfg')):
-            checkout['eggs'] = eggs_info(directory)
-        elif os.path.exists(os.path.join(directory, 'Pipfile')):
-            checkout['eggs'] = pipenv_info(directory)
-            pipenv = checkout['eggs'] is not None
+
+        # determine the type of installation (buildout or pipenv)
+        if os.path.exists(os.path.join(directory, 'Pipfile')) and \
+                get_executable('pipenv'):
+            mode = 'pipenv'
+        elif os.path.exists(os.path.join(directory, 'buildout.cfg')):
+            mode = 'buildout'
         else:
+            mode = None
             logger.warn("/srv directory without buildout.cfg or "
                         "Pipfile: %s", directory)
 
-        bin_django = os.path.join(directory, 'bin', 'django')
-        if os.path.exists(bin_django):
-            checkout['django'] = django_info_buildout(bin_django)
-            if not checkout['django']:
-                num_bin_django_failures += 1
-        elif pipenv and os.path.exists(os.path.join(directory, 'manage.py')):
-            checkout['django'] = django_info(directory, pipenv=pipenv)
-            if not checkout['django']:
-                num_bin_django_failures += 1
+        # determine the installed packages
+        if mode == 'buildout':
+            checkout['eggs'] = eggs_info(directory)
+        elif mode == 'pipenv':
+            checkout['eggs'] = pipenv_info(directory)
         else:
-            logger.debug("No django script found in %s", directory)
+            checkout['eggs'] = None
 
-        bin_supervisorctl = os.path.join(directory, 'bin', 'supervisorctl')
-        etc_directory = os.path.join(directory, 'etc')
-        if os.path.exists(bin_supervisorctl):
-            try:
-                num_not_running += supervisorctl_warnings(bin_supervisorctl)
-            except:  # Bare except.
-                logger.exception("Error calling %s", bin_supervisorctl)
-        elif os.path.exists(etc_directory):
-            confs = [fn for fn in os.listdir(etc_directory)
-                     if 'supervisor' in fn and fn.endswith('.conf')]
-            if len(confs) == 1:
-                conf_path = os.path.join(etc_directory, confs[0])
-                svc_command = "supervisorctl -c '{}'".format(conf_path)
-                try:
-                    num_not_running += supervisorctl_warnings(svc_command)
-                except:  # Bare except.
-                    logger.exception("Error calling %s", svc_command)
-            elif len(confs) == 0:
-                logger.exception("No supervisorctl configuration found in %s",
-                                 etc_directory)
+        # determine django info settings
+        if mode == 'buildout':
+            bin_django = os.path.join(directory, 'bin', 'django')
+            if os.path.exists(bin_django):
+                checkout['django'] = django_info_buildout(bin_django)
+                if not checkout['django']:
+                    num_bin_django_failures += 1
             else:
-                logger.exception("Multiple supervisorctl configurations "
-                                 "found in %s", etc_directory)
-        else:
-            logger.debug("No supervisorctl script or etc directory found in "
-                         "%s", directory)
+                logger.debug("bin/django not found in %s", directory)
+        elif mode == 'pipenv':
+            django_manage = os.path.join(directory, 'manage.py')
+            if os.path.exists(django_manage):
+                checkout['django'] = django_info_pipenv(directory)
+                if not checkout['django']:
+                    num_bin_django_failures += 1
+            else:
+                logger.debug("manage.py not found in %s", directory)
 
+        # determine supervisorctl status
+        if mode == 'buildout':
+            bin_supervisor = os.path.join(directory, 'bin', 'supervisorctl')
+            if os.path.exists(bin_supervisor):
+                try:
+                    num_not_running += supervisorctl_warnings(bin_supervisor)
+                except:  # Bare except.
+                    logger.exception("Error calling %s", bin_supervisor)
+            else:
+                logger.debug("bin/supervisorctl not found in %s", directory)
+        elif mode == 'pipenv' and get_executable('supervisorctl'):
+            # expect the supervisor conf file in the etc directory
+            etc_directory = os.path.join(directory, 'etc')
+            if os.path.exists(etc_directory):
+                confs = [fn for fn in os.listdir(etc_directory)
+                         if 'supervisor' in fn and fn.endswith('.conf')]
+                if len(confs) == 1:
+                    svc_command = "{0} -c '{1}'".format(
+                        get_executable('supervisorctl'),
+                        os.path.join(etc_directory, confs[0]),
+                    )
+                    try:
+                        num_not_running += supervisorctl_warnings(svc_command)
+                    except:  # Bare except.
+                        logger.exception("Error calling %s", svc_command)
+                elif len(confs) == 0:
+                    logger.exception("No supervisorctl configuration found in %s",
+                                     etc_directory)
+                else:
+                    logger.exception("Multiple supervisorctl configurations "
+                                     "found in %s", etc_directory)
         result[name] = checkout
 
     open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
