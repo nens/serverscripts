@@ -200,13 +200,8 @@ def run_in_dir(command, directory):
 
 
 def whereis(name):
-    """ Find the first available path to an executable script. If the PATH
-    variable is not set (cronjobs), look inside some default bin folders."""
+    """ Find the first available path to an executable script. """
     paths = os.environ.get("PATH")
-    if paths:
-        paths = paths.split(':')
-    else:  # cronjobs have no PATH, set some defaults here
-        paths = ['/usr/local/bin', '/usr/bin', '/bin']
     for path in paths:
         executable = os.path.join(path, name)
         if os.access(executable, os.X_OK):
@@ -215,15 +210,13 @@ def whereis(name):
 
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    pipenv_exe = whereis('pipenv')
-    output, error = run_in_dir("%s --where" % pipenv_exe, directory)
+    output, error = run_in_dir("pipenv --where", directory)
 
     if output.strip() != directory:
         logger.error("No pipenv found in %s", directory)
         return
 
-    output, error = run_in_dir("%s run python --version" % pipenv_exe,
-                               directory)
+    output, error = run_in_dir("pipenv run python --version", directory)
     match = PYTHON_VERSION.match((output + error).replace('\n', ''))
     if match is None:
         python_version = 'UNKNOWN'
@@ -231,7 +224,7 @@ def pipenv_info(directory):
         python_version = match.group('version')
     logger.debug("Python version used: %s", python_version)
 
-    output, error = run_in_dir("%s run pip freeze" % pipenv_exe, directory)
+    output, error = run_in_dir("pipenv run pip freeze", directory)
 
     pkgs = dict()
     for pkg in output.split('\n'):
@@ -270,8 +263,7 @@ def django_info_buildout(bin_django):
 
 
 def django_info_pipenv(directory):
-    pipenv_exe = whereis('pipenv')
-    django_script = '%s run python manage.py' % pipenv_exe
+    django_script = 'pipenv run python manage.py'
 
     matplotlibenv = 'MPLCONFIGDIR=/tmp'
     # Corner case when something needs matplotlib in django's settings.
@@ -458,8 +450,7 @@ def main():
                 confs = [fn for fn in os.listdir(etc_directory)
                          if 'supervisor' in fn and fn.endswith('.conf')]
                 if len(confs) == 1:
-                    svc_command = "{0} -c '{1}'".format(
-                        whereis('supervisorctl'),
+                    svc_command = "supervisorctl -c '{1}'".format(
                         os.path.join(etc_directory, confs[0]),
                     )
                     try:
