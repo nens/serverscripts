@@ -5,7 +5,9 @@ Changelog of serverscripts
 1.5.4 (unreleased)
 ------------------
 
-- Fixed pipenv usage in cronjobs by adding checkouts.whereis that finds executables.
+- Refactor of checkouts.py
+
+- Check existence of pipenv executable.
 
 
 1.5.3 (2018-05-24)
