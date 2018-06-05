@@ -5,7 +5,9 @@ Changelog of serverscripts
 1.5.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Refactor of checkouts.py
+
+- Check existence of pipenv executable.
 
 
 1.5.3 (2018-05-24)
