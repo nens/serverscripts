@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.5.4 (unreleased)
+1.5.4 (2018-06-11)
 ------------------
 
 - Refactor of checkouts.py
