@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.5.5 (unreleased)
+1.5.5 (2018-06-14)
 ------------------
 
 - Fixed `checkouts.whereis` and `supervisorctl` in case of pipenv projects.
