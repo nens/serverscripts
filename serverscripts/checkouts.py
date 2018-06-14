@@ -201,7 +201,7 @@ def run_in_dir(command, directory):
 
 def whereis(name):
     """ Find the first available path to an executable script. """
-    paths = os.environ.get("PATH")
+    paths = os.environ.get("PATH").split(":")
     for path in paths:
         executable = os.path.join(path, name)
         if os.access(executable, os.X_OK):
@@ -450,7 +450,7 @@ def main():
                 confs = [fn for fn in os.listdir(etc_directory)
                          if 'supervisor' in fn and fn.endswith('.conf')]
                 if len(confs) == 1:
-                    svc_command = "supervisorctl -c '{1}'".format(
+                    svc_command = "supervisorctl -c '{0}'".format(
                         os.path.join(etc_directory, confs[0]),
                     )
                     try:
