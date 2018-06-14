@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.5.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed `checkouts.whereis` and `supervisorctl` in case of pipenv projects.
 
 
 1.5.4 (2018-06-11)
