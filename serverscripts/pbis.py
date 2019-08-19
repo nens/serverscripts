@@ -6,8 +6,9 @@ import json
 import logging
 import os
 import serverscripts
-import sys
 import subprocess
+import sys
+
 
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'

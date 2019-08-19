@@ -1,6 +1,8 @@
 """Extract information from apache config files.
 
 """
+from serverscripts.six.moves.urllib.parse import urlparse
+
 import argparse
 import copy
 import json
@@ -10,7 +12,6 @@ import re
 import serverscripts
 import sys
 
-from serverscripts.six.moves.urllib.parse import urlparse
 
 VAR_DIR = '/var/local/serverscripts'
 APACHE_DIR = '/etc/apache2/sites-enabled'

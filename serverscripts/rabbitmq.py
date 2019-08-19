@@ -4,11 +4,11 @@
 import argparse
 import json
 import logging
+import operator
 import os
 import serverscripts
-import sys
 import subprocess
-import operator
+import sys
 
 
 VAR_DIR = '/var/local/serverscripts'

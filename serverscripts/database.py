@@ -12,6 +12,7 @@ import re
 import serverscripts
 import sys
 
+
 VAR_DIR = '/var/local/serverscripts'
 POSTGRES_DIR = '/etc/postgres/sites-enabled'
 OUTPUT_DIR = '/var/local/serverinfo-facts'

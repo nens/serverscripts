@@ -20,6 +20,7 @@ import serverscripts
 import sys
 import tempfile
 
+
 SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
     origin            # We want the origin remote.

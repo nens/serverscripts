@@ -1,6 +1,8 @@
 """Extract information from nginx config files.
 
 """
+from serverscripts.six.moves.urllib.parse import urlparse
+
 import argparse
 import copy
 import json
@@ -10,7 +12,6 @@ import re
 import serverscripts
 import sys
 
-from serverscripts.six.moves.urllib.parse import urlparse
 
 VAR_DIR = '/var/local/serverscripts'
 NGINX_DIR = '/etc/nginx/sites-enabled'

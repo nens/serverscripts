@@ -24,6 +24,7 @@ import subprocess
 import sys
 import time
 
+
 LOGFILE = '/var/log/cifsfixer.log'
 VAR_DIR = '/var/local/serverscripts'
 OUTPUT_DIR = '/var/local/serverinfo-facts'

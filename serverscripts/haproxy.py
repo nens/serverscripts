@@ -9,6 +9,7 @@ import re
 import serverscripts
 import sys
 
+
 HAPROXY_CFG = '/etc/haproxy/haproxy.cfg'
 SITE = re.compile(r"""
     ^acl                   # 'acl' at the start of the line.
