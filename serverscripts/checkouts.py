@@ -7,6 +7,8 @@ Originally copied from ``buildout.py`` in
 https://github.com/reinout/serverinfo/
 
 """
+from serverscripts.utils import get_output
+
 import argparse
 import copy
 import json
@@ -15,10 +17,8 @@ import os
 import pkg_resources
 import re
 import serverscripts
-import subprocess
 import sys
 import tempfile
-
 
 SRV_DIR = '/srv/'
 GIT_URL = re.compile(r"""
@@ -82,11 +82,8 @@ def git_info(directory):
         logger.warn("No .git directory found in %s", directory)
         return
 
-    sub = subprocess.Popen('git remote -v', cwd=directory, shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    for line in sub.communicate():
+    output, error = get_output('git remote -v', cwd=directory)
+    for line in output.split('\n'):
         if not line:
             continue
         match = GIT_URL.search(line)
@@ -98,21 +95,15 @@ def git_info(directory):
             user=match.group('user'),
             project=match.group('project'))
         logger.debug("Git repo found: %s", data['url'])
-    sub = subprocess.Popen('git status', cwd=directory, shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    output, errors = sub.communicate()
+    output, error = get_output('git status', cwd=directory)
     output = output.lower()
     if 'master' in output:
         data['release'] = 'master'
         logger.debug("It is a master checkout")
     else:
-        sub = subprocess.Popen('git describe', cwd=directory, shell=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
-        first_line = sub.communicate()[0]
+        output, error = get_output('git describe',
+                                   cwd=directory)
+        first_line = output.split('\n')[0]
         data['release'] = first_line.strip()
         logger.debug("We're on a tag or branch: %s", data['release'])
     data['has_local_modifications'] = ('changes not staged' in output)
@@ -156,14 +147,8 @@ def eggs_info(directory):
         # Detect python executable
         first_line = lines[0].strip()
         python_executable = first_line.lstrip('#!')
-        sub = subprocess.Popen('%s --version' % python_executable,
-                               cwd=directory,
-                               shell=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
-        output, error = sub.communicate()
-        output = output + error
+        output, error = get_output('%s --version' % python_executable,
+                                   cwd=directory)
         try:
             python_version = output.strip().split()[1]
             # ^^^ stdout (3) / stderr (2) outputs "Python 2.7.10"
@@ -187,18 +172,6 @@ def eggs_info(directory):
     return eggs
 
 
-def run_in_dir(command, directory):
-    logger.debug("Running %s...", command)
-    sub = subprocess.Popen(command,
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True,
-                           cwd=directory)
-    output, error = sub.communicate()
-    return output, error
-
-
 def whereis(name):
     """ Find the first available path to an executable script. """
     paths = os.environ.get("PATH").split(":")
@@ -210,13 +183,13 @@ def whereis(name):
 
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    output, error = run_in_dir("pipenv --where", directory)
+    output, error = get_output("pipenv --where", cwd=directory)
 
     if output.strip() != directory:
         logger.error("No pipenv found in %s", directory)
         return
 
-    output, error = run_in_dir("pipenv run python --version", directory)
+    output, error = get_output("pipenv run python --version", cwd=directory)
     match = PYTHON_VERSION.match((output + error).replace('\n', ''))
     if match is None:
         python_version = 'UNKNOWN'
@@ -224,7 +197,7 @@ def pipenv_info(directory):
         python_version = match.group('version')
     logger.debug("Python version used: %s", python_version)
 
-    output, error = run_in_dir("pipenv run pip freeze", directory)
+    output, error = get_output("pipenv run pip freeze", cwd=directory)
 
     pkgs = dict()
     for pkg in output.split('\n'):
@@ -249,12 +222,7 @@ def django_info_buildout(bin_django):
     command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
                                                        bin_django)
     logger.debug("Running %s diffsettings...", bin_django)
-    sub = subprocess.Popen(command,
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    output, error = sub.communicate()
+    output, error = get_output(command)
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
         if not output:
@@ -269,7 +237,7 @@ def django_info_pipenv(directory):
     # Corner case when something needs matplotlib in django's settings.
     command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
                                                        django_script)
-    output, error = run_in_dir(command, directory)
+    output, error = get_output(command, cwd=directory)
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
         if not output:
@@ -323,14 +291,10 @@ def supervisorctl_warnings(supervisorctl_command):
     """Return number of not-running processes inside supervisorctl"""
     command = "%s status" % supervisorctl_command
     logger.debug("Running '%s'...", command)
-    sub = subprocess.Popen(command,
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    output, error = sub.communicate()
+    output, error = get_output(command)
     if error:
         logger.warn("Error output from supervisorctl command: %s", error)
+
     lines = [line.strip() for line in output.split('\n')]
     lines = [line for line in lines if line]
     for exception in SUPERVISOR_CRONJOB_EXCEPTIONS:
@@ -439,7 +403,7 @@ def main():
             if os.path.exists(bin_supervisor):
                 try:
                     num_not_running += supervisorctl_warnings(bin_supervisor)
-                except:  # Bare except.
+                except Exception:  # Bare except.
                     logger.exception("Error calling %s", bin_supervisor)
             else:
                 logger.debug("bin/supervisorctl not found in %s", directory)
@@ -455,7 +419,7 @@ def main():
                     )
                     try:
                         num_not_running += supervisorctl_warnings(svc_command)
-                    except:  # Bare except.
+                    except Exception:  # Bare except.
                         logger.exception("Error calling %s", svc_command)
                 elif len(confs) == 0:
                     logger.exception("No supervisorctl configuration found in %s",
