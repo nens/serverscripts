@@ -33,5 +33,5 @@ def main():
     ]:
         try:
             module.main()
-        except Exception, e:
+        except Exception as e:
             print(e)
