@@ -22,6 +22,8 @@ tests_require = [
     'coverage',
     'mock',
     'pytest',
+    'pytest-cov',
+    'pytest-flakes'
     ]
 
 setup(name='serverscripts',
