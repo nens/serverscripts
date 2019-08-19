@@ -31,19 +31,19 @@ class DatabaseTestCase(TestCase):
             mock_get_output.return_value = (
                 "14160 bla bla /usr/lib/postgresql/9.3/bin/postgres bla bla",
                 "")
-            self.assertEquals("9.3", database._postgres_version())
+            self.assertEqual("9.3", database._postgres_version())
 
     def test_database_info(self):
         with mock.patch('serverscripts.database.get_output') as mock_get_output:
             mock_get_output.return_value = (self.sizes_output,
                                             "")
-            self.assertEquals(9, len(database._database_infos()))
+            self.assertEqual(9, len(database._database_infos()))
 
     def test_database_info(self):
         with mock.patch('serverscripts.database.get_output') as mock_get_output:
             mock_get_output.return_value = (self.sizes_output,
                                             "")
-            self.assertEquals(
+            self.assertEqual(
                 database._database_infos()['lizard_nxt']['size'],
                 2207000000)
 
@@ -61,7 +61,7 @@ class DatabaseTestCase(TestCase):
                                                'alexandr': {'name': 'reinout',
                                                             'size': 40}}
                     result = database.all_info()
-                    self.assertEquals(result['version'], '2.0')
-                    self.assertEquals(result['num_databases'], 2)
-                    self.assertEquals(result['total_databases_size'], 60)
-                    self.assertEquals(result['biggest_database_size'], 40)
+                    self.assertEqual(result['version'], '2.0')
+                    self.assertEqual(result['num_databases'], 2)
+                    self.assertEqual(result['total_databases_size'], 60)
+                    self.assertEqual(result['biggest_database_size'], 40)
