@@ -33,13 +33,13 @@ class DatabaseTestCase(TestCase):
                 "")
             self.assertEqual("9.3", database._postgres_version())
 
-    def test_database_info(self):
+    def test_database_info1(self):
         with mock.patch('serverscripts.database.get_output') as mock_get_output:
             mock_get_output.return_value = (self.sizes_output,
                                             "")
             self.assertEqual(9, len(database._database_infos()))
 
-    def test_database_info(self):
+    def test_database_info2(self):
         with mock.patch('serverscripts.database.get_output') as mock_get_output:
             mock_get_output.return_value = (self.sizes_output,
                                             "")

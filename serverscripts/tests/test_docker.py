@@ -2,7 +2,6 @@ from serverscripts import docker
 from unittest import TestCase
 
 import mock
-import os
 
 
 REGULAR_OUTPUT = """
