@@ -264,7 +264,7 @@ def parse_django_info(output):
     global_env = {}
     settings = {}
     try:
-        execfile(tempfile_name, global_env, settings)
+        exec(open(tempfile_name).read(), global_env, settings)
     except Exception:
         logger.exception("'diffsettings' output could not be parsed:\n%s",
                          output)
