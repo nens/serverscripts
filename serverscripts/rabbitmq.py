@@ -105,7 +105,7 @@ def retrieve_queues(vhost):
 
 def get_max_queue(queues):
     """Retrieve a queue with max messages as tuple."""
-    queue, value = max(queues.iteritems(), key=operator.itemgetter(1))
+    queue, value = max(queues.items(), key=operator.itemgetter(1))
     return (queue, value)
 
 
@@ -119,8 +119,8 @@ def validate_configuration(configuration):
     for vhost in configuration:
         queues_limit_value = configuration[vhost].get(QUEUES_LIMIT)
         messages_limit_value = configuration[vhost].get(MESSAGES_LIMIT)
-        queues_limit_key = configuration[vhost].has_key(QUEUES_LIMIT)
-        messages_limit_key = configuration[vhost].has_key(MESSAGES_LIMIT)
+        queues_limit_key = (QUEUES_LIMIT in configuration[vhost])
+        messages_limit_key = (MESSAGES_LIMIT in configuration[vhost])
 
         if not queues_limit_key:
             logger.error("%s: vhost '%s' has not '%s' item.",

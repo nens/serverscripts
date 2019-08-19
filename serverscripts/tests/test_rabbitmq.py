@@ -45,10 +45,10 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertGreater(len(queues), 1)
 
     def test_get_max_queue(self):
-        test_case = ('q1', 10)
         queues = {'q1': 10, 'q2': 3, 'z': -1}
         result = rabbitmq.get_max_queue(queues)
-        self.assertEqual(result, test_case)
+        expected = ('q1', 10)
+        assert result == expected
 
     def test_load_config_file(self):
         configuration = rabbitmq.load_config(self.config_example)
