@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import mock
 import os
+import shutil
 import sys
 import tempfile
 
@@ -12,13 +13,17 @@ class PipenvTestCase(TestCase):
     def setUpClass(cls):
         cls.our_dir = os.path.dirname(__file__)
         cls.dir_outside_proj = tempfile.mkdtemp()
-        cls.dir_with_pipenv = os.path.join(cls.our_dir, '..', '..')
+        cls.dir_with_pipenv = tempfile.mkdtemp()
+        os.chdir(cls.dir_with_pipenv)
+        os.system("pipenv install")
+        os.chdir(cls.our_dir)
         cls.example_diffsettings_output = open(os.path.join(
             cls.our_dir, 'example_diffsettings.txt')).read()
 
     @classmethod
     def tearDownClass(cls):
-        os.rmdir(cls.dir_outside_proj)
+        shutil.rmtree(cls.dir_outside_proj)
+        shutil.rmtree(cls.dir_with_pipenv)
 
     def test_no_pipenv(self):
         # a subdirectory of the project
