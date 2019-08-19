@@ -21,39 +21,39 @@ class ApacheTestCase(TestCase):
     def test_single_count(self):
         result = list(apache.extract_sites(self.single_example))
         pprint(result)
-        self.assertEquals(len(result), 1)
+        self.assertEqual(len(result), 1)
 
     def test_multiple_count(self):
         # Four virtualhosts
         result = list(apache.extract_sites(self.multiple_example))
         pprint(result)
-        self.assertEquals(len(result), 4)
+        self.assertEqual(len(result), 4)
 
     def test_count_with_alias(self):
         result = list(apache.extract_sites(self.customlog_example))
         pprint(result)
-        self.assertEquals(len(result), 2)
+        self.assertEqual(len(result), 2)
 
     def test_srv_extraction_customlog(self):
         result = list(apache.extract_sites(self.customlog_example))
         pprint(result)
-        self.assertEquals('somewhere', result[0]['related_checkout'])
+        self.assertEqual('somewhere', result[0]['related_checkout'])
 
     def test_srv_extraction_docroot(self):
         result = list(apache.extract_sites(self.single_example))
         pprint(result)
-        self.assertEquals('serverinfo.lizard.net',
+        self.assertEqual('serverinfo.lizard.net',
                           result[0]['related_checkout'])
 
     def test_protocol_http(self):
         result = list(apache.extract_sites(self.single_example))
         pprint(result)
-        self.assertEquals(result[0]['protocol'], 'http')
+        self.assertEqual(result[0]['protocol'], 'http')
 
     def test_protocol_https(self):
         result = list(apache.extract_sites(self.multiple_example))
         pprint(result)
-        self.assertEquals(2, len([i for i in result
+        self.assertEqual(2, len([i for i in result
                                   if i['protocol'] == 'https']))
 
     def test_protocol_https_without_portnumber(self):
@@ -70,19 +70,19 @@ class ApacheTestCase(TestCase):
         pprint(result)
         specific_site = [site for site in result
                          if site['name'] == 'fewsvecht.controlnext.org'][0]
-        self.assertEquals(specific_site['proxy_to_other_server'],
+        self.assertEqual(specific_site['proxy_to_other_server'],
                           'p-fews-mc-v2-d1.external-nens.local')
 
     def test_redirect_count1(self):
         result = list(apache.extract_sites(self.redirect_example))
         pprint(result)
-        self.assertEquals(len(result), 4)
+        self.assertEqual(len(result), 4)
 
     def test_redirect_count2(self):
         result = list(apache.extract_sites(self.redirect_example))
         pprint(result)
         redirects = [i['redirect_to'] for i in result]
-        self.assertEquals(len(redirects), 4)
+        self.assertEqual(len(redirects), 4)
 
     def test_redirects1(self):
         result = list(apache.extract_sites(self.redirect_example))
@@ -106,4 +106,4 @@ class ApacheTestCase(TestCase):
         result = [site for site in apache.extract_sites(self.redirect_example)
                   if site['name'] == 'www.portal.ddsc.nl'][0]
         pprint(result)
-        self.assertEquals(result['redirect_to_protocol'], 'https')
+        self.assertEqual(result['redirect_to_protocol'], 'https')

@@ -23,7 +23,7 @@ class GitAndEggInfoTestCase(TestCase):
         with open(self.vhosts_stdout_example, 'r') as vhosts_file:
             vhosts_stdout = vhosts_file.read()
             pprint(vhosts_stdout)
-            
+
         vhosts = rabbitmq.parse_vhosts_stdout(vhosts_stdout)
         pprint(vhosts)
         self.assertGreater(len(vhosts), 1)
@@ -32,14 +32,14 @@ class GitAndEggInfoTestCase(TestCase):
         vhosts_stdout = ''
         vhosts = rabbitmq.parse_vhosts_stdout(vhosts_stdout)
         pprint(vhosts)
-        self.assertEquals(len(vhosts), 0)
+        self.assertEqual(len(vhosts), 0)
 
     def test_parse_queues_stdout(self):
         queues_stdout = ''
         with open(self.queues_stdout_example, 'r') as queues_file:
             queues_stdout = queues_file.read()
             pprint(queues_stdout)
-            
+
         queues = rabbitmq.parse_queues_stdout(queues_stdout)
         pprint(queues)
         self.assertGreater(len(queues), 1)
@@ -48,7 +48,7 @@ class GitAndEggInfoTestCase(TestCase):
         test_case = ('q1', 10)
         queues = {'q1': 10, 'q2': 3, 'z': -1}
         result = rabbitmq.get_max_queue(queues)
-        self.assertEquals(result, test_case)
+        self.assertEqual(result, test_case)
 
     def test_load_config_file(self):
         configuration = rabbitmq.load_config(self.config_example)
@@ -56,18 +56,18 @@ class GitAndEggInfoTestCase(TestCase):
 
     def test_load_config_file_broken_content(self):
         configuration = rabbitmq.load_config(self.broken_config_example)
-        self.assertEquals(len(configuration), 0)
+        self.assertEqual(len(configuration), 0)
 
     def test_rabbitmqctl_not_exists(self):
         vhost = 'asdasda'
         queues = rabbitmq.retrieve_queues(vhost)
         pprint("'%s' contains '%s' queues." % (vhost, queues))
-        self.assertEquals(queues, None)
+        self.assertEqual(queues, None)
 
     def test_rabbitmqctl_vhosts(self):
         vhosts = rabbitmq.retrieve_vhosts()
         pprint("broker contains '%s' vhosts." % vhosts)
-        self.assertEquals(vhosts, None)
+        self.assertEqual(vhosts, None)
 
     def test_validate_configuration_empty(self):
         configuration = {}
