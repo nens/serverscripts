@@ -94,10 +94,10 @@ def retrieve_queues(vhost):
         stdout = subprocess.check_output(
             ['/usr/sbin/rabbitmqctl', 'list_queues', '-p', str(vhost)])
     except OSError:
-        logger.warn("/usr/sbin/rabbitmqctl is not available.")
+        logger.warning("/usr/sbin/rabbitmqctl is not available.")
         return
     except subprocess.CalledProcessError:
-        logger.warn("'/usr/sbin/rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
+        logger.warning("'/usr/sbin/rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
         return
 
     return parse_queues_stdout(stdout)
@@ -231,6 +231,6 @@ def main():
     open(zabbix_message_file, 'w').write(
         ", ".join(wrong_vhosts))
     if num_too_big:
-        logger.warn("Number queues/messages too big for: %s" % ", ".join(wrong_vhosts))
+        logger.warning("Number queues/messages too big for: %s" % ", ".join(wrong_vhosts))
     zabbix_rmq_count_file = os.path.join(VAR_DIR, 'nens.num_rabbitmq_too_big.warnings')
     open(zabbix_rmq_count_file, 'w').write('%d' % num_too_big)

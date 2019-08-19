@@ -100,7 +100,7 @@ def extract_sites(filename):
             logfilename = line.split()[0]
             parts = logfilename.split('/')
             if parts[1] != 'srv':
-                logger.warn("access_log line without a dir inside /srv: %s",
+                logger.warning("access_log line without a dir inside /srv: %s",
                             line)
                 continue
             buildout_directory = parts[2]

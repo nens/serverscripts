@@ -81,7 +81,7 @@ def extract_sites(filename):
             where = line_parts[1]
             path_parts = where.split('/')
             if path_parts[1] != 'srv':
-                logger.warn(
+                logger.warning(
                     "logfile or doc root line without a dir inside /srv: %s",
                     line)
                 continue
@@ -100,7 +100,7 @@ def extract_sites(filename):
                 proxied_to = proxied_to.replace('$1', '')
                 parsed = urlparse(proxied_to)
                 if parsed.hostname == 'localhost':
-                    logger.warn(
+                    logger.warning(
                         "Proxy to localhost port %s, we'd expect mod_wsgi...",
                         parsed.port)
                     site['proxy_to_local_port'] = str(parsed.port)
@@ -112,7 +112,7 @@ def extract_sites(filename):
             parts = line.split()
             parts = [part for part in parts if part]
             if len(parts) < 3:
-                logger.warn("Redirect line with fewer than 3 parts: %s", line)
+                logger.warning("Redirect line with fewer than 3 parts: %s", line)
                 continue
             if ('410'  in parts[1]) or ('gone' in parts[1]):
                 site['redirect_to'] = 'GONE'
@@ -127,7 +127,7 @@ def extract_sites(filename):
                 site['redirect_to'] = urlparse(redirect_to).hostname
                 site['redirect_to_protocol'] = urlparse(redirect_to).scheme
             else:
-                logger.warn(
+                logger.warning(
                     "Redirect without recognizable http(s) target: %s",
                     line)
         elif line.startswith('rewriterule'):
@@ -135,7 +135,7 @@ def extract_sites(filename):
             parts = [part for part in parts if part]
             parts = [part.replace('"', '').replace("'", '') for part in parts]
             if len(parts) < 3:
-                logger.warn("Rewriterule line with fewer than 3 parts: %s",
+                logger.warning("Rewriterule line with fewer than 3 parts: %s",
                             line)
                 continue
             if parts[1] != '^(.*)':
@@ -149,7 +149,7 @@ def extract_sites(filename):
                 site['redirect_to'] = urlparse(redirect_to).hostname
                 site['redirect_to_protocol'] = urlparse(redirect_to).scheme
             else:
-                logger.warn(
+                logger.warning(
                     "Redirect without recognizable http(s) target: %s",
                     line)
 

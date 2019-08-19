@@ -47,7 +47,7 @@ def all_info():
                            universal_newlines=True)
     output, error = sub.communicate()
     if error:
-        logger.warn("Error output from docker command: %s", error)
+        logger.warning("Error output from docker command: %s", error)
     lines = [line.strip() for line in output.split('\n')]
     lines = [line.lower() for line in lines if line]
     if not lines or 'active' not in lines[0]:

@@ -79,7 +79,7 @@ def git_info(directory):
     data = {}
     dir_contents = os.listdir(directory)
     if '.git' not in dir_contents:
-        logger.warn("No .git directory found in %s", directory)
+        logger.warning("No .git directory found in %s", directory)
         return
 
     output, error = get_output('git remote -v', cwd=directory)
@@ -88,7 +88,7 @@ def git_info(directory):
             continue
         match = GIT_URL.search(line)
         if not match:
-            logger.warn("Non-recognized 'git remote -v' line: %s", line)
+            logger.warning("Non-recognized 'git remote -v' line: %s", line)
             continue
 
         data['url'] = 'https://github.com/{user}/{project}'.format(
@@ -225,7 +225,7 @@ def django_info_buildout(bin_django):
     logger.debug("Running %s diffsettings...", bin_django)
     output, error = get_output(command)
     if error:
-        logger.warn("Error output from diffsettings command: %s", error)
+        logger.warning("Error output from diffsettings command: %s", error)
         if not output:
             return
     return parse_django_info(output)
@@ -240,7 +240,7 @@ def django_info_pipenv(directory):
                                                        django_script)
     output, error = get_output(command, cwd=directory, fail_on_exit_code=False)
     if error:
-        logger.warn("Error output from diffsettings command: %s", error)
+        logger.warning("Error output from diffsettings command: %s", error)
         if not output:
             return
     return parse_django_info(output)
@@ -281,7 +281,7 @@ def parse_django_info(output):
                  'host': database.get('HOST', 'localhost'),
                  'user': database.get('USER')})
         else:
-            logger.warn("Unkown db engine %s", engine)
+            logger.warning("Unkown db engine %s", engine)
     result['debug_mode'] = ('DEBUG' in settings)
     result['settings_module'] = settings['SETTINGS_MODULE']
     os.remove(tempfile_name)
@@ -294,7 +294,7 @@ def supervisorctl_warnings(supervisorctl_command):
     logger.debug("Running '%s'...", command)
     output, error = get_output(command)
     if error:
-        logger.warn("Error output from supervisorctl command: %s", error)
+        logger.warning("Error output from supervisorctl command: %s", error)
 
     lines = [line.strip() for line in output.split('\n')]
     lines = [line for line in lines if line]
@@ -303,10 +303,10 @@ def supervisorctl_warnings(supervisorctl_command):
     not_running = [line for line in lines if 'running' not in line.lower()]
     num_not_running = len(not_running)
     if num_not_running:
-        logger.warn(
+        logger.warning(
             "Some processes in %s aren't running:", supervisorctl_command)
         for line in not_running:
-            logger.warn("    %s", line)
+            logger.warning("    %s", line)
     return num_not_running
 
 
@@ -369,7 +369,7 @@ def main():
             mode = 'buildout'
         else:
             mode = None
-            logger.warn("/srv directory without buildout.cfg or "
+            logger.warning("/srv directory without buildout.cfg or "
                         "Pipfile: %s", directory)
 
         # determine the installed packages

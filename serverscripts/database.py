@@ -51,7 +51,7 @@ def _database_infos():
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
     output, error = get_output(command)
     if error:
-        logger.warn("Error output from psql command: %s", error)
+        logger.warning("Error output from psql command: %s", error)
     result = {}
     for line in output.split('\n'):
         if '|' not in line:
@@ -181,7 +181,7 @@ ORDER BY bloat_mb DESC;
 
         output, error = get_output(command)
         if error:
-            logger.warn("Error output from psql command: %s", error)
+            logger.warning("Error output from psql command: %s", error)
         for line in output.split('\n'):
             #  database_name | schema_name | table_name | bloat_pct | bloat_mb
             if '|' not in line:

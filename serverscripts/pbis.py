@@ -29,7 +29,7 @@ def check_pbis():
                            universal_newlines=True)
     output, error = sub.communicate()
     if error:
-        logger.warn("Error output from pbis command: %s", error)
+        logger.warning("Error output from pbis command: %s", error)
     lines = [line.strip().lower() for line in output.split('\n')]
     online = [line for line in lines if 'online' in line]
     nens_local = [line for line in lines if 'nens.local' in line]

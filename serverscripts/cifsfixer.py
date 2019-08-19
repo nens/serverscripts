@@ -101,7 +101,7 @@ def _extract_options(line_part):
 def _extract_username(filename):
     """Return username (if found) from the credentials"""
     if not os.path.exists(filename):
-        logger.warn("Cifs credentials file %s does not exist", filename)
+        logger.warning("Cifs credentials file %s does not exist", filename)
         return
     for line in open(filename):
         if ('username' in line) and ('=' in line):
@@ -191,7 +191,7 @@ def check_unknown_mounts(fstab_mounts, mtab_mounts):
         cifs_share = share_info['cifs_share']
         # Check if it is mounted.
         if local_folder not in fstab_mounts:
-            logger.warn(
+            logger.warning(
                 "Error: %s is mounted (%s), but not known in /etc/fstab",
                 local_folder,
                 cifs_share)
@@ -251,7 +251,7 @@ def main():
                  FSTAB,
                  seconds_since_last_edit)
     if (seconds_since_last_edit < 60 * 5) and not options.force:
-        logger.warn("%s edited less than 5 minutes ago, skipping for now.",
+        logger.warning("%s edited less than 5 minutes ago, skipping for now.",
                     FSTAB)
         sys.exit()
 
