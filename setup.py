@@ -21,7 +21,7 @@ install_requires = [
 tests_require = [
     'coverage',
     'mock',
-    'nose',
+    'pytest',
     ]
 
 setup(name='serverscripts',

@@ -19,6 +19,15 @@ install our test dependencies (which tox does automatically)::
 
   $ tox
 
+Note that if you change something in the dependencies, you'll have to
+re-create the virtualenvs::
+
+  $ tox --recreate
+
+If you waht to test agains just one of the environments, run something like
+this::
+
+  $ tox -e py27
 
 
 Installation on servers
