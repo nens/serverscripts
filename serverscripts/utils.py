@@ -1,7 +1,7 @@
 import subprocess
 
 
-def get_output(command, cwd='.', fail_on_exit_code=True):
+def get_output(command, cwd=".", fail_on_exit_code=True):
     """Run command and return output.
 
     ``command`` is just a string like "cat something".

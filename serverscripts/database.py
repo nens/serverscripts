@@ -13,63 +13,65 @@ import serverscripts
 import sys
 
 
-VAR_DIR = '/var/local/serverscripts'
-POSTGRES_DIR = '/etc/postgres/sites-enabled'
-OUTPUT_DIR = '/var/local/serverinfo-facts'
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'databases.fact')
-DATABASE_TEMPLATE = {'name': '',
-                     'size': 0}
-POSTGRES_VERSION = re.compile(r"""
+VAR_DIR = "/var/local/serverscripts"
+POSTGRES_DIR = "/etc/postgres/sites-enabled"
+OUTPUT_DIR = "/var/local/serverinfo-facts"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "databases.fact")
+DATABASE_TEMPLATE = {"name": "", "size": 0}
+POSTGRES_VERSION = re.compile(
+    r"""
     .*
     /usr/lib/postgresql/     # Start of path to binary
     (?P<version>[0-9\.]+)    # dotted version
     /bin/postgres            # end of path to binary
     .*
-    """, re.VERBOSE)
+    """,
+    re.VERBOSE,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def is_postgres_available():
-    return os.path.exists('/etc/postgresql')
+    return os.path.exists("/etc/postgresql")
 
 
 def _postgres_version():
-    output, error = get_output('ps ax')
-    lines = output.split('\n')
+    output, error = get_output("ps ax")
+    lines = output.split("\n")
     for line in lines:
         if POSTGRES_VERSION.match(line):
             match = POSTGRES_VERSION.search(line)
-            version = match.group('version')
+            version = match.group("version")
             return version
-    return ''
+    return ""
 
 
 def _database_infos():
     """Return dict with info about the databases {database name: info}"""
-    query = ("select datname, pg_database_size(datname) "
-             "from pg_database;")
+    query = "select datname, pg_database_size(datname) " "from pg_database;"
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
     output, error = get_output(command)
     if error:
         logger.warning("Error output from psql command: %s", error)
     result = {}
-    for line in output.split('\n'):
-        if '|' not in line:
+    for line in output.split("\n"):
+        if "|" not in line:
             continue
-        parts = line.split('|')
+        parts = line.split("|")
         name = parts[0].strip()
         size = parts[1].strip()  # in MB
-        if name.startswith('template') or name == 'postgres':
+        if name.startswith("template") or name == "postgres":
             logger.debug("Omitting database %s", name)
             continue
         size = int(size)
         database_info = copy.deepcopy(DATABASE_TEMPLATE)
-        database_info['name'] = name
-        database_info['size'] = size
+        database_info["name"] = name
+        database_info["size"] = size
         result[name] = database_info
-        logger.info("Found database %s with size %s (%s MB)",
-                    name, size, size / 1024 / 1024)
+        logger.info(
+            "Found database %s with size %s (%s MB)", name, size, size / 1024 / 1024
+        )
     return result
 
 
@@ -178,24 +180,22 @@ ORDER BY bloat_mb DESC;
     for database_name in database_names:
         command = 'sudo -u postgres psql -c "%s" --tuples-only %s' % (
             query,
-            database_name)
+            database_name,
+        )
 
         output, error = get_output(command)
         if error:
             logger.warning("Error output from psql command: %s", error)
-        for line in output.split('\n'):
+        for line in output.split("\n"):
             #  database_name | schema_name | table_name | bloat_pct | bloat_mb
-            if '|' not in line:
+            if "|" not in line:
                 continue
-            parts = [part.strip() for part in line.split('|')]
-            name = ':'.join([parts[0].strip(), parts[1], parts[2]])
+            parts = [part.strip() for part in line.split("|")]
+            name = ":".join([parts[0].strip(), parts[1], parts[2]])
             percentage = parts[3]
             mb = parts[4]
-            result.append({'name': name,
-                           'percentage': percentage,
-                           'mb': mb})
-            logger.info("Table %s has %s%% bloat (%sMB)",
-                        name, percentage, mb)
+            result.append({"name": name, "percentage": percentage, "mb": mb})
+            logger.info("Table %s has %s%% bloat (%sMB)", name, percentage, mb)
 
     return result
 
@@ -203,17 +203,17 @@ ORDER BY bloat_mb DESC;
 def all_info():
     """Return the info we want to extract from postgres + its databases"""
     result = {}
-    result['version'] = _postgres_version()
-    result['databases'] = _database_infos()
-    database_names = result['databases'].keys()
-    result['bloated_tables'] = _table_bloat(database_names)
+    result["version"] = _postgres_version()
+    result["databases"] = _database_infos()
+    database_names = result["databases"].keys()
+    result["bloated_tables"] = _table_bloat(database_names)
 
-    if result['databases']:
+    if result["databases"]:
         # Info for zabbix.
-        result['num_databases'] = len(result['databases'])
-        sizes = [info['size'] for info in result['databases'].values()]
-        result['total_databases_size'] = sum(sizes)
-        result['biggest_database_size'] = max(sizes)
+        result["num_databases"] = len(result["databases"])
+        sizes = [info["size"] for info in result["databases"].values()]
+        result["total_databases_size"] = sum(sizes)
+        result["biggest_database_size"] = max(sizes)
 
     return result
 
@@ -227,14 +227,16 @@ def main():
         action="store_true",
         dest="verbose",
         default=False,
-        help="Verbose output")
+        help="Verbose output",
+    )
     parser.add_argument(
         "-V",
         "--version",
         action="store_true",
         dest="print_version",
         default=False,
-        help="Print version")
+        help="Print version",
+    )
     options = parser.parse_args()
     if options.print_version:
         print(serverscripts.__version__)
@@ -243,8 +245,7 @@ def main():
         loglevel = logging.DEBUG
     else:
         loglevel = logging.WARN
-    logging.basicConfig(level=loglevel,
-                        format="%(levelname)s: %(message)s")
+    logging.basicConfig(level=loglevel, format="%(levelname)s: %(message)s")
 
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
@@ -254,11 +255,11 @@ def main():
         return
 
     result = all_info()
-    open(OUTPUT_FILE, 'w').write(json.dumps(result, sort_keys=True, indent=4))
+    open(OUTPUT_FILE, "w").write(json.dumps(result, sort_keys=True, indent=4))
 
-    zabbix_file = os.path.join(VAR_DIR, 'nens.num_databases.info')
-    open(zabbix_file, 'w').write(str(result['num_databases']))
-    zabbix_file = os.path.join(VAR_DIR, 'nens.total_databases_size.info')
-    open(zabbix_file, 'w').write(str(result['total_databases_size']))
-    zabbix_file = os.path.join(VAR_DIR, 'nens.biggest_database_size.info')
-    open(zabbix_file, 'w').write(str(result['biggest_database_size']))
+    zabbix_file = os.path.join(VAR_DIR, "nens.num_databases.info")
+    open(zabbix_file, "w").write(str(result["num_databases"]))
+    zabbix_file = os.path.join(VAR_DIR, "nens.total_databases_size.info")
+    open(zabbix_file, "w").write(str(result["total_databases_size"]))
+    zabbix_file = os.path.join(VAR_DIR, "nens.biggest_database_size.info")
+    open(zabbix_file, "w").write(str(result["biggest_database_size"]))

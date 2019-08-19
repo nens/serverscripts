@@ -22,14 +22,14 @@ def main():
 
     """
     for module in [
-            serverscripts.apache,
-            serverscripts.checkouts,
-            serverscripts.database,
-            serverscripts.docker,
-            serverscripts.haproxy,
-            serverscripts.nginx,
-            serverscripts.pbis,
-            serverscripts.rabbitmq,
+        serverscripts.apache,
+        serverscripts.checkouts,
+        serverscripts.database,
+        serverscripts.docker,
+        serverscripts.haproxy,
+        serverscripts.nginx,
+        serverscripts.pbis,
+        serverscripts.rabbitmq,
     ]:
         try:
             module.main()

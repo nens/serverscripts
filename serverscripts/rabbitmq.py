@@ -11,16 +11,16 @@ import subprocess
 import sys
 
 
-VAR_DIR = '/var/local/serverscripts'
+VAR_DIR = "/var/local/serverscripts"
 
-CONFIG_DIR = '/etc/serverscripts'
-CONFIG_FILE = os.path.join(CONFIG_DIR, 'rabbitmq_zabbix.json')
+CONFIG_DIR = "/etc/serverscripts"
+CONFIG_FILE = os.path.join(CONFIG_DIR, "rabbitmq_zabbix.json")
 
 ALLOWED_NUM_QUEUES = 100
 ALLOWED_NUM_MESSAGES = 200
 
-QUEUES_LIMIT = 'queues_limit'
-MESSAGES_LIMIT = 'messages_limit'
+QUEUES_LIMIT = "queues_limit"
+MESSAGES_LIMIT = "messages_limit"
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def parse_queues_stdout(queues_stdout):
     The second column contains amount of massages in the queue.
     """
     queues = {}
-    for line in queues_stdout.split('\n'):
+    for line in queues_stdout.split("\n"):
         line_attrs = line.split()
         if len(line_attrs) == 2:
             queues[line_attrs[0]] = int(line_attrs[1])
@@ -61,7 +61,7 @@ def parse_vhosts_stdout(vhosts_stdout):
 
     """
     vhosts = []
-    for line in vhosts_stdout.split('\n'):
+    for line in vhosts_stdout.split("\n"):
         if line.find("done") > 0:
             # end of stdout is reached
             break
@@ -73,10 +73,9 @@ def parse_vhosts_stdout(vhosts_stdout):
 
 def retrieve_vhosts():
     """Run shell command 'rabbitmqctl list_vhosts', parse stdout, return vhosts."""
-    stdout = ''
+    stdout = ""
     try:
-        stdout = subprocess.check_output(
-            ['/usr/sbin/rabbitmqctl', 'list_vhosts'])
+        stdout = subprocess.check_output(["/usr/sbin/rabbitmqctl", "list_vhosts"])
     except OSError:
         logger.info("/usr/sbin/rabbitmqctl is not available.")
         return
@@ -89,15 +88,19 @@ def retrieve_vhosts():
 
 def retrieve_queues(vhost):
     """Run shell command, parse stdout, returtn queues."""
-    stdout = ''
+    stdout = ""
     try:
         stdout = subprocess.check_output(
-            ['/usr/sbin/rabbitmqctl', 'list_queues', '-p', str(vhost)])
+            ["/usr/sbin/rabbitmqctl", "list_queues", "-p", str(vhost)]
+        )
     except OSError:
         logger.warning("/usr/sbin/rabbitmqctl is not available.")
         return
     except subprocess.CalledProcessError:
-        logger.warning("'/usr/sbin/rabbitmqctl list_queues -p %s' returns non-zero exit status." % vhost)
+        logger.warning(
+            "'/usr/sbin/rabbitmqctl list_queues -p %s' returns non-zero exit status."
+            % vhost
+        )
         return
 
     return parse_queues_stdout(stdout)
@@ -119,23 +122,26 @@ def validate_configuration(configuration):
     for vhost in configuration:
         queues_limit_value = configuration[vhost].get(QUEUES_LIMIT)
         messages_limit_value = configuration[vhost].get(MESSAGES_LIMIT)
-        queues_limit_key = (QUEUES_LIMIT in configuration[vhost])
-        messages_limit_key = (MESSAGES_LIMIT in configuration[vhost])
+        queues_limit_key = QUEUES_LIMIT in configuration[vhost]
+        messages_limit_key = MESSAGES_LIMIT in configuration[vhost]
 
         if not queues_limit_key:
-            logger.error("%s: vhost '%s' has not '%s' item.",
-                         error_type, vhost, QUEUES_LIMIT)
+            logger.error(
+                "%s: vhost '%s' has not '%s' item.", error_type, vhost, QUEUES_LIMIT
+            )
             return False
         if not messages_limit_key:
-            logger.error("%s: vhost '%s' has not '%s' item.",
-                         error_type, vhost, MESSAGES_LIMIT)
+            logger.error(
+                "%s: vhost '%s' has not '%s' item.", error_type, vhost, MESSAGES_LIMIT
+            )
             return False
         try:
             int(queues_limit_value)
             int(messages_limit_value)
         except:
-            logger.error("%s: '%s' one of the values is not an integer.",
-                         error_type, vhost)
+            logger.error(
+                "%s: '%s' one of the values is not an integer.", error_type, vhost
+            )
             return False
     return True
 
@@ -146,11 +152,11 @@ def load_config(config_file_path):
     content = {}
     if not os.path.exists(config_file_path):
         return {}
-    with open(config_file_path, 'r') as config_file:
+    with open(config_file_path, "r") as config_file:
         try:
             content = json.loads(config_file.read())
         except:
-            logger.error('Can not load a rabbitmq-zabbix configuration.')
+            logger.error("Can not load a rabbitmq-zabbix configuration.")
     # end with
     if validate_configuration(content):
         return content
@@ -166,14 +172,16 @@ def main():
         action="store_true",
         dest="verbose",
         default=False,
-        help="Verbose output")
+        help="Verbose output",
+    )
     parser.add_argument(
         "-V",
         "--version",
         action="store_true",
         dest="print_version",
         default=False,
-        help="Print version")
+        help="Print version",
+    )
 
     options = parser.parse_args()
     if options.print_version:
@@ -183,8 +191,7 @@ def main():
         loglevel = logging.DEBUG
     else:
         loglevel = logging.WARN
-    logging.basicConfig(level=loglevel,
-                        format="%(levelname)s: %(message)s")
+    logging.basicConfig(level=loglevel, format="%(levelname)s: %(message)s")
 
     vhosts = retrieve_vhosts()
     if vhosts is None:
@@ -215,22 +222,28 @@ def main():
         if len(queues) >= vhost_num_queues:
             wrong_vhosts.append(vhost)
             num_too_big = num_too_big + 1
-            logger.error("Number of queues is greater than %d: %d",
-                         vhost_num_queues, len(queues))
+            logger.error(
+                "Number of queues is greater than %d: %d", vhost_num_queues, len(queues)
+            )
             continue
         # check the allowed amount of messages in the largest queue
         queue_name, queue_value = get_max_queue(queues)
         if queue_value >= queue_num_messages:
             wrong_vhosts.append(vhost)
             num_too_big = num_too_big + 1
-            logger.error("Number of messages in queue '%s' is greater than %d: %d",
-                         queue_name, queue_num_messages, queue_value)
+            logger.error(
+                "Number of messages in queue '%s' is greater than %d: %d",
+                queue_name,
+                queue_num_messages,
+                queue_value,
+            )
 
     logger.info("Write check results to files: %d." % num_too_big)
-    zabbix_message_file = os.path.join(VAR_DIR, 'nens.rabbitmq.message')
-    open(zabbix_message_file, 'w').write(
-        ", ".join(wrong_vhosts))
+    zabbix_message_file = os.path.join(VAR_DIR, "nens.rabbitmq.message")
+    open(zabbix_message_file, "w").write(", ".join(wrong_vhosts))
     if num_too_big:
-        logger.warning("Number queues/messages too big for: %s" % ", ".join(wrong_vhosts))
-    zabbix_rmq_count_file = os.path.join(VAR_DIR, 'nens.num_rabbitmq_too_big.warnings')
-    open(zabbix_rmq_count_file, 'w').write('%d' % num_too_big)
+        logger.warning(
+            "Number queues/messages too big for: %s" % ", ".join(wrong_vhosts)
+        )
+    zabbix_rmq_count_file = os.path.join(VAR_DIR, "nens.num_rabbitmq_too_big.warnings")
+    open(zabbix_rmq_count_file, "w").write("%d" % num_too_big)
