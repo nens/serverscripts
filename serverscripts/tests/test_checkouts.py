@@ -41,17 +41,18 @@ class PipenvTestCase(TestCase):
         self.assertEquals(output['python'], our_python_version)
 
     def test_django_info_no_pipenv(self):
-        result = checkouts.django_info_pipenv(self.dir_outside_proj)
-        self.assertIsNone(result)
+        with mock.patch('serverscripts.checkouts.get_output') as mock_get_output:
+            mock_get_output.return_value = ('', 'bloody murder')
+            result = checkouts.django_info_pipenv(self.dir_outside_proj)
+            self.assertIsNone(result)
 
     def test_django_info_pipenv(self):
         result = checkouts.django_info_pipenv(self.dir_with_pipenv)
         self.assertIsNone(result)
 
     def test_django_info(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = (self.example_diffsettings_output,
-                                             "")
+        with mock.patch('serverscripts.checkouts.get_output') as mock_get_output:
+            mock_get_output.return_value = (self.example_diffsettings_output, '')
             result = checkouts.django_info_pipenv(self.dir_outside_proj)
             self.assertEquals(len(result['databases']), 2)
 
@@ -108,19 +109,19 @@ class GitAndEggInfoTestCase(TestCase):
         self.assertEquals(match.group('user'), 'nens')
 
     def test_django_info(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = (self.example_diffsettings_output,
+        with mock.patch('serverscripts.checkouts.get_output') as mock_get_output:
+            mock_get_output.return_value = (self.example_diffsettings_output,
                                              "")
             result = checkouts.django_info_buildout('some/bin/django')
             self.assertEquals(len(result['databases']), 2)
 
     def test_supervisorctl_warnings(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = """
+        with mock.patch('serverscripts.checkouts.get_output') as mock_get_output:
+            mock_get_output.return_value = ("""
 gunicorn                         RUNNING   pid 1418, uptime 0:39:04
 something                        STOPPED
 
-            """, ""
+            """, "")
             result = checkouts.supervisorctl_warnings(
                 'some/bin/supervisorctl')
             self.assertEquals(result, 1)

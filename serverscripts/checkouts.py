@@ -150,7 +150,8 @@ def eggs_info(directory):
         output, error = get_output('%s --version' % python_executable,
                                    cwd=directory)
         try:
-            python_version = output.strip().split()[1]
+            total_output = output + error
+            python_version = total_output.strip().split()[1]
             # ^^^ stdout (3) / stderr (2) outputs "Python 2.7.10"
         except IndexError:
             python_version = 'UNKNOWN'
@@ -237,7 +238,7 @@ def django_info_pipenv(directory):
     # Corner case when something needs matplotlib in django's settings.
     command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv,
                                                        django_script)
-    output, error = get_output(command, cwd=directory)
+    output, error = get_output(command, cwd=directory, fail_on_exit_code=False)
     if error:
         logger.warn("Error output from diffsettings command: %s", error)
         if not output:

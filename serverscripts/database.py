@@ -1,6 +1,8 @@
 """Extract information from postgres databases.
 
 """
+from serverscripts.utils import get_output
+
 import argparse
 import copy
 import json
@@ -8,7 +10,6 @@ import logging
 import os
 import re
 import serverscripts
-import subprocess
 import sys
 
 VAR_DIR = '/var/local/serverscripts'
@@ -33,13 +34,8 @@ def is_postgres_available():
 
 
 def _postgres_version():
-    sub = subprocess.Popen('ps ax',
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    output, error = sub.communicate()
-    lines = output.splitlines()
+    output, error = get_output('ps ax')
+    lines = output.split('\n')
     for line in lines:
         if POSTGRES_VERSION.match(line):
             match = POSTGRES_VERSION.search(line)
@@ -53,17 +49,12 @@ def _database_infos():
     query = ("select datname, pg_database_size(datname) "
              "from pg_database;")
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
-    sub = subprocess.Popen(command,
-                           shell=True,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE,
-                           universal_newlines=True)
-    output, error = sub.communicate()
+    output, error = get_output(command)
     if error:
         logger.warn("Error output from psql command: %s", error)
     result = {}
     for line in output.split('\n'):
-        if not '|' in line:
+        if '|' not in line:
             continue
         parts = line.split('|')
         name = parts[0].strip()
@@ -188,12 +179,7 @@ ORDER BY bloat_mb DESC;
             query,
             database_name)
 
-        sub = subprocess.Popen(command,
-                               shell=True,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE,
-                               universal_newlines=True)
-        output, error = sub.communicate()
+        output, error = get_output(command)
         if error:
             logger.warn("Error output from psql command: %s", error)
         for line in output.split('\n'):
