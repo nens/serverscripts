@@ -8,8 +8,30 @@ All scripts should be reasonably well-behaved including ``-h/--help``,
 ``--version`` and ``-v/--verbose`` options.
 
 
-Installation
-------------
+Local development and testing
+-----------------------------
+
+To ensure we can test with python 2 and 3, we use "tox" instead of
+"pipenv". Like pipenv, you need to install tox globally.
+
+We don't have any dependencies ourselves (by design), so we only need to
+install our test dependencies (which tox does automatically)::
+
+  $ tox
+
+Note that if you change something in the dependencies, you'll have to
+re-create the virtualenvs::
+
+  $ tox --recreate
+
+If you waht to test agains just one of the environments, run something like
+this::
+
+  $ tox -e py27
+
+
+Installation on servers
+-----------------------
 
 TODO. Build python package locally. Scp somewhere. As root, ``pip install
 URL``.

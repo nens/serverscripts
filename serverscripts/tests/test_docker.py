@@ -2,7 +2,6 @@ from serverscripts import docker
 from unittest import TestCase
 
 import mock
-import os
 
 
 REGULAR_OUTPUT = """
@@ -14,9 +13,8 @@ Local Volumes       3                   3                   123 MB              
 
 
 class DockerTestCase(TestCase):
-
     def test_all_info(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
+        with mock.patch("subprocess.Popen.communicate") as mock_communicate:
             mock_communicate.return_value = (REGULAR_OUTPUT, "")
             result = docker.all_info()
-            self.assertEqual(3, result['active_volumes'])
+            self.assertEqual(3, result["active_volumes"])

@@ -5,7 +5,6 @@ import mock
 
 
 class DatabaseTestCase(TestCase):
-
     def setUp(self):
         self.sizes_output = """
         template1                  |        6000000
@@ -27,37 +26,37 @@ class DatabaseTestCase(TestCase):
         self.assertTrue("Smoke test, it just should not crash")
 
     def test_postgres_version(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = ("9.3/main (port 5432): online",
-                                             "")
-            self.assertEquals("9.3", database._postgres_version())
+        with mock.patch("serverscripts.database.get_output") as mock_get_output:
+            mock_get_output.return_value = (
+                "14160 bla bla /usr/lib/postgresql/9.3/bin/postgres bla bla",
+                "",
+            )
+            self.assertEqual("9.3", database._postgres_version())
 
-    def test_database_info(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = (self.sizes_output,
-                                             "")
-            self.assertEquals(9, len(database._database_infos()))
+    def test_database_info1(self):
+        with mock.patch("serverscripts.database.get_output") as mock_get_output:
+            mock_get_output.return_value = (self.sizes_output, "")
+            self.assertEqual(9, len(database._database_infos()))
 
-    def test_database_info(self):
-        with mock.patch('subprocess.Popen.communicate') as mock_communicate:
-            mock_communicate.return_value = (self.sizes_output,
-                                             "")
-            self.assertEquals(
-                database._database_infos()['lizard_nxt']['size'],
-                2207000000)
+    def test_database_info2(self):
+        with mock.patch("serverscripts.database.get_output") as mock_get_output:
+            mock_get_output.return_value = (self.sizes_output, "")
+            self.assertEqual(
+                database._database_infos()["lizard_nxt"]["size"], 2207000000
+            )
 
     def test_all_info(self):
-        with mock.patch(
-                'serverscripts.database._postgres_version') as mock_version:
-            with mock.patch(
-                    'serverscripts.database._database_infos') as mock_infos:
-                mock_version.return_value = '2.0'
-                mock_infos.return_value = {'reinout': {'name': 'reinout',
-                                                       'size': 20},
-                                           'alexandr': {'name': 'reinout',
-                                                        'size': 40}}
-                result = database.all_info()
-                self.assertEquals(result['version'], '2.0')
-                self.assertEquals(result['num_databases'], 2)
-                self.assertEquals(result['total_databases_size'], 60)
-                self.assertEquals(result['biggest_database_size'], 40)
+        with mock.patch("serverscripts.database._postgres_version") as mock_version:
+            with mock.patch("serverscripts.database._database_infos") as mock_infos:
+                with mock.patch("serverscripts.database.get_output") as mock_get_output:
+                    mock_get_output.return_value = ("", "")
+                    mock_version.return_value = "2.0"
+                    mock_infos.return_value = {
+                        "reinout": {"name": "reinout", "size": 20},
+                        "alexandr": {"name": "reinout", "size": 40},
+                    }
+                    result = database.all_info()
+                    self.assertEqual(result["version"], "2.0")
+                    self.assertEqual(result["num_databases"], 2)
+                    self.assertEqual(result["total_databases_size"], 60)
+                    self.assertEqual(result["biggest_database_size"], 40)
