@@ -45,19 +45,25 @@ class PipenvTestCase(TestCase):
 
     def test_django_info_no_pipenv(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
-            mock_get_output.return_value = ("", "bloody murder")
-            result = checkouts.django_info_pipenv(self.dir_outside_proj)
-            self.assertIsNone(result)
+            with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
+                mock_get_output.return_value = ("", "bloody murder")
+                mock_stat.return_value = mock.Mock(st_uid=1234)
+                result = checkouts.django_info_pipenv(self.dir_outside_proj)
+                self.assertIsNone(result)
 
     def test_django_info_pipenv(self):
-        result = checkouts.django_info_pipenv(self.dir_with_pipenv)
-        self.assertIsNone(result)
+        with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
+            mock_stat.return_value = mock.Mock(st_uid=1234)
+            result = checkouts.django_info_pipenv(self.dir_with_pipenv)
+            self.assertIsNone(result)
 
     def test_django_info(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
-            mock_get_output.return_value = (self.example_diffsettings_output, "")
-            result = checkouts.django_info_pipenv(self.dir_outside_proj)
-            self.assertEqual(len(result["databases"]), 2)
+            with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
+                mock_get_output.return_value = (self.example_diffsettings_output, "")
+                mock_stat.return_value = mock.Mock(st_uid=1234)
+                result = checkouts.django_info_pipenv(self.dir_outside_proj)
+                self.assertEqual(len(result["databases"]), 2)
 
 
 class GitAndEggInfoTestCase(TestCase):
@@ -114,9 +120,11 @@ class GitAndEggInfoTestCase(TestCase):
 
     def test_django_info(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
-            mock_get_output.return_value = (self.example_diffsettings_output, "")
-            result = checkouts.django_info_buildout("some/bin/django")
-            self.assertEqual(len(result["databases"]), 2)
+            with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
+                mock_get_output.return_value = (self.example_diffsettings_output, "")
+                mock_stat.return_value = mock.Mock(st_uid=1234)
+                result = checkouts.django_info_buildout("some/bin/django")
+                self.assertEqual(len(result["databases"]), 2)
 
     def test_supervisorctl_warnings(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
