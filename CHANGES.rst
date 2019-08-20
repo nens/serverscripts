@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.5.6 (unreleased)
+1.6.0 (unreleased)
 ------------------
 
 - Made it run on both python 2.7 and 3.5/3.6/3.7.

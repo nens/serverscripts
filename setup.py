@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-version = "1.5.6.dev0"
+version = "1.6.0.dev0"
 
 long_description = "\n\n".join(
     [open("README.rst").read(), open("CREDITS.rst").read(), open("CHANGES.rst").read()]
