@@ -376,7 +376,7 @@ def main():
         else:
             mode = None
             logger.warning(
-                "/srv directory without buildout.cfg or " "Pipfile: %s", directory
+                "/srv directory without buildout.cfg or Pipfile: %s", directory
             )
 
         # determine the installed packages
@@ -438,7 +438,7 @@ def main():
                     )
                 else:
                     logger.exception(
-                        "Multiple supervisorctl configurations " "found in %s",
+                        "Multiple supervisorctl configurations found in %s",
                         etc_directory,
                     )
         result[name] = checkout
