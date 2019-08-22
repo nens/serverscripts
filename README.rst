@@ -132,12 +132,3 @@ Should be installed in a cronjob. Suggestion for the crontab (note: it needs
 to run as root)::
 
     */5 * * * * /usr/local/bin/docker-info > /dev/null 2>&1
-
-
-TODO/ideas
-----------
-
-- Jenkins integration, test coverage.
-
-- zest.releaser plugin (google for it first!) for uploading the sdist
-  somewhere non-vanrees-like.
