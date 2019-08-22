@@ -12,6 +12,9 @@ Changelog of serverscripts
 - Running ``bin/django diffsettings`` and ``python manage.py diffsettings`` as
   the actual script's owner instead of assuming the ``buildout`` user.
 
+- Made it open source. Perhaps someone can grab a trick or two out of it. And
+  it is easier for ourselves to download a release :-)
+
 
 1.5.5 (2018-06-14)
 ------------------
