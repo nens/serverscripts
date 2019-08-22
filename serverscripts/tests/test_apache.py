@@ -68,7 +68,7 @@ class ApacheTestCase(TestCase):
         ][0]
         self.assertEqual(
             specific_site["proxy_to_other_server"],
-            "p-fews-mc-v2-d1.external-nens.local",
+            "p-fews-mc-v2-d1.ourdomain",
         )
 
     def test_redirect_count1(self):

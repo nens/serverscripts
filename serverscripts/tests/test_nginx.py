@@ -52,7 +52,7 @@ class GitAndEggInfoTestCase(TestCase):
         pprint(result)
         specific_site = [site for site in result if site["name"] == "api.ddsc.nl"][0]
         self.assertEqual(
-            specific_site["proxy_to_other_server"], "110-haprox-d2.external-nens.local"
+            specific_site["proxy_to_other_server"], "110-haprox-d2.ourdomain"
         )
 
     def test_redirect_count(self):

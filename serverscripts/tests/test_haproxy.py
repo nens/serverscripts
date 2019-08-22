@@ -27,11 +27,11 @@ class HaproxyTestCase(TestCase):
 
     def test_server_regex(self):
         line = (
-            "server 110-raster-d1.external-nens.local  "
+            "server 110-raster-d1.ourdomain  "
             + "10.100.110.131:80 check observe layer7"
         )
         match = haproxy.SERVER.search(line)
-        self.assertEqual(match.group("server"), "110-raster-d1.external-nens.local")
+        self.assertEqual(match.group("server"), "110-raster-d1.ourdomain")
 
     def test_count(self):
         # 3 nxt sites * 3 nxt servers + 1 raster site * 2 raster backends = 11
@@ -62,4 +62,4 @@ class HaproxyTestCase(TestCase):
         ]
         # 3 backends, so there should be 3 sites with this name.
         remote_servers = [site["proxy_to_other_server"] for site in specific_sites]
-        self.assertTrue("p-web-ws-d2.external-nens.local" in remote_servers)
+        self.assertTrue("p-web-ws-d2.ourdomain" in remote_servers)
