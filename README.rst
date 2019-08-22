@@ -33,23 +33,13 @@ this::
 Installation on servers
 -----------------------
 
-TODO. Build python package locally. Scp somewhere. As root, ``pip install
-URL``.
+We're installed by an ansible script (see the private "sysadminsable"
+repository).
 
-0.1 test release::
+If you need to do it manually, pip-install it *as root* (with the correct
+version number).
 
-    $ bin/fullrelease
-
-This prints a /tmp dir where the dist has been made. Scp that::
-
-    $ scp /that/tmp/dir/dist/serverscripts-0.1.tar.gz vanrees.org:www/download/
-
-And on a server, as root::
-
-    $ pip install http://reinout.vanrees.org/download/serverscripts-0.1.tar.gz
-
-You could also copy the tgz directly to the server and ``pip install the/file.tgz``.
-
+  # pip install https://github.com/nens/serverscripts/archive/1.6.0.tar.gz
 
 Prerequisite: ``apt-get install python-pip``.
 

@@ -5,7 +5,8 @@ Changelog of serverscripts
 1.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Updated install instructions now that we can download the release from
+  github.
 
 
 1.6.0 (2019-08-22)
