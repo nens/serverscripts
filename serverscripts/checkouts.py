@@ -229,8 +229,13 @@ def pipenv_info(directory):
 
 def django_info_buildout(bin_django):
     matplotlibenv = "MPLCONFIGDIR=/tmp"
-    # Corner case when something needs matplotlib in django's settings.
-    command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv, bin_django)
+    # ^^^ Corner case when something needs matplotlib in django's settings.
+    target_user_id = os.stat(bin_django).st_uid
+    command = "sudo -u %s %s %s diffsettings" % (
+        target_user_id,
+        matplotlibenv,
+        bin_django,
+    )
     logger.debug("Running %s diffsettings...", bin_django)
     output, error = get_output(command)
     if error:
@@ -241,11 +246,16 @@ def django_info_buildout(bin_django):
 
 
 def django_info_pipenv(directory):
+    matplotlibenv = "MPLCONFIGDIR=/tmp"
+    # ^^^ Corner case when something needs matplotlib in django's settings.
+    target_user_id = os.stat("manage.py").st_uid
     django_script = "pipenv run python manage.py"
 
-    matplotlibenv = "MPLCONFIGDIR=/tmp"
-    # Corner case when something needs matplotlib in django's settings.
-    command = "sudo -u buildout %s %s diffsettings" % (matplotlibenv, django_script)
+    command = "sudo -u %s %s %s diffsettings" % (
+        target_user_id,
+        matplotlibenv,
+        django_script,
+    )
     output, error = get_output(command, cwd=directory, fail_on_exit_code=False)
     if error:
         logger.warning("Error output from diffsettings command: %s", error)
@@ -376,7 +386,7 @@ def main():
         else:
             mode = None
             logger.warning(
-                "/srv directory without buildout.cfg or " "Pipfile: %s", directory
+                "/srv directory without buildout.cfg or Pipfile: %s", directory
             )
 
         # determine the installed packages
@@ -438,7 +448,7 @@ def main():
                     )
                 else:
                     logger.exception(
-                        "Multiple supervisorctl configurations " "found in %s",
+                        "Multiple supervisorctl configurations found in %s",
                         etc_directory,
                     )
         result[name] = checkout

@@ -49,7 +49,7 @@ def _postgres_version():
 
 def _database_infos():
     """Return dict with info about the databases {database name: info}"""
-    query = "select datname, pg_database_size(datname) " "from pg_database;"
+    query = "select datname, pg_database_size(datname) from pg_database;"
     command = "sudo -u postgres psql -c '%s' --tuples-only" % query
     output, error = get_output(command)
     if error:

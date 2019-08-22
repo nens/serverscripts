@@ -2,10 +2,15 @@ Changelog of serverscripts
 ===================================================
 
 
-1.5.6 (unreleased)
+1.6.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Made it run on both python 2.7 and 3.5/3.6/3.7.
+
+- Added automatic travis-ci tests.
+
+- Running ``bin/django diffsettings`` and ``python manage.py diffsettings`` as
+  the actual script's owner instead of assuming the ``buildout`` user.
 
 
 1.5.5 (2018-06-14)
