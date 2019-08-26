@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.6.1 (unreleased)
+1.6.1 (2019-08-26)
 ------------------
 
 - Updated install instructions now that we can download the release from
