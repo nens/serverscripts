@@ -231,7 +231,7 @@ def django_info_buildout(bin_django):
     matplotlibenv = "MPLCONFIGDIR=/tmp"
     # ^^^ Corner case when something needs matplotlib in django's settings.
     target_user_id = os.stat(bin_django).st_uid
-    command = "sudo -u %s %s %s diffsettings" % (
+    command = "sudo -u \\#%s %s %s diffsettings" % (
         target_user_id,
         matplotlibenv,
         bin_django,
@@ -251,7 +251,7 @@ def django_info_pipenv(directory):
     target_user_id = os.stat("manage.py").st_uid
     django_script = "pipenv run python manage.py"
 
-    command = "sudo -u %s %s %s diffsettings" % (
+    command = "sudo -u \\#%s %s %s diffsettings" % (
         target_user_id,
         matplotlibenv,
         django_script,

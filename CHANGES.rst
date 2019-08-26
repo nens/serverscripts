@@ -8,6 +8,8 @@ Changelog of serverscripts
 - Updated install instructions now that we can download the release from
   github.
 
+- Fixed sudo command: a numeric UID must be prefixed with ``#``.
+
 
 1.6.0 (2019-08-22)
 ------------------
