@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.7.0 (unreleased)
+1.7.0 (2019-08-27)
 ------------------
 
 - Unmounting duplicate mounts, when found. It regularly occurs that shares are
