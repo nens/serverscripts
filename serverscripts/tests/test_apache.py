@@ -67,8 +67,7 @@ class ApacheTestCase(TestCase):
             site for site in result if site["name"] == "fewsvecht.controlnext.org"
         ][0]
         self.assertEqual(
-            specific_site["proxy_to_other_server"],
-            "p-fews-mc-v2-d1.ourdomain",
+            specific_site["proxy_to_other_server"], "p-fews-mc-v2-d1.ourdomain"
         )
 
     def test_redirect_count1(self):
