@@ -52,6 +52,10 @@ def _cifs_lines(tabfile, unmount_duplicates=False):
 
     Also return number of warnings.
 
+    ``unmount_duplicates=True`` is set when checking the /etc/mtab. Shares
+    that are mounted more than once in the same location have their duplicates
+    unmounted.
+
     """
     result = {}
     num_warnings = 0
