@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Goal copy/pasted from trac (https://office.lizard.net/trac/ticket/4272)::
 
@@ -48,7 +47,7 @@ cifs                       # We're only interested in cifs mounts
 logger = logging.getLogger(__name__)
 
 
-def _cifs_lines(tabfile):
+def _cifs_lines(tabfile, unmount_duplicates=False):
     """Return cifs share and local folder for cifs mounts in tabfile
 
     Also return number of warnings.
@@ -79,6 +78,9 @@ def _cifs_lines(tabfile):
             if local_folder in result:
                 num_warnings += 1
                 logger.warning("local folder %s is a duplicate!", local_folder)
+                if unmount_duplicates:
+                    logger.warning("Unmounting a duplicate %s", local_folder)
+                    _unmount(local_folder)
             if cifs_share in result.values():
                 num_warnings += 1
                 logger.warning("cifs share %s is already mounted elsewhere", cifs_share)
@@ -262,7 +264,7 @@ def main():
         sys.exit()
 
     fstab_mounts, num_warnings1 = _cifs_lines(FSTAB)
-    mtab_mounts, num_warnings2 = _cifs_lines(MTAB)
+    mtab_mounts, num_warnings2 = _cifs_lines(MTAB, unmount_duplicates=True)
     num_warnings3 = check_unknown_mounts(fstab_mounts, mtab_mounts)
     num_warnings = num_warnings1 + num_warnings2 + num_warnings3
     num_errors = check_if_mounted(fstab_mounts, mtab_mounts)

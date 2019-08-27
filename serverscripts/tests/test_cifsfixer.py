@@ -14,6 +14,9 @@ class TabfileTestCase(TestCase):
             "serverscripts.tests", "example_fstab_with_duplicate_mount"
         )
         self.mtab = resource_filename("serverscripts.tests", "example_mtab")
+        self.mtab_with_duplicate_mount = resource_filename(
+            "serverscripts.tests", "example_mtab_with_duplicate_mount"
+        )
         self.credentials = resource_filename(
             "serverscripts.tests", "example_cifs_credentials"
         )
@@ -49,6 +52,15 @@ class TabfileTestCase(TestCase):
         # So: only cifs mounts are returned and commented-out cifs mounts are
         # ignored.
         self.assertEqual(expected, cifsfixer._cifs_lines(self.mtab)[0])
+
+    def test_mtab_with_duplicate_mount(self):
+        with patch("serverscripts.cifsfixer._unmount") as mocked:
+            mounts, warnings = cifsfixer._cifs_lines(
+                self.mtab_with_duplicate_mount, unmount_duplicates=True
+            )
+            assert mounts == {"/some/mount": {"cifs_share": "//someserver/somewhere"}}
+            assert warnings == 1
+            assert mocked.called
 
     def test_username_extraction(self):
         self.assertEqual("some_user", cifsfixer._extract_username(self.credentials))
