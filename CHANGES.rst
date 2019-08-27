@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.6.2 (unreleased)
+1.7.0 (unreleased)
 ------------------
 
 - Unmounting duplicate mounts, when found. It regularly occurs that shares are
