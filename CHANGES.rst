@@ -5,7 +5,9 @@ Changelog of serverscripts
 1.6.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Unmounting duplicate mounts, when found. It regularly occurs that shares are
+  mounted more than once in the same location. This new behaviour
+  automatically cleans it up.
 
 
 1.6.1 (2019-08-26)
