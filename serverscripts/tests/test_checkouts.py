@@ -51,12 +51,6 @@ class PipenvTestCase(TestCase):
                 result = checkouts.django_info_pipenv(self.dir_outside_proj)
                 self.assertIsNone(result)
 
-    def test_django_info_pipenv(self):
-        with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
-            mock_stat.return_value = mock.Mock(st_uid=1234)
-            result = checkouts.django_info_pipenv(self.dir_with_pipenv)
-            self.assertIsNone(result)
-
     def test_django_info(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
             with mock.patch("serverscripts.checkouts.os.stat") as mock_stat:
