@@ -5,7 +5,8 @@ Changelog of serverscripts
 1.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Change directory to a pipenv-managed directory before running commands
+  there.
 
 
 1.7.0 (2019-08-27)

@@ -246,6 +246,8 @@ def django_info_buildout(bin_django):
 
 
 def django_info_pipenv(directory):
+    original_dir = os.getcwd()
+    os.chdir(directory)
     matplotlibenv = "MPLCONFIGDIR=/tmp"
     # ^^^ Corner case when something needs matplotlib in django's settings.
     target_user_id = os.stat("manage.py").st_uid
@@ -257,6 +259,7 @@ def django_info_pipenv(directory):
         django_script,
     )
     output, error = get_output(command, cwd=directory, fail_on_exit_code=False)
+    os.chdir(original_dir)
     if error:
         logger.warning("Error output from diffsettings command: %s", error)
         if not output:
