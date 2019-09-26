@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.7.2 (unreleased)
+1.8.0 (unreleased)
 ------------------
 
 - Nothing changed yet.
