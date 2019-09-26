@@ -147,3 +147,7 @@ class UtilsTestCase(TestCase):
         fstab_mounts = {}
         mtab_mounts = {"/some/folder": {"cifs_share": "some//cifs"}}
         self.assertEqual(1, cifsfixer.check_unknown_mounts(fstab_mounts, mtab_mounts))
+
+
+def test_check_if_already_running():
+    assert cifsfixer.check_if_already_running() is False
