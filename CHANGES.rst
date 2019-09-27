@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.8.1 (unreleased)
+1.8.1 (2019-09-27)
 ------------------
 
 - When cifsfixer is started from cron, ``ps ax`` shows both the actual command
