@@ -2,10 +2,12 @@ Changelog of serverscripts
 ===================================================
 
 
-1.7.2 (unreleased)
+1.8.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added check if cifsfixer is already running. When so, there's probably a
+  hanging mount. In any case, it indicates a big problem. This prevents
+  cifsfixer from starting over and over again, leading to even more problems.
 
 
 1.7.1 (2019-09-06)

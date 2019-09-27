@@ -213,6 +213,24 @@ def check_unknown_mounts(fstab_mounts, mtab_mounts):
     return num_warnings
 
 
+def check_if_already_running():
+    """Return whether we're already running: that indicates huge problems."""
+    command = "ps ax"
+    sub = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    output, error = sub.communicate()
+    OUR_BINARY = "/usr/local/bin/cifsfixer"
+    lines = (output + error).split("\n")
+    found = [line for line in lines if OUR_BINARY in line]
+    # One is fine.
+    return len(found) > 1
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -268,10 +286,16 @@ def main():
         sys.exit()
 
     fstab_mounts, num_warnings1 = _cifs_lines(FSTAB)
-    mtab_mounts, num_warnings2 = _cifs_lines(MTAB, unmount_duplicates=True)
-    num_warnings3 = check_unknown_mounts(fstab_mounts, mtab_mounts)
-    num_warnings = num_warnings1 + num_warnings2 + num_warnings3
-    num_errors = check_if_mounted(fstab_mounts, mtab_mounts)
+    if not check_if_already_running():
+        # Regular checks.
+        mtab_mounts, num_warnings2 = _cifs_lines(MTAB, unmount_duplicates=True)
+        num_warnings3 = check_unknown_mounts(fstab_mounts, mtab_mounts)
+        num_warnings = num_warnings1 + num_warnings2 + num_warnings3
+        num_errors = check_if_mounted(fstab_mounts, mtab_mounts)
+    else:
+        logger.error("Another process is already running! Hanging mount?")
+        num_warnings = num_warnings1
+        num_errors = 1
 
     # Write to files that will be read by zabbix.
     warningsfile = os.path.join(VAR_DIR, "nens.cifschecker.warnings")
