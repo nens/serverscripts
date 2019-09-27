@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.8.0 (unreleased)
+1.8.0 (2019-09-27)
 ------------------
 
 - Added check if cifsfixer is already running. When so, there's probably a
