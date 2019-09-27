@@ -5,7 +5,10 @@ Changelog of serverscripts
 1.8.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- When cifsfixer is started from cron, ``ps ax`` shows both the actual command
+  *and* a ``bin/sh -c /usr/local/bin/cifsfixer`` line. So cifsfixer thinks it
+  runs twice, which it considers an error. So... I now allow "two" instances
+  before raising an error.
 
 
 1.8.0 (2019-09-27)

@@ -227,8 +227,9 @@ def check_if_already_running():
     OUR_BINARY = "/usr/local/bin/cifsfixer"
     lines = (output + error).split("\n")
     found = [line for line in lines if OUR_BINARY in line]
-    # One is fine.
-    return len(found) > 1
+    # Two is fine: the actual command *and* cron's "bin/sh" (plus the command)
+    # line.
+    return len(found) > 2
 
 
 def main():
