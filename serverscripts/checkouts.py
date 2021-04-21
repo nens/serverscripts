@@ -409,8 +409,8 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
         logger.info("Created %s", OUTPUT_DIR)
-    for name in ["lizard-nxt"]:
-        directory = os.path.join("..", name)
+    for name in os.listdir(SRV_DIR):
+        directory = os.path.join(SRV_DIR, name)
         if os.path.islink(directory):
             logger.info("Ignoring %s, it is a symlink", directory)
             continue
