@@ -192,24 +192,17 @@ def whereis(name):
             return executable
 
 
-def pipenv_info(directory):
-    directory = os.path.abspath(directory)
-    output, error = get_output("pipenv --where", cwd=directory)
-
-    if output.strip() != directory:
-        logger.error("No pipenv found in %s", directory)
-        return
-
-    output, error = get_output("pipenv run python --version", cwd=directory)
+def _parse_python_version(output, error):
     match = PYTHON_VERSION.match((output + error).replace("\n", ""))
     if match is None:
         python_version = "UNKNOWN"
     else:
         python_version = match.group("version")
     logger.debug("Python version used: %s", python_version)
+    return python_version
 
-    output, error = get_output("pipenv run pip freeze", cwd=directory)
 
+def _parse_freeze(output):
     pkgs = dict()
     for pkg in output.split("\n"):
         if len(pkg) == 0:
@@ -222,8 +215,34 @@ def pipenv_info(directory):
             # invalid spec
             continue
         pkgs[pkg[0]] = pkg[1]
+    return pkgs
 
-    pkgs["python"] = python_version
+
+def pipenv_info(directory):
+    directory = os.path.abspath(directory)
+    output, error = get_output("pipenv --where", cwd=directory)
+
+    if output.strip() != directory:
+        logger.error("No pipenv found in %s", directory)
+        return    
+
+    output, error = get_output("pipenv run pip freeze", cwd=directory)
+    pkgs = _parse_freeze(output)
+
+    output, error = get_output("pipenv run python --version", cwd=directory)
+    pkgs["python"] = _parse_python_version(output, error)
+    return pkgs
+
+
+def venv_info(directory, bin_dir):
+    if bin_dir[-1] != "/":
+        bin_dir += "/"
+
+    output, error =  get_output(bin_dir + "pip freeze")
+    pkgs = _parse_freeze(output)
+
+    output, error = get_output(bin_dir + "python --version")
+    pkgs["python"] = _parse_python_version(output, error)
     return pkgs
 
 
@@ -252,6 +271,31 @@ def django_info_pipenv(directory):
     # ^^^ Corner case when something needs matplotlib in django's settings.
     target_user_id = os.stat("manage.py").st_uid
     django_script = "pipenv run python manage.py"
+
+    command = "sudo -u \\#%s %s %s diffsettings" % (
+        target_user_id,
+        matplotlibenv,
+        django_script,
+    )
+    output, error = get_output(command, cwd=directory, fail_on_exit_code=False)
+    os.chdir(original_dir)
+    if error:
+        logger.warning("Error output from diffsettings command: %s", error)
+        if not output:
+            return
+    return parse_django_info(output)
+
+
+def django_info_venv(directory, bin_dir):
+    if bin_dir[-1] != "/":
+        bin_dir += "/"
+
+    original_dir = os.getcwd()
+    os.chdir(directory)
+    matplotlibenv = "MPLCONFIGDIR=/tmp"
+    # ^^^ Corner case when something needs matplotlib in django's settings.
+    target_user_id = os.stat("manage.py").st_uid
+    django_script = bin_dir + "python manage.py"
 
     command = "sudo -u \\#%s %s %s diffsettings" % (
         target_user_id,
@@ -365,8 +409,8 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.mkdir(OUTPUT_DIR)
         logger.info("Created %s", OUTPUT_DIR)
-    for name in os.listdir(SRV_DIR):
-        directory = os.path.join(SRV_DIR, name)
+    for name in ["lizard-nxt"]:
+        directory = os.path.join("..", name)
         if os.path.islink(directory):
             logger.info("Ignoring %s, it is a symlink", directory)
             continue
@@ -386,6 +430,12 @@ def main():
             mode = "pipenv"
         elif os.path.exists(os.path.join(directory, "buildout.cfg")):
             mode = "buildout"
+        elif os.path.isfile(os.path.join(directory, ".venv/pyvenv.cfg")):
+            mode = "virtualenv"
+            bin_dir = os.path.abspath(os.path.join(directory, ".venv/bin"))
+        elif os.path.isfile(os.path.join(directory, "pyvenv.cfg")):
+            mode = "virtualenv"
+            bin_dir = os.path.abspath(os.path.join(directory, "bin"))
         else:
             mode = None
             logger.warning(
@@ -397,6 +447,8 @@ def main():
             checkout["eggs"] = eggs_info(directory)
         elif mode == "pipenv":
             checkout["eggs"] = pipenv_info(directory)
+        elif mode == "virtualenv":
+            checkout["eggs"] = venv_info(directory, bin_dir)
         else:
             checkout["eggs"] = None
 
@@ -417,6 +469,14 @@ def main():
                     num_bin_django_failures += 1
             else:
                 logger.debug("manage.py not found in %s", directory)
+        elif mode == "virtualenv":
+            django_manage = os.path.join(directory, "manage.py")
+            if os.path.exists(django_manage):
+                checkout["django"] = django_info_venv(directory, bin_dir)
+                if not checkout["django"]:
+                    num_bin_django_failures += 1
+            else:
+                logger.debug("manage.py not found in %s", directory)
 
         # determine supervisorctl status
         if mode == "buildout":
@@ -428,7 +488,7 @@ def main():
                     logger.exception("Error calling %s", bin_supervisor)
             else:
                 logger.debug("bin/supervisorctl not found in %s", directory)
-        elif mode == "pipenv" and whereis("supervisorctl"):
+        elif mode in {"pipenv", "virtualenv"} and whereis("supervisorctl"):
             # expect the supervisor conf file in the etc directory
             etc_directory = os.path.join(directory, "etc")
             if os.path.exists(etc_directory):

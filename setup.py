@@ -19,7 +19,7 @@ install_requires = (
     ],
 )
 
-tests_require = ["coverage", "mock", "pytest", "pytest-cov", "pytest-flakes"]
+tests_require = ["coverage", "mock", "pytest", "pytest-cov", "pytest-flakes", "virtualenv"]
 
 setup(
     name="serverscripts",

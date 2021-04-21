@@ -60,6 +60,37 @@ class PipenvTestCase(TestCase):
                 self.assertEqual(len(result["databases"]), 2)
 
 
+
+class VirtualenvTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.our_dir = os.path.dirname(__file__)
+        cls.dir_outside_proj = tempfile.mkdtemp()
+        cls.dir_with_venv = tempfile.mkdtemp()
+        cls.bin_dir = os.path.join(cls.dir_with_venv, "bin")
+        os.chdir(cls.dir_with_venv)
+        os.system("virtualenv .")
+        os.chdir(cls.our_dir)
+        cls.example_diffsettings_output = open(
+            os.path.join(cls.our_dir, "example_diffsettings.txt")
+        ).read()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.dir_outside_proj)
+        shutil.rmtree(cls.dir_with_venv)
+
+    def test_correct_venv_info(self):
+        output = checkouts.venv_info(self.dir_with_venv, self.bin_dir)
+        self.assertIn("certifi", output)
+        our_python_version = "%s.%s.%s" % (
+            sys.version_info.major,
+            sys.version_info.minor,
+            sys.version_info.micro,
+        )
+        self.assertEqual(output["python"], our_python_version)
+
+    
 class GitAndEggInfoTestCase(TestCase):
     def setUp(self):
         self.our_dir = os.path.dirname(__file__)
