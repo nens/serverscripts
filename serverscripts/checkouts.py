@@ -196,7 +196,7 @@ def whereis(name):
             return executable
 
 
-def _parse_python_version(output, error):
+def parse_python_version(output, error):
     match = PYTHON_VERSION.match((output + error).replace("\n", ""))
     if match is None:
         python_version = "UNKNOWN"
@@ -206,7 +206,7 @@ def _parse_python_version(output, error):
     return python_version
 
 
-def _parse_freeze(output):
+def parse_freeze(output):
     pkgs = dict()
     for pkg in output.split("\n"):
         if len(pkg) == 0:
@@ -233,10 +233,10 @@ def pipenv_info(directory):
         return
 
     output, error = get_output(pipenv + " run pip freeze --all", cwd=directory)
-    pkgs = _parse_freeze(output)
+    pkgs = parse_freeze(output)
 
     output, error = get_output(pipenv + " run python --version", cwd=directory)
-    pkgs["python"] = _parse_python_version(output, error)
+    pkgs["python"] = parse_python_version(output, error)
     return pkgs
 
 
@@ -245,10 +245,10 @@ def venv_info(bin_dir):
         bin_dir += "/"
 
     output, error = get_output(bin_dir + "pip freeze --all")
-    pkgs = _parse_freeze(output)
+    pkgs = parse_freeze(output)
 
     output, error = get_output(bin_dir + "python --version")
-    pkgs["python"] = _parse_python_version(output, error)
+    pkgs["python"] = parse_python_version(output, error)
     return pkgs
 
 

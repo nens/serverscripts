@@ -4,21 +4,121 @@ import json
 import logging
 import os
 import serverscripts
-import subprocess
 import sys
+
+from serverscripts.utils import get_output
+from serverscripts.checkouts import parse_freeze
+from serverscripts.checkouts import parse_python_version
 
 
 VAR_DIR = "/var/local/serverscripts"
 OUTPUT_DIR = "/var/local/serverinfo-facts"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "docker.fact")
-DOCKER_TEMPLATE = {"active_images": 0, "active_containers": 0, "active_volumes": 0}
-
+DOCKER_TEMPLATE = {
+    "active_images": 0,
+    "active_containers": 0,
+    "active_volumes": 0,
+    "containers": [],
+}
+DOCKER_PS_FIELDS = (
+    "ID",
+    "Image",
+    "Command",
+    "CreatedAt",
+    "RunningFor",
+    "Ports",
+    # "State",  errors on older docker
+    "Status",
+    "Size",
+    "Names",
+    # "Labels",  very long field
+    "Mounts",
+    "Networks",
+)
+# create a string like: {"id": {{.ID}}, "image": "{{.Image}}"}
+DOCKER_PS_FORMAT = "\t".join(["{{." + x + "}}" for x in DOCKER_PS_FIELDS])
+# recognize a python interpreter by the presence of one of these in the docker command:
+PYTHON_EXEC_OPTIONS = (
+    "python",
+    "python3",
+    "bin/python",
+    ".venv/bin/python",
+    "/usr/bin/python",
+    "/usr/bin/python3",
+)
+DOCKER_EXEC_ERROR = "OCI runtime exec failed:"
 
 logger = logging.getLogger(__name__)
 
 
 def is_docker_available():
     return os.path.exists("/etc/docker")
+
+
+def python_details(container):
+    """Run pip freeze in containers that are python-based
+
+    A container is python based if it has "python" in its command.
+    """
+    # identify the python interpreter inside the docker
+    split_command = container["command"].strip('"').split(" ")
+    for python_exec in PYTHON_EXEC_OPTIONS:
+        if python_exec in split_command:
+            break
+    else:
+        # it is some other command (gunicorn; bin/gunicorn)
+        dirname = os.path.dirname(split_command[0])
+        if dirname == "":
+            python_exec = "python3"  # global default
+        else:
+            python_exec = os.path.join(dirname, "python")
+    python_in_docker = "docker exec " + container["id"] + " " + python_exec + " "
+
+    # identify the python version
+    command = "--version"
+    logger.debug(
+        "Running %s %s in container '%s'..", python_exec, command, container["names"]
+    )
+    output, _ = get_output(python_in_docker + command, fail_on_exit_code=False)
+    if output.startswith(DOCKER_EXEC_ERROR) or output.startswith("Traceback"):
+        logger.info("Did not find Python in docker %s", container["names"])
+        return {}
+    python_version = parse_python_version(output, "")
+    logger.info(
+        "Found Python %s ('%s') in container '%s'..",
+        python_version,
+        python_exec,
+        container["names"],
+    )
+
+    # identify the python packages (eggs)
+    command = "-m pip freeze --all"
+    logger.debug(
+        "Running %s %s in container '%s'..", python_exec, command, container["names"]
+    )
+    output, _ = get_output(python_in_docker + command, fail_on_exit_code=False)
+    if output.startswith(DOCKER_EXEC_ERROR):
+        logger.warning("Error output from pip freeze in docker: %s", output)
+    eggs = parse_freeze(output)
+    eggs["python"] = python_version
+
+    return {"eggs": eggs}
+
+
+def container_details():
+    """Return a list of details of running containers
+
+    The fields are all fields that docker ps can return. See:
+    See https://docs.docker.com/engine/reference/commandline/ps/.
+    """
+    command = "docker ps --no-trunc --format '{}'".format(DOCKER_PS_FORMAT)
+    logger.debug("Running 'docker ps'...")
+    output, error = get_output(command, fail_on_exit_code=False)
+    if error:
+        logger.warning("Error output from docker command: %s", error)
+        return []
+    keys = [x.lower() for x in DOCKER_PS_FIELDS]
+    return [dict(zip(keys, line.split("\t"))) for line in output.split("\n") if line]
 
 
 def all_info():
@@ -37,14 +137,7 @@ def all_info():
     result = DOCKER_TEMPLATE.copy()
     command = "docker system df"
     logger.debug("Running '%s'...", command)
-    sub = subprocess.Popen(
-        command,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True,
-    )
-    output, error = sub.communicate()
+    output, error = get_output(command, fail_on_exit_code=False)
     if error:
         logger.warning("Error output from docker command: %s", error)
     lines = [line.strip() for line in output.split("\n")]
@@ -66,7 +159,10 @@ def all_info():
             result["active_containers"] = count
         if "volumes" in line:
             result["active_volumes"] = count
-    logger.info("Found the following info on docker: %r", result)
+    result["containers"] = container_details()
+    for container in result["containers"]:
+        container["python"] = python_details(container)
+    logger.info("Found %d active docker containers", result["active_containers"])
     return result
 
 
@@ -108,7 +204,11 @@ def main():
 
     info_on_docker = all_info()
     docker_is_active = any(info_on_docker.values())
-    result_for_serverinfo = {"available": True, "active": docker_is_active}
+    result_for_serverinfo = {
+        "available": True,
+        "active": docker_is_active,
+        "containers": info_on_docker["containers"],
+    }
     open(OUTPUT_FILE, "w").write(
         json.dumps(result_for_serverinfo, sort_keys=True, indent=4)
     )
