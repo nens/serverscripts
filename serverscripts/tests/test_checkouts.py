@@ -7,15 +7,24 @@ import shutil
 import sys
 import tempfile
 
+OUR_PYTHON_VERSION = "%s.%s.%s" % (
+    sys.version_info.major,
+    sys.version_info.minor,
+    sys.version_info.micro,
+)
 
-class PipenvTestCase(TestCase):
+
+class VenvPipenvTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.our_dir = os.path.dirname(__file__)
         cls.dir_outside_proj = tempfile.mkdtemp()
         cls.dir_with_pipenv = tempfile.mkdtemp()
+        cls.dir_with_venv = tempfile.mkdtemp()
         os.chdir(cls.dir_with_pipenv)
-        os.system("pipenv install")
+        os.system(sys.executable + " -m pipenv install --python=" + sys.executable)
+        os.chdir(cls.dir_with_venv)
+        os.system(sys.executable + " -m virtualenv .")
         os.chdir(cls.our_dir)
         cls.example_diffsettings_output = open(
             os.path.join(cls.our_dir, "example_diffsettings.txt")
@@ -25,6 +34,7 @@ class PipenvTestCase(TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.dir_outside_proj)
         shutil.rmtree(cls.dir_with_pipenv)
+        shutil.rmtree(cls.dir_with_venv)
 
     def test_no_pipenv(self):
         # a subdirectory of the project
@@ -34,14 +44,15 @@ class PipenvTestCase(TestCase):
 
     def test_correct_pipenv_info(self):
         output = checkouts.pipenv_info(self.dir_with_pipenv)
-        self.assertIn("serverscripts", output)
-        self.assertEqual(output["mock"], mock.__version__)
-        our_python_version = "%s.%s.%s" % (
-            sys.version_info.major,
-            sys.version_info.minor,
-            sys.version_info.micro,
-        )
-        self.assertEqual(output["python"], our_python_version)
+        self.assertIn("pip", output)
+        self.assertEqual(output["python"], OUR_PYTHON_VERSION)
+
+    def test_correct_venv_info(self):
+        """Pipenv is just a special virtualenv"""
+        bin_dir = self.dir_with_venv + "/bin"
+        output = checkouts.venv_info(bin_dir)
+        self.assertIn("pip", output)
+        self.assertEqual(output["python"], OUR_PYTHON_VERSION)
 
     def test_django_info_no_pipenv(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:
