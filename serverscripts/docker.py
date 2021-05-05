@@ -11,14 +11,57 @@ import sys
 VAR_DIR = "/var/local/serverscripts"
 OUTPUT_DIR = "/var/local/serverinfo-facts"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "docker.fact")
-DOCKER_TEMPLATE = {"active_images": 0, "active_containers": 0, "active_volumes": 0}
-
+DOCKER_TEMPLATE = {
+    "active_images": 0,
+    "active_containers": 0,
+    "active_volumes": 0,
+    "containers": [],
+}
+DOCKER_PS_FIELDS = (
+    "ID",
+    "Image",
+    "Command",
+    "CreatedAt",
+    "RunningFor",
+    "Ports",
+    "State",
+    "Status",
+    "Size",
+    "Names",
+    # "Labels",
+    "Mounts",
+    "Networks",
+)
+# create a string like: {"id": {{.ID}}, "image": "{{.Image}}"}
+DOCKER_PS_FORMAT = "\t".join(["{{." + x + "}}" for x in DOCKER_PS_FIELDS])
 
 logger = logging.getLogger(__name__)
 
 
 def is_docker_available():
     return os.path.exists("/etc/docker")
+
+
+def container_details():
+    """Return a list of details of running containers
+
+    The fields are all fields that docker ps can return. See:
+    See https://docs.docker.com/engine/reference/commandline/ps/.
+    """
+    command = "docker ps --no-trunc --format '{}'".format(DOCKER_PS_FORMAT)
+    logger.debug("Running 'docker ps'...", command)
+    sub = subprocess.Popen(
+        command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    output, error = sub.communicate()
+    if error:
+        logger.warning("Error output from docker command: %s", error)
+    keys = [x.lower() for x in DOCKER_PS_FIELDS]
+    return [dict(zip(keys, line.split("\t"))) for line in output.split("\n") if line]
 
 
 def all_info():
@@ -66,6 +109,7 @@ def all_info():
             result["active_containers"] = count
         if "volumes" in line:
             result["active_volumes"] = count
+    result["containers"] = container_details()
     logger.info("Found the following info on docker: %r", result)
     return result
 
@@ -108,7 +152,11 @@ def main():
 
     info_on_docker = all_info()
     docker_is_active = any(info_on_docker.values())
-    result_for_serverinfo = {"available": True, "active": docker_is_active}
+    result_for_serverinfo = {
+        "available": True,
+        "active": docker_is_active,
+        "containers": info_on_docker["containers"],
+    }
     open(OUTPUT_FILE, "w").write(
         json.dumps(result_for_serverinfo, sort_keys=True, indent=4)
     )
@@ -120,3 +168,7 @@ def main():
         open(zabbix_file2, "w").write(str(info_on_docker["active_containers"]))
         zabbix_file3 = os.path.join(VAR_DIR, "nens.num_active_docker_volumes.info")
         open(zabbix_file3, "w").write(str(info_on_docker["active_volumes"]))
+
+
+if __name__ == "__main__":
+    main()
