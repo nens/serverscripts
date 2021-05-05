@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.8.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added docker support.
 
 
 1.8.2 (2021-05-05)
