@@ -7,10 +7,8 @@ import serverscripts
 import sys
 
 from serverscripts.utils import get_output
-from serverscripts.checkouts import (
-    parse_freeze,
-    parse_python_version,
-)
+from serverscripts.checkouts import parse_freeze
+from serverscripts.checkouts import parse_python_version
 
 
 VAR_DIR = "/var/local/serverscripts"
