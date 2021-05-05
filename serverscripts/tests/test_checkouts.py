@@ -7,6 +7,12 @@ import shutil
 import sys
 import tempfile
 
+OUR_PYTHON_VERSION = "%s.%s.%s" % (
+    sys.version_info.major,
+    sys.version_info.minor,
+    sys.version_info.micro,
+)
+
 
 class PipenvTestCase(TestCase):
     @classmethod
@@ -38,27 +44,15 @@ class PipenvTestCase(TestCase):
 
     def test_correct_pipenv_info(self):
         output = checkouts.pipenv_info(self.dir_with_pipenv)
-        self.assertIn("serverscripts", output)
-        self.assertEqual(output["mock"], mock.__version__)
-        our_python_version = "%s.%s.%s" % (
-            sys.version_info.major,
-            sys.version_info.minor,
-            sys.version_info.micro,
-        )
-        self.assertEqual(output["python"], our_python_version)
+        self.assertIn("pip", output)
+        self.assertEqual(output["python"], OUR_PYTHON_VERSION)
 
     def test_correct_venv_info(self):
         """Pipenv is just a special virtualenv"""
         bin_dir = self.dir_with_venv + "/bin"
         output = checkouts.venv_info(bin_dir)
         self.assertIn("pip", output)
-        self.assertEqual(output["python"], sys.version.split(" ")[0])
-        our_python_version = "%s.%s.%s" % (
-            sys.version_info.major,
-            sys.version_info.minor,
-            sys.version_info.micro,
-        )
-        self.assertEqual(output["python"], our_python_version)
+        self.assertEqual(output["python"], OUR_PYTHON_VERSION)
 
     def test_django_info_no_pipenv(self):
         with mock.patch("serverscripts.checkouts.get_output") as mock_get_output:

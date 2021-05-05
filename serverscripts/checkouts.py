@@ -21,6 +21,10 @@ import sys
 import tempfile
 
 
+# if the serverscripts python interpreter is in a virtualenv, ignore that
+os.environ["PIPENV_IGNORE_VIRTUALENVS"] = "1"
+
+
 SRV_DIR = "/srv/"
 GIT_URL = re.compile(
     r"""
@@ -184,7 +188,7 @@ def eggs_info(directory):
 
 
 def whereis(name):
-    """ Find the first available path to an executable script. """
+    """Find the first available path to an executable script."""
     paths = os.environ.get("PATH").split(":")
     for path in paths:
         executable = os.path.join(path, name)
@@ -220,16 +224,18 @@ def _parse_freeze(output):
 
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    output, error = get_output(sys.executable + " -m pipenv --where", cwd=directory)
+    # run pipenv using the serverscripts' interpreter
+    pipenv = sys.executable + " -m pipenv"
+    output, error = get_output(pipenv + " --where", cwd=directory)
 
     if output.strip() != directory:
         logger.error("No pipenv found in %s", directory)
-        return    
+        return
 
-    output, error = get_output(sys.executable + " -m pipenv run pip freeze --all", cwd=directory)
+    output, error = get_output(pipenv + " run pip freeze --all", cwd=directory)
     pkgs = _parse_freeze(output)
 
-    output, error = get_output(sys.executable + " -m pipenv run python --version", cwd=directory)
+    output, error = get_output(pipenv + " run python --version", cwd=directory)
     pkgs["python"] = _parse_python_version(output, error)
     return pkgs
 
@@ -238,7 +244,7 @@ def venv_info(bin_dir):
     if bin_dir[-1] != "/":
         bin_dir += "/"
 
-    output, error =  get_output(bin_dir + "pip freeze --all")
+    output, error = get_output(bin_dir + "pip freeze --all")
     pkgs = _parse_freeze(output)
 
     output, error = get_output(bin_dir + "python --version")
