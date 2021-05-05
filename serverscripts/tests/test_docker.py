@@ -17,18 +17,19 @@ cca6ed94102fa749cd32cb289cde07d38323380697a87f6c6334de9715caac76	harbor.lizard.n
 """
 
 class DockerTestCase(TestCase):
-    @mock.patch("subprocess.Popen.communicate")
+    @mock.patch("serverscripts.docker.get_output")
     @mock.patch("serverscripts.docker.container_details")
-    def test_all_info(self, mock_details, mock_communicate):
-        mock_communicate.return_value = (REGULAR_OUTPUT, "")
-        mock_details.return_value = ["foo", "bar"]
+    @mock.patch("serverscripts.docker.python_details")
+    def test_all_info(self, mock_python, mock_details, mock_output):
+        mock_output.return_value = (REGULAR_OUTPUT, "")
+        mock_details.return_value = [{"id": "123", "command": "run"}]
         result = docker.all_info()
         self.assertEqual(3, result["active_volumes"])
         self.assertIs(mock_details.return_value, result["containers"])
 
-    @mock.patch("subprocess.Popen.communicate")
-    def test_container_details(self, mock_communicate):
-        mock_communicate.return_value = (DOCKER_PS_OUTPUT, "")
+    @mock.patch("serverscripts.docker.get_output")
+    def test_container_details(self, mock_output):
+        mock_output.return_value = (DOCKER_PS_OUTPUT, "")
         result = docker.container_details()
         self.assertEqual(2, len(result))
         self.assertEqual(result[0]["command"], "\"python manage.py runserver 0.0.0.0:8000\"")
