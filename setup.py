@@ -1,11 +1,9 @@
 from setuptools import setup
 
 
-version = "1.8.2.dev0"
+version = "1.8.3.dev0"
 
-long_description = "\n\n".join(
-    [open("README.rst").read(), open("CHANGES.rst").read()]
-)
+long_description = "\n\n".join([open("README.rst").read(), open("CHANGES.rst").read()])
 
 install_requires = (
     [
@@ -19,7 +17,15 @@ install_requires = (
     ],
 )
 
-tests_require = ["coverage", "mock", "pytest", "pytest-cov", "pytest-flakes"]
+tests_require = [
+    "coverage",
+    "mock",
+    "pytest",
+    "pytest-cov",
+    "pytest-flakes",
+    "pipenv",
+    "virtualenv",
+]
 
 setup(
     name="serverscripts",
