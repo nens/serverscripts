@@ -168,7 +168,3 @@ def main():
         open(zabbix_file2, "w").write(str(info_on_docker["active_containers"]))
         zabbix_file3 = os.path.join(VAR_DIR, "nens.num_active_docker_volumes.info")
         open(zabbix_file3, "w").write(str(info_on_docker["active_volumes"]))
-
-
-if __name__ == "__main__":
-    main()
