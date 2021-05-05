@@ -14,7 +14,7 @@ OUR_PYTHON_VERSION = "%s.%s.%s" % (
 )
 
 
-class PipenvTestCase(TestCase):
+class VenvPipenvTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.our_dir = os.path.dirname(__file__)
@@ -22,7 +22,7 @@ class PipenvTestCase(TestCase):
         cls.dir_with_pipenv = tempfile.mkdtemp()
         cls.dir_with_venv = tempfile.mkdtemp()
         os.chdir(cls.dir_with_pipenv)
-        os.system(sys.executable + " -m pipenv install")
+        os.system(sys.executable + " -m pipenv install --python=" + sys.executable)
         os.chdir(cls.dir_with_venv)
         os.system(sys.executable + " -m virtualenv .")
         os.chdir(cls.our_dir)
