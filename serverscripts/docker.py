@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import serverscripts
-import subprocess
 import sys
 
 from serverscripts.utils import get_output
