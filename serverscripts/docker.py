@@ -49,15 +49,6 @@ PYTHON_EXEC_OPTIONS = (
     "/usr/bin/python",
     "/usr/bin/python3",
 )
-# recognize a python docker by the presence of one of these in the command
-# the interpreter is guessed to be "python3"
-OTHER_PYTHON_COMMANDS = (
-    "./manage.py",
-    "/code/manage.py",
-    "gunicorn",
-    "uvicorn",
-    "celery",
-)
 DOCKER_EXEC_ERROR = "OCI runtime exec failed:"
 
 logger = logging.getLogger(__name__)
@@ -92,7 +83,7 @@ def python_details(container):
         "Running %s %s in container '%s'..", python_exec, command, container["names"]
     )
     output, _ = get_output(python_in_docker + command, fail_on_exit_code=False)
-    if output.startswith(DOCKER_EXEC_ERROR):
+    if output.startswith(DOCKER_EXEC_ERROR) or output.startswith("Traceback"):
         logger.info("Did not find Python in docker %s", container["names"])
         return {}
     python_version = parse_python_version(output, "")
