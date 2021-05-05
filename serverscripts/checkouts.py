@@ -114,6 +114,9 @@ def git_info(directory):
     if "master" in output:
         data["release"] = "master"
         logger.debug("It is a master checkout")
+    elif "main" in output:
+        data["release"] = "main"
+        logger.debug("It is a 'main' checkout")
     else:
         output, error = get_output("git describe", cwd=directory)
         first_line = output.split("\n")[0]
