@@ -52,9 +52,13 @@ PYTHON_EXEC_OPTIONS = (
 # recognize a python docker by the presence of one of these in the command
 # the interpreter is guessed to be "python3"
 OTHER_PYTHON_COMMANDS = (
+    "./manage.py",
+    "/code/manage.py",
     "gunicorn",
     "uvicorn",
+    "celery",
 )
+DOCKER_EXEC_ERROR = "OCI runtime exec failed:"
 
 logger = logging.getLogger(__name__)
 
@@ -74,44 +78,39 @@ def python_details(container):
         if python_exec in split_command:
             break
     else:
-        # it could be gunicorn / uvicorn
-        if any([x in split_command for x in OTHER_PYTHON_COMMANDS]):
-            python_exec = "python3"
-        else:
-            logger.info("Did not find Python in container '%s'..", container["names"])
-            return {}
-    logger.info("Found '%s' in container '%s'..", python_exec, container["names"])
+        # it is some other command probably using:
+        python_exec = "python3"
     python_in_docker = "docker exec " + container["id"] + " " + python_exec + " "
 
     # identify the python version
     command = "--version"
-    logger.debug("Running python %s in container '%s'..", command, container["names"])
-    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
-    if error:
-        logger.warning("Error output from python in docker: %s", error)
+    logger.debug(
+        "Running %s %s in container '%s'..", python_exec, command, container["names"]
+    )
+    output, _ = get_output(python_in_docker + command, fail_on_exit_code=False)
+    if output.startswith(DOCKER_EXEC_ERROR):
+        logger.info("Did not find Python in docker %s", container["names"])
         return {}
-    python_version = parse_python_version(output, error)
+    python_version = parse_python_version(output, "")
+    logger.info(
+        "Found Python %s ('%s') in container '%s'..",
+        python_version,
+        python_exec,
+        container["names"],
+    )
 
     # identify the python packages (eggs)
     command = "-m pip freeze --all"
-    logger.debug("Running python %s in container '%s'..", command, container["names"])
-    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
-    if error:
-        logger.warning("Error output from pip freeze in docker: %s", error)
+    logger.debug(
+        "Running %s %s in container '%s'..", python_exec, command, container["names"]
+    )
+    output, _ = get_output(python_in_docker + command, fail_on_exit_code=False)
+    if output.startswith(DOCKER_EXEC_ERROR):
+        logger.warning("Error output from pip freeze in docker: %s", output)
     eggs = parse_freeze(output)
     eggs["python"] = python_version
 
-    # identify the django (fails if no manage.py present, which is OK)
-    command = "manage.py diffsettings"
-    logger.debug("Running python %s in container '%s'..", command, container["names"])
-    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
-    if error:
-        django = {}
-        logger.warning("Error output from diffsettings in docker: %s", error)
-    else:
-        django = parse_django_info(output)
-
-    return {"eggs": eggs, "django": django}
+    return {"eggs": eggs}
 
 
 def container_details():
