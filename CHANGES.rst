@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.9.1 (unreleased)
+1.9.1 (2021-05-05)
 ------------------
 
 - Fixed checkoutinfo crash when there's a 'main' branch instead of 'master'.
