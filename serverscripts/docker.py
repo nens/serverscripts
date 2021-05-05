@@ -30,11 +30,11 @@ DOCKER_PS_FIELDS = (
     "CreatedAt",
     "RunningFor",
     "Ports",
-    "State",
+    # "State",  errors on older docker
     "Status",
     "Size",
     "Names",
-    # "Labels",
+    # "Labels",  very long field
     "Mounts",
     "Networks",
 )
@@ -78,8 +78,12 @@ def python_details(container):
         if python_exec in split_command:
             break
     else:
-        # it is some other command probably using:
-        python_exec = "python3"
+        # it is some other command (gunicorn; bin/gunicorn)
+        dirname = os.path.dirname(split_command[0])
+        if dirname == "":
+            python_exec = "python3"  # global default
+        else:
+            python_exec = os.path.join(dirname, "python")
     python_in_docker = "docker exec " + container["id"] + " " + python_exec + " "
 
     # identify the python version
