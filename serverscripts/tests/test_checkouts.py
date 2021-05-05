@@ -14,8 +14,11 @@ class PipenvTestCase(TestCase):
         cls.our_dir = os.path.dirname(__file__)
         cls.dir_outside_proj = tempfile.mkdtemp()
         cls.dir_with_pipenv = tempfile.mkdtemp()
+        cls.dir_with_venv = tempfile.mkdtemp()
         os.chdir(cls.dir_with_pipenv)
-        os.system("pipenv install")
+        os.system(sys.executable + " -m pipenv install")
+        os.chdir(cls.dir_with_venv)
+        os.system(sys.executable + " -m virtualenv .")
         os.chdir(cls.our_dir)
         cls.example_diffsettings_output = open(
             os.path.join(cls.our_dir, "example_diffsettings.txt")
@@ -25,6 +28,7 @@ class PipenvTestCase(TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.dir_outside_proj)
         shutil.rmtree(cls.dir_with_pipenv)
+        shutil.rmtree(cls.dir_with_venv)
 
     def test_no_pipenv(self):
         # a subdirectory of the project
@@ -45,10 +49,10 @@ class PipenvTestCase(TestCase):
 
     def test_correct_venv_info(self):
         """Pipenv is just a special virtualenv"""
-        bin_dir = self.dir_with_pipenv + "/.venv/bin"
-        output = checkouts.venv_info(self.dir_with_venv, bin_dir)
-        self.assertIn("serverscripts", output)
-        self.assertEqual(output["mock"], mock.__version__)
+        bin_dir = self.dir_with_venv + "/bin"
+        output = checkouts.venv_info(bin_dir)
+        self.assertIn("pip", output)
+        self.assertEqual(output["python"], sys.version.split(" ")[0])
         our_python_version = "%s.%s.%s" % (
             sys.version_info.major,
             sys.version_info.minor,

@@ -220,25 +220,25 @@ def _parse_freeze(output):
 
 def pipenv_info(directory):
     directory = os.path.abspath(directory)
-    output, error = get_output("pipenv --where", cwd=directory)
+    output, error = get_output(sys.executable + " -m pipenv --where", cwd=directory)
 
     if output.strip() != directory:
         logger.error("No pipenv found in %s", directory)
         return    
 
-    output, error = get_output("pipenv run pip freeze", cwd=directory)
+    output, error = get_output(sys.executable + " -m pipenv run pip freeze --all", cwd=directory)
     pkgs = _parse_freeze(output)
 
-    output, error = get_output("pipenv run python --version", cwd=directory)
+    output, error = get_output(sys.executable + " -m pipenv run python --version", cwd=directory)
     pkgs["python"] = _parse_python_version(output, error)
     return pkgs
 
 
-def venv_info(directory, bin_dir):
+def venv_info(bin_dir):
     if bin_dir[-1] != "/":
         bin_dir += "/"
 
-    output, error =  get_output(bin_dir + "pip freeze")
+    output, error =  get_output(bin_dir + "pip freeze --all")
     pkgs = _parse_freeze(output)
 
     output, error = get_output(bin_dir + "python --version")
@@ -448,7 +448,7 @@ def main():
         elif mode == "pipenv":
             checkout["eggs"] = pipenv_info(directory)
         elif mode == "virtualenv":
-            checkout["eggs"] = venv_info(directory, bin_dir)
+            checkout["eggs"] = venv_info(bin_dir)
         else:
             checkout["eggs"] = None
 
