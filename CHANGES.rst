@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.8.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added virtualenv support.
 
 
 1.8.1 (2019-09-27)
