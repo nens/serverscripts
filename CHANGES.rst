@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.8.2 (unreleased)
+1.8.2 (2021-05-05)
 ------------------
 
 - Added virtualenv support.
