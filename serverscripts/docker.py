@@ -40,6 +40,7 @@ DOCKER_PS_FIELDS = (
 )
 # create a string like: {"id": {{.ID}}, "image": "{{.Image}}"}
 DOCKER_PS_FORMAT = "\t".join(["{{." + x + "}}" for x in DOCKER_PS_FIELDS])
+# recognize a python interpreter by the presence of one of these in the docker command:
 PYTHON_EXEC_OPTIONS = (
     "python",
     "python3",
@@ -47,6 +48,12 @@ PYTHON_EXEC_OPTIONS = (
     ".venv/bin/python",
     "/usr/bin/python",
     "/usr/bin/python3",
+)
+# recognize a python docker by the presence of one of these in the command
+# the interpreter is guessed to be "python3"
+OTHER_PYTHON_COMMANDS = (
+    "gunicorn",
+    "uvicorn",
 )
 
 logger = logging.getLogger(__name__)
@@ -56,45 +63,52 @@ def is_docker_available():
     return os.path.exists("/etc/docker")
 
 
-def python_details(container_id, command):
+def python_details(container):
     """Run pip freeze in containers that are python-based
 
     A container is python based if it has "python" in its command.
     """
     # identify the python interpreter inside the docker
-    split_command = command.strip('"').split(" ")
+    split_command = container["command"].strip('"').split(" ")
     for python_exec in PYTHON_EXEC_OPTIONS:
         if python_exec in split_command:
             break
     else:
-        return {}
-    python_in_docker = "docker exec " + container_id + " " + python_exec
+        # it could be gunicorn / uvicorn
+        if any([x in split_command for x in OTHER_PYTHON_COMMANDS]):
+            python_exec = "python3"
+        else:
+            logger.info("Did not find Python in container '%s'..", container["names"])
+            return {}
+    logger.info("Found '%s' in container '%s'..", python_exec, container["names"])
+    python_in_docker = "docker exec " + container["id"] + " " + python_exec + " "
 
     # identify the python version
-    command = python_in_docker + " --version"
-    logger.debug("Running %s..", command)
-    output, error = get_output(command, fail_on_exit_code=False)
+    command = "--version"
+    logger.debug("Running python %s in container '%s'..", command, container["names"])
+    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
     if error:
         logger.warning("Error output from python in docker: %s", error)
         return {}
     python_version = parse_python_version(output, error)
 
     # identify the python packages (eggs)
-    command = python_in_docker + " -m pip freeze --all"
-    logger.debug("Running %s..", command)
-    output, error = get_output(command, fail_on_exit_code=False)
+    command = "-m pip freeze --all"
+    logger.debug("Running python %s in container '%s'..", command, container["names"])
+    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
     if error:
         logger.warning("Error output from pip freeze in docker: %s", error)
     eggs = parse_freeze(output)
     eggs["python"] = python_version
 
-    # identify the django settings
-    if "manage.py" in split_command:
-        command = python_in_docker + " manage.py diffsettings"
-        logger.debug("Running %s..", command)
-        output, error = get_output(command, fail_on_exit_code=False)
-        if error:
-            logger.warning("Error output from diffsettings in docker: %s", error)
+    # identify the django (fails if no manage.py present, which is OK)
+    command = "manage.py diffsettings"
+    logger.debug("Running python %s in container '%s'..", command, container["names"])
+    output, error = get_output(python_in_docker + command, fail_on_exit_code=False)
+    if error:
+        django = {}
+        logger.warning("Error output from diffsettings in docker: %s", error)
+    else:
         django = parse_django_info(output)
 
     return {"eggs": eggs, "django": django}
@@ -156,7 +170,7 @@ def all_info():
             result["active_volumes"] = count
     result["containers"] = container_details()
     for container in result["containers"]:
-        container["python"] = python_details(container["id"], container["command"])
+        container["python"] = python_details(container)
     logger.info("Found %d active docker containers", result["active_containers"])
     return result
 
@@ -215,7 +229,3 @@ def main():
         open(zabbix_file2, "w").write(str(info_on_docker["active_containers"]))
         zabbix_file3 = os.path.join(VAR_DIR, "nens.num_active_docker_volumes.info")
         open(zabbix_file3, "w").write(str(info_on_docker["active_volumes"]))
-
-
-if __name__ == "__main__":
-    main()
