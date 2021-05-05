@@ -10,7 +10,6 @@ from serverscripts.utils import get_output
 from serverscripts.checkouts import (
     parse_freeze,
     parse_python_version,
-    parse_django_info,
 )
 
 
