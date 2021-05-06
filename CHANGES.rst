@@ -5,7 +5,7 @@ Changelog of serverscripts
 1.9.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed editable packages in docker containers without git.
 
 
 1.9.1 (2021-05-05)
