@@ -46,6 +46,19 @@ PYTHON_EXEC_OPTIONS = (
     "/usr/bin/python",
     "/usr/bin/python3",
 )
+DOCKER_SKIP_PYTHON_DISCOVERY = (
+    "harbor.lizard.net/threedi/threedicore",
+    "minio/minio",
+    "google/cadvisor",
+    "harbor.lizard.net/threedi/threedi_nginx",
+    "postgres",
+    "mdillon/postgis",
+    "memcached",
+    "redis",
+    "prom/prometheus",
+    "vmware/registry",
+    "grafana"
+)
 DOCKER_EXEC_ERROR = "OCI runtime exec failed:"
 
 logger = logging.getLogger(__name__)
@@ -60,6 +73,12 @@ def python_details(container):
 
     A container is python based if it has "python" in its command.
     """
+    # do not try to exec python in a docker for certain images
+    for image_skip in DOCKER_SKIP_PYTHON_DISCOVERY:
+        if container["image"].startswith(image_skip):
+            logger.info("Skipping Python discovery in docker %s", container["names"])
+            return {}
+
     # identify the python interpreter inside the docker
     split_command = container["command"].strip('"').split(" ")
     for python_exec in PYTHON_EXEC_OPTIONS:
