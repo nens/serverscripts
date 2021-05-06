@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-1.9.2 (unreleased)
+1.9.2 (2021-05-06)
 ------------------
 
 - Fixed editable packages in docker containers without git.
