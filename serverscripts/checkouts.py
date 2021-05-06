@@ -216,7 +216,9 @@ def parse_freeze(output):
             continue
         if pkg.startswith("-e"):
             match = EDITABLE_PKG.match(pkg)
-            pkgs[match.group("project")] = match.group("ref")
+            if match is not None:
+                pkgs["-e " + match.group("project")] = match.group("ref")
+                continue
         pkg = pkg.split("==")  # name==version
         if len(pkg) != 2:
             # invalid spec

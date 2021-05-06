@@ -14,6 +14,17 @@ OUR_PYTHON_VERSION = "%s.%s.%s" % (
 )
 
 
+def test_parse_pip_freeze_with_error():
+    to_parse = "ERROR: foo\nWARNING: bar\nappdirs==1.4.4\n-e sso==2.18.dev0"
+    to_parse += "\n-e git+git@github.com:nens/repo.git@master#egg=repo"
+    actual = checkouts.parse_freeze(to_parse)
+    assert actual == {
+        "appdirs": "1.4.4",
+        "-e sso": "2.18.dev0",
+        "-e repo": "master",
+    }
+
+
 class VenvPipenvTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
