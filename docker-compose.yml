@@ -1,0 +1,7 @@
+version: "2"
+
+services:
+  script:
+    build: .
+    volumes:
+      - .:/code
