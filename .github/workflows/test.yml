@@ -1,0 +1,32 @@
+name: Test + generate .deb
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+  pull_request:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build our test docker
+        run: docker compose build
+
+      - name: Run tests with tox
+        run: docker compose run --rm script tox
+
+      # - name: Call fpm to generate .deb
+      #   uses: nens/fpm-action@0.1
+
+      # - name: upload (when on master, so if a tag has been made)
+      #   run: ./upload-artifact.sh
+      #   if: startsWith(github.event.ref, 'refs/tags')
+      #   env:
+      #     ARTIFACTS_KEY: ${{ secrets.ARTIFACTS_KEY }}
