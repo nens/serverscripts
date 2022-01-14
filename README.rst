@@ -11,23 +11,24 @@ All scripts should be reasonably well-behaved including ``-h/--help``,
 Local development and testing
 -----------------------------
 
-To ensure we can test with python 2 and 3, we use "tox" instead of
-"pipenv". Like pipenv, you need to install tox globally.
+To ensure we can test with various python 3 versions, we use "tox". To get our
+hands on those python versions, we use
+docker. https://github.com/fkrull/docker-multi-python has a handy dockerfile
+with lots of python versions (thanks to the "deadsnakes" repository). So to
+test everything::
 
-We don't have any dependencies ourselves (by design), so we only need to
-install our test dependencies (which tox does automatically)::
-
-  $ tox
+  $ docker compose build
+  $ docker compose run --rm script tox
 
 Note that if you change something in the dependencies, you'll have to
 re-create the virtualenvs::
 
-  $ tox --recreate
+  $ docker compose run --rm script tox --recreate
 
-If you waht to test agains just one of the environments, run something like
+If you want to test agains just one of the environments, run something like
 this::
 
-  $ tox -e py27
+  $ docker compose run --rm script tox -e py38
 
 
 Installation on servers

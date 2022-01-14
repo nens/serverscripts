@@ -5,7 +5,11 @@ Changelog of serverscripts
 1.9.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Removed six (we're python3-only now).
+
+- Moved tests from travis-ci to github actions.
+
+- Using docker to run the tests now.
 
 
 1.9.2 (2021-05-06)

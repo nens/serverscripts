@@ -1,7 +1,7 @@
 """Extract information from apache config files.
 
 """
-from serverscripts.six.moves.urllib.parse import urlparse
+from urllib.parse import urlparse
 
 import argparse
 import copy

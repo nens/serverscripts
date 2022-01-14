@@ -48,3 +48,4 @@ bower_components/
 
 .idea
 .venv
+.DS_Store

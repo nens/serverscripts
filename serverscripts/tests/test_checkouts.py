@@ -111,7 +111,7 @@ class GitAndEggInfoTestCase(TestCase):
             output = checkouts.eggs_info(self.dir_with_buildout)
             self.assertEqual(output["python"], "2.9.42")
             mock_get_output.assert_called_with(
-                "/usr/bin/python --version", cwd=self.dir_with_buildout
+                "python3 --version", cwd=self.dir_with_buildout
             )
 
     def test_git_regex(self):
