@@ -727,7 +727,6 @@ if PY3:
             raise value.with_traceback(tb)
         raise value
 
-
 else:
 
     def exec_(_code_, _globs_=None, _locs_=None):
@@ -856,7 +855,6 @@ if sys.version_info[0:2] < (3, 4):
             return f
 
         return wrapper
-
 
 else:
     wraps = functools.wraps
