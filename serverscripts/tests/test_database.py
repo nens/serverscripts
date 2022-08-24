@@ -47,12 +47,15 @@ class DatabaseTestCase(TestCase):
 
     def test_database_usage(self):
         with mock.patch("serverscripts.database.get_output") as mock_get_output:
-            mock_get_output.return_value = ("""
+            mock_get_output.return_value = (
+                """
                 9 ror_export database=ror_export
                73 waterlabel_site database=waterlabel_site
             23054 efcis_site database=efcis_site
             26591 schademodule database=schademodule2018
-            """, "")
+            """,
+                "",
+            )
             result = database._usage()
             print(result)
             self.assertEqual(result["waterlabel_site"], 73)
@@ -61,7 +64,9 @@ class DatabaseTestCase(TestCase):
         with mock.patch("serverscripts.database._postgres_version") as mock_version:
             with mock.patch("serverscripts.database._database_infos") as mock_infos:
                 with mock.patch("serverscripts.database._usage") as mock_usage:
-                    with mock.patch("serverscripts.database.get_output") as mock_get_output:
+                    with mock.patch(
+                        "serverscripts.database.get_output"
+                    ) as mock_get_output:
                         mock_get_output.return_value = ("", "")
                         mock_version.return_value = "2.0"
                         mock_infos.return_value = {
@@ -74,5 +79,9 @@ class DatabaseTestCase(TestCase):
                         self.assertEqual(result["num_databases"], 2)
                         self.assertEqual(result["total_databases_size"], 60)
                         self.assertEqual(result["biggest_database_size"], 40)
-                        self.assertEqual(result["databases"]["reinout"]["num_logins"], 1972)
-                        self.assertEqual(result["databases"]["alexandr"]["num_logins"], 0)
+                        self.assertEqual(
+                            result["databases"]["reinout"]["num_logins"], 1972
+                        )
+                        self.assertEqual(
+                            result["databases"]["alexandr"]["num_logins"], 0
+                        )
