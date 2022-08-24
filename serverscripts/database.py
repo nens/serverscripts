@@ -28,6 +28,16 @@ POSTGRES_VERSION = re.compile(
     """,
     re.VERBOSE,
 )
+USAGE_LINE = re.compile(
+    r"""
+    ^\s*                     # Start of line plus whitespace
+    (?P<num_logins>\d+)      # Number of logins
+    .+database=              # Whitespace, username, etc.
+    (?P<database>\w+)        # Database name
+    """,
+    re.VERBOSE,
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -200,13 +210,41 @@ ORDER BY bloat_mb DESC;
     return result
 
 
+def _usage():
+    command = (
+        'zgrep "connection authorized" /var/log/postgresql/postgres*main.log*'
+        '|grep -v "user=postgres"|cut -d= -f2,3|sort|uniq -c | sort -n'
+    )
+    output, error = get_output(command)
+    if error:
+        logger.warning("Error output from usage zgrep command: %s", error)
+    # Output looks like this:
+    #     9 ror_export database=ror_export
+    #    73 waterlabel_site database=waterlabel_site
+    # 23054 efcis_site database=efcis_site
+    # 26591 schademodule database=schademodule2018
+    result = {}
+    for line in output.split("\n"):
+        if USAGE_LINE.match(line):
+            match = USAGE_LINE.search(line)
+            num_logins = int(match.group("num_logins"))
+            database = match.group("database")
+            result[database] = num_logins
+    return result
+
+
 def all_info():
     """Return the info we want to extract from postgres + its databases"""
     result = {}
     result["version"] = _postgres_version()
+    if not result["version"]:
+        return result
     result["databases"] = _database_infos()
     database_names = result["databases"].keys()
     result["bloated_tables"] = _table_bloat(database_names)
+    used_databases = _usage()
+    for database in result["databases"]:
+        result["databases"][database]["num_logins"] = used_databases.get(database, 0)
 
     if result["databases"]:
         # Info for zabbix.
