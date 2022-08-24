@@ -11,6 +11,8 @@ Changelog of serverscripts
 
 - Using docker to run the tests now.
 
+- Added grep command to determine database usage.
+
 
 1.9.2 (2021-05-06)
 ------------------
