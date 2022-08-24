@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.2 (unreleased)
+2.2 (2022-08-24)
 ----------------
 
 - Switched off database table bloat detection: we don't really look at it and
