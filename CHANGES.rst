@@ -5,7 +5,8 @@ Changelog of serverscripts
 2.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Switched off database table bloat detection: we don't really look at it and
+  it sometimes takes a lot of time for it to finish.
 
 
 2.1 (2022-08-24)
