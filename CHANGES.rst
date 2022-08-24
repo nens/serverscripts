@@ -5,7 +5,8 @@ Changelog of serverscripts
 2.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Database usage regex now accepts database names with a dash in them
+  (``geoserver-v2``)....
 
 
 2.0 (2022-08-24)

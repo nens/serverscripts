@@ -33,7 +33,7 @@ USAGE_LINE = re.compile(
     ^\s*                     # Start of line plus whitespace
     (?P<num_logins>\d+)      # Number of logins
     .+database=              # Whitespace, username, etc.
-    (?P<database>\w+)        # Database name
+    (?P<database>[\w\-]+)    # Database name
     """,
     re.VERBOSE,
 )
@@ -213,7 +213,7 @@ ORDER BY bloat_mb DESC;
 def _usage():
     command = (
         'zgrep "connection authorized" /var/log/postgresql/postgres*main.log*'
-        '|grep -v "user=postgres"|cut -d= -f2,3|sort|uniq -c | sort -n'
+        '|grep -v "user=postgres"|cut -d= -f2,3|cut -d\  -f1,2|sort|uniq -c | sort -n'
     )
     output, error = get_output(command)
     if error:

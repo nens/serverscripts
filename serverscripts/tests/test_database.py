@@ -53,12 +53,14 @@ class DatabaseTestCase(TestCase):
                73 waterlabel_site database=waterlabel_site
             23054 efcis_site database=efcis_site
             26591 schademodule database=schademodule2018
+            241537 klimaatatlas-geoserver database=klimaatatlas-geoserver-v2
             """,
                 "",
             )
             result = database._usage()
             print(result)
             self.assertEqual(result["waterlabel_site"], 73)
+            self.assertEqual(result["klimaatatlas-geoserver-v2"], 241537)
 
     def test_all_info(self):
         with mock.patch("serverscripts.database._postgres_version") as mock_version:
