@@ -2,8 +2,8 @@ Changelog of serverscripts
 ===================================================
 
 
-1.9.3 (unreleased)
-------------------
+2.0 (2022-08-24)
+----------------
 
 - Removed six (we're python3-only now).
 
