@@ -1,14 +1,14 @@
 """Extract info on docker."""
+from serverscripts.checkouts import parse_freeze
+from serverscripts.checkouts import parse_python_version
+from serverscripts.utils import get_output
+
 import argparse
 import json
 import logging
 import os
 import serverscripts
 import sys
-
-from serverscripts.utils import get_output
-from serverscripts.checkouts import parse_freeze
-from serverscripts.checkouts import parse_python_version
 
 
 VAR_DIR = "/var/local/serverscripts"

@@ -7,6 +7,7 @@ import shutil
 import sys
 import tempfile
 
+
 OUR_PYTHON_VERSION = "%s.%s.%s" % (
     sys.version_info.major,
     sys.version_info.minor,
