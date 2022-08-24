@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.1 (unreleased)
+2.1 (2022-08-24)
 ----------------
 
 - Database usage regex now accepts database names with a dash in them
