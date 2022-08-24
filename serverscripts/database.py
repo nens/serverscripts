@@ -85,7 +85,7 @@ def _database_infos():
     return result
 
 
-def _table_bloat(database_names):
+def _table_bloat(database_names):  # UNUSED since 2022-08-24
     query = """
 -- btree index stats query
 -- estimates bloat for btree indexes
@@ -240,8 +240,11 @@ def all_info():
     if not result["version"]:
         return result
     result["databases"] = _database_infos()
-    database_names = result["databases"].keys()
-    result["bloated_tables"] = _table_bloat(database_names)
+
+    # database_names = result["databases"].keys()
+    # result["bloated_tables"] = _table_bloat(database_names)
+    result["bloated_tables"] = []
+
     used_databases = _usage()
     for database in result["databases"]:
         result["databases"][database]["num_logins"] = used_databases.get(database, 0)
