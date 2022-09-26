@@ -37,6 +37,15 @@ USAGE_LINE = re.compile(
     """,
     re.VERBOSE,
 )
+CONNECTION_LINE = re.compile(
+    r"""
+    ^\s*                     # Start of line plus whitespace
+    (?P<num_connections>\d+) # Number of logins
+    \s+                      # Whitespace
+    (?P<ip_address>[\d\.]+)  # IP address
+    """,
+    re.VERBOSE,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -233,6 +242,28 @@ def _usage():
     return result
 
 
+def _connections():
+    command = (
+        'zgrep "connection received: host=" /var/log/postgresql/postgres*main.log*'
+        '|grep -v "local"|cut -d= -f2|cut -d\  -f1|sort|uniq -c | sort -n'
+    )
+    output, error = get_output(command)
+    if error:
+        logger.warning("Error output from usage zgrep command: %s", error)
+    # Output looks like this:
+    #   1629 10.100.160.171
+    #   2495 10.100.57.17
+    #   9805 10.100.57.16
+    result = {}
+    for line in output.split("\n"):
+        if CONNECTION_LINE.match(line):
+            match = CONNECTION_LINE.search(line)
+            num_connections = int(match.group("num_connections"))
+            ip_address = match.group("ip_address")
+            result[ip_address] = num_connections
+    return result
+
+
 def all_info():
     """Return the info we want to extract from postgres + its databases"""
     result = {}
@@ -249,6 +280,7 @@ def all_info():
     for database in result["databases"]:
         result["databases"][database]["num_logins"] = used_databases.get(database, 0)
 
+    result["connections"] = _connections()
     if result["databases"]:
         # Info for zabbix.
         result["num_databases"] = len(result["databases"])

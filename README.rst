@@ -123,3 +123,15 @@ Should be installed in a cronjob. Suggestion for the crontab (note: it needs
 to run as root)::
 
     */5 * * * * /usr/local/bin/docker-info > /dev/null 2>&1
+
+
+Database-info
+-------------
+
+``bin/database-info`` collects info on databases. Size, number of logins,
+etc.
+
+It used to include info on bloated tables, but that's disabled for now. The
+query itself was pretty heavy on some databases and we don't really use the
+info. Originally, it *was* useful to get a feel for how autovacuuming worked
+and how it impacted everything.

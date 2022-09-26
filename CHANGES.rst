@@ -5,7 +5,7 @@ Changelog of serverscripts
 2.3 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Extracting the ip adresses from where database connections are made.
 
 
 2.2 (2022-08-24)

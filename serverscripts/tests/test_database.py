@@ -62,28 +62,47 @@ class DatabaseTestCase(TestCase):
             self.assertEqual(result["waterlabel_site"], 73)
             self.assertEqual(result["klimaatatlas-geoserver-v2"], 241537)
 
+    def test_database_connections(self):
+        with mock.patch("serverscripts.database.get_output") as mock_get_output:
+            mock_get_output.return_value = (
+                """
+             1629 10.100.160.171
+             2495 10.100.57.17
+             9805 10.100.57.16
+            """,
+                "",
+            )
+            result = database._connections()
+            print(result)
+            self.assertEqual(result["10.100.160.171"], 1629)
+
     def test_all_info(self):
         with mock.patch("serverscripts.database._postgres_version") as mock_version:
             with mock.patch("serverscripts.database._database_infos") as mock_infos:
                 with mock.patch("serverscripts.database._usage") as mock_usage:
-                    with mock.patch(
-                        "serverscripts.database.get_output"
-                    ) as mock_get_output:
-                        mock_get_output.return_value = ("", "")
-                        mock_version.return_value = "2.0"
-                        mock_infos.return_value = {
-                            "reinout": {"name": "reinout", "size": 20},
-                            "alexandr": {"name": "reinout", "size": 40},
-                        }
-                        mock_usage.return_value = {"reinout": 1972}
-                        result = database.all_info()
-                        self.assertEqual(result["version"], "2.0")
-                        self.assertEqual(result["num_databases"], 2)
-                        self.assertEqual(result["total_databases_size"], 60)
-                        self.assertEqual(result["biggest_database_size"], 40)
-                        self.assertEqual(
-                            result["databases"]["reinout"]["num_logins"], 1972
-                        )
-                        self.assertEqual(
-                            result["databases"]["alexandr"]["num_logins"], 0
-                        )
+                    with mock.patch("serverscripts.database._connections") as mock_connections:
+                        with mock.patch(
+                            "serverscripts.database.get_output"
+                        ) as mock_get_output:
+                            mock_get_output.return_value = ("", "")
+                            mock_version.return_value = "2.0"
+                            mock_infos.return_value = {
+                                "reinout": {"name": "reinout", "size": 20},
+                                "alexandr": {"name": "reinout", "size": 40},
+                            }
+                            mock_usage.return_value = {"reinout": 1972}
+                            mock_connections.return_value = {"1.2.3.4": 42}
+                            result = database.all_info()
+                            self.assertEqual(result["version"], "2.0")
+                            self.assertEqual(result["num_databases"], 2)
+                            self.assertEqual(result["total_databases_size"], 60)
+                            self.assertEqual(result["biggest_database_size"], 40)
+                            self.assertEqual(
+                                result["databases"]["reinout"]["num_logins"], 1972
+                            )
+                            self.assertEqual(
+                                result["databases"]["alexandr"]["num_logins"], 0
+                            )
+                            self.assertEqual(
+                                result["connections"], {"1.2.3.4": 42}
+                            )
