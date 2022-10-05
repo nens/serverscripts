@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl-3e5060a1:1610036b625:-7fda</id>
+  <name>hhdl_tuinders_OP2018</name>
+  <description>Locaties aflaten tuinders</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl-3e5060a1:1610036b625:-7fdc</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">ISO-8859-1</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">http://opengeo.org/#hhdl</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/New folder (2)/hhdl_tuinders_OP2018.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

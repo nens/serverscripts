@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl--60c900ab:164d9ef45e6:-7f39</id>
+  <name>risicokaart_overstromingen_kleinekans_beschermd</name>
+  <description>risicokaart_overstromingen_kleinekans_beschermd</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--60c900ab:164d9ef45e6:-7f4d</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">oss</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/oss/risicokaart_overstromingen_kleinekans_maxwd_beschermd.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

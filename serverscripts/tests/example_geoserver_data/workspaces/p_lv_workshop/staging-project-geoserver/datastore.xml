@@ -1,0 +1,27 @@
+<dataStore>
+  <id>DataStoreInfoImpl-33397ba:16b2264f2a2:3c5f</id>
+  <name>staging-project-geoserver</name>
+  <type>PostGIS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl-33397ba:16b2264f2a2:3c5d</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="schema">public</entry>
+    <entry key="fetch size">1000</entry>
+    <entry key="validate connections">true</entry>
+    <entry key="Connection timeout">20</entry>
+    <entry key="preparedStatements">true</entry>
+    <entry key="database">staging-project-geoserver</entry>
+    <entry key="port">5432</entry>
+    <entry key="passwd">crypt2:C52ukiyvdSZS2BObnbRRSH8TgIGT30H6eKcldcr7yMM=</entry>
+    <entry key="min connections">1</entry>
+    <entry key="dbtype">postgis</entry>
+    <entry key="host">s-project-db-d1.nens</entry>
+    <entry key="Loose bbox">true</entry>
+    <entry key="namespace">http://opengeo.org/#p_lv_workshop</entry>
+    <entry key="max connections">10</entry>
+    <entry key="user">staging-project-geoserver</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

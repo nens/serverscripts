@@ -80,7 +80,9 @@ class DatabaseTestCase(TestCase):
         with mock.patch("serverscripts.database._postgres_version") as mock_version:
             with mock.patch("serverscripts.database._database_infos") as mock_infos:
                 with mock.patch("serverscripts.database._usage") as mock_usage:
-                    with mock.patch("serverscripts.database._connections") as mock_connections:
+                    with mock.patch(
+                        "serverscripts.database._connections"
+                    ) as mock_connections:
                         with mock.patch(
                             "serverscripts.database.get_output"
                         ) as mock_get_output:
@@ -103,6 +105,4 @@ class DatabaseTestCase(TestCase):
                             self.assertEqual(
                                 result["databases"]["alexandr"]["num_logins"], 0
                             )
-                            self.assertEqual(
-                                result["connections"], {"1.2.3.4": 42}
-                            )
+                            self.assertEqual(result["connections"], {"1.2.3.4": 42})

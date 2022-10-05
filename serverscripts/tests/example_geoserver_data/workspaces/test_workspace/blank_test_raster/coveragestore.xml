@@ -1,0 +1,11 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--7212f53c:1672f84b0b0:-7fc1</id>
+  <name>blank_test_raster</name>
+  <type>GeoTIFF</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--7212f53c:1672f84b0b0:-7fc3</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:data/test_workspace/blank_test_raster/blank_test_raster.geotiff</url>
+</coverageStore>

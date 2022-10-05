@@ -5,7 +5,8 @@ Changelog of serverscripts
 2.4 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added geoserver data extraction. You need a config file on the server to
+  enable it.
 
 
 2.3 (2022-09-26)

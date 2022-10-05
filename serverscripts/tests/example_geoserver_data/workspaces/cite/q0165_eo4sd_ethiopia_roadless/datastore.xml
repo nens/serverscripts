@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl--50e17a2e:15fbf7a9b75:-7fab</id>
+  <name>q0165_eo4sd_ethiopia_roadless</name>
+  <description>Roadless patches Ethiopia</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ff3</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">ISO-8859-1</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">http://www.opengeospatial.net/cite</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/q0165_EO4SD/Geoville - Ethiopia - Roadless Areas/q0162_roadless_ethiopia.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>
