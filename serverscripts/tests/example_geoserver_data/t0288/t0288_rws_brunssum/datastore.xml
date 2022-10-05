@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl-33397ba:16b2264f2a2:3c58</id>
+  <name>t0288_rws_brunssum</name>
+  <description>t0288_rws_brunssum</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl-33397ba:16b2264f2a2:2d46</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">ISO-8859-1</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">parkstad</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/t0288_parkstad/rws_brunssum.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

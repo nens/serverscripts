@@ -1,0 +1,14 @@
+<dataStore>
+  <id>DataStoreInfoImpl--7212f53c:1672f84b0b0:-7eaf</id>
+  <name>hittelabel</name>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--7212f53c:1672f84b0b0:-7ed6</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="namespace">http://opengeo.org/#hittestress</entry>
+    <entry key="url">file:data/hittestress/hittelabel.shp</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

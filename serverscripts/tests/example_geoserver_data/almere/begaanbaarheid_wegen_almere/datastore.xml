@@ -1,0 +1,22 @@
+<dataStore>
+  <id>DataStoreInfoImpl--60c900ab:164d9ef45e6:-7fba</id>
+  <name>begaanbaarheid_wegen_almere</name>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--60c900ab:164d9ef45e6:-7fbc</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">almere</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/almere/begaanbaarheid_wegen.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

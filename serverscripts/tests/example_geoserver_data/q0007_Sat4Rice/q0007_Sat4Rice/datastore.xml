@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl--50e17a2e:15fbf7a9b75:-7ffa</id>
+  <name>q0007_Sat4Rice</name>
+  <description>Velden van nonLT en LT farmers in Sat4Rice, zuiden van Vietnam</description>
+  <type>Directory of spatial files (shapefiles)</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--50e17a2e:15fbf7a9b75:-7ffc</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">q0007_Sat4Rice</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/q0007_Sat4Rice/shapes/shapes 2018-01-19</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

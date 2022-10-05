@@ -1,0 +1,20 @@
+<dataStore>
+  <id>DataStoreInfoImpl-52b81a0d:16feab49b5d:-7e04</id>
+  <name>u0011_staging-project-geoserver</name>
+  <type>PostGIS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl-52b81a0d:16feab49b5d:-7e06</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="schema">public</entry>
+    <entry key="database">staging-project-geoserver</entry>
+    <entry key="port">5432</entry>
+    <entry key="passwd">crypt2:x3Z1DFrFR4HfZ0BvFowxItNjY2YiMcwkcJXLlJeaUzQ=</entry>
+    <entry key="host">s-project-db-d1.nens</entry>
+    <entry key="dbtype">postgis</entry>
+    <entry key="namespace">http://p_twn_klimaatatlas</entry>
+    <entry key="user">staging-project-geoserver</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

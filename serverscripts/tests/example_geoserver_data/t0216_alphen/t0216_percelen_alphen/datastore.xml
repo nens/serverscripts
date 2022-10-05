@@ -1,0 +1,22 @@
+<dataStore>
+  <id>DataStoreInfoImpl--60c900ab:164d9ef45e6:-7faa</id>
+  <name>t0216_percelen_alphen</name>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--60c900ab:164d9ef45e6:-7fb2</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">t0216_alphen</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/t0216_alphen/t0216_percelen.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

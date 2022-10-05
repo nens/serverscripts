@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl-33397ba:16938f836f3:-7ffd</id>
+  <name>test_url</name>
+  <description>test_url</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--7212f53c:1672f84b0b0:-7fc3</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">http://test_workspace</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/tests/shapes/urltest.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>

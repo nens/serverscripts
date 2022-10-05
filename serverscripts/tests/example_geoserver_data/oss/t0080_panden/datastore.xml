@@ -1,0 +1,23 @@
+<dataStore>
+  <id>DataStoreInfoImpl--60c900ab:164d9ef45e6:-7f3f</id>
+  <name>t0080_panden</name>
+  <description>t0080_panden</description>
+  <type>Shapefile</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--60c900ab:164d9ef45e6:-7f4d</id>
+  </workspace>
+  <connectionParameters>
+    <entry key="charset">UTF-8</entry>
+    <entry key="filetype">shapefile</entry>
+    <entry key="create spatial index">true</entry>
+    <entry key="memory mapped buffer">false</entry>
+    <entry key="timezone">Europe/Amsterdam</entry>
+    <entry key="enable spatial index">true</entry>
+    <entry key="namespace">oss</entry>
+    <entry key="cache and reuse memory maps">true</entry>
+    <entry key="url">file:data/oss/oss_wateroverlastpanden_60mm_3857.shp</entry>
+    <entry key="fstype">shape</entry>
+  </connectionParameters>
+  <__default>false</__default>
+</dataStore>
