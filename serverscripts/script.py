@@ -20,6 +20,9 @@ def main():
     info-gathering to a separate script, but for now it is OK. So... cifsfixer
     is run separately by another cronjob.
 
+    geoserver-info also isn't being run as it is quite expensive: it reads
+    potentially huge nginx access log collections.
+
     """
     for module in [
         serverscripts.apache,
