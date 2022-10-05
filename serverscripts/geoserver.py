@@ -209,12 +209,15 @@ def extract_workspaces_info(geoserver_configuration):
         common_referers = [referer for (referer, count) in referers.most_common(5)]
         workspaces[workspace_name] = {
             "usage": len(workspace_lines),
-            "referer_list": common_referers,
             "referers": " + ".join(common_referers),
         }
 
     result = []
     datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
+    for workspace_name in datastores_info:
+        if workspace_name not in workspaces:
+            workspaces[workspace_name] = {"usage": "", "referers": ""}
+
     for workspace_name, workspace_info in workspaces.items():
         workspace_info["workspace_name"] = workspace_name
         workspace_info["geoserver_name"] = geoserver_configuration["geoserver_name"]
