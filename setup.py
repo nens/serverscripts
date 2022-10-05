@@ -52,6 +52,7 @@ setup(
             "cifsfixer = serverscripts.cifsfixer:main",
             "database-info = serverscripts.database:main",
             "docker-info = serverscripts.docker:main",
+            "geoserver-info = serverscripts.geoserver:main",
             "haproxy-info = serverscripts.haproxy:main",
             "nginx-info = serverscripts.nginx:main",
             "pbis-info = serverscripts.pbis:main",
