@@ -1,5 +1,5 @@
-{"geoserver9.lizard.net":
- {"logfile": "/var/log/nginx/access.log",
+[{"geoserver_name": "geoserver9.lizard.net",
+  "logfile": "/var/log/nginx/access.log",
   "data_dir": "/mnt/geoserver/data/"
  }
-}
+]
