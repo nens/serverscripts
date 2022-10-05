@@ -135,3 +135,19 @@ It used to include info on bloated tables, but that's disabled for now. The
 query itself was pretty heavy on some databases and we don't really use the
 info. Originally, it *was* useful to get a feel for how autovacuuming worked
 and how it impacted everything.
+
+
+Geoserver-info
+--------------
+
+``bin/geoserver-info`` collects info on geoserver workspaces, their usage and
+the databases they connect to.
+
+To enable it, add an ``/etc/serverscripts/geoserver.json`` file with contents
+like this::
+
+    [{"geoserver_name": "geoserver9.lizard.net",
+      "logfile": "/var/log/nginx/access.log",
+      "data_dir": "/mnt/geoserver/data/"
+     }
+    ]
