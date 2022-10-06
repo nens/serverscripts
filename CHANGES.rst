@@ -5,7 +5,8 @@ Changelog of serverscripts
 2.5 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Small geoserver-info fixes: allow missing logfile and only iterate over
+  workspaces once when there are multiple datastore files.
 
 
 2.4 (2022-10-06)
