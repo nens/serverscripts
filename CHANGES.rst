@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.5 (unreleased)
+2.5 (2022-10-06)
 ----------------
 
 - Small geoserver-info fixes: allow missing logfile and only iterate over
