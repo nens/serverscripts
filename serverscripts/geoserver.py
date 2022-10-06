@@ -102,6 +102,9 @@ def extract_from_line(line):
 
 
 def extract_from_logfiles(logfile):
+    if not os.path.exists(logfile):
+        return []
+
     logfile_pattern = logfile + "*"
     cmd = "zcat --force %s" % logfile_pattern
     logger.debug("Grabbing logfile output with: %s", cmd)
@@ -130,6 +133,7 @@ def get_text_or_none(element, tag):
 
 
 def extract_datastore_info(datastore_file):
+    logger.debug("Extracting info from %s...", datastore_file)
     root = ET.parse(datastore_file).getroot()
     result = {}
     result["type"] = get_text_or_none(root, "type")
@@ -160,9 +164,9 @@ def _combine_with_comma(datastores, key):
 def extract_from_dirs(data_dir):
     workspaces_dir = os.path.join(data_dir, "workspaces")
     datastore_files = glob.glob(workspaces_dir + "/*/*/datastore.xml")
-    workspace_names = [
-        datastore_file.split("/")[-3] for datastore_file in datastore_files
-    ]
+    workspace_names = set(
+        [datastore_file.split("/")[-3] for datastore_file in datastore_files]
+    )
     result = {}
     for workspace_name in workspace_names:
         workspace = {}
