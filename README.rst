@@ -108,7 +108,6 @@ Before the taking it in production run the file manually in debug mode like::
     $ sudo bin/rabbitmq-checker -v
 
 
-
 Docker-info
 ------------
 
