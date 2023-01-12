@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.6 (unreleased)
+2.6 (2023-01-12)
 ----------------
 
 - Fix for geoserver usage reporting. In the query parameters, uppercase
