@@ -94,7 +94,8 @@ def extract_from_line(line):
     #  'version': ['1.1.1'],
     #  'width': ['256']}
     if "layers" not in query:
-        return
+        if "LAYERS" not in query:
+            return
     return {
         "referer": referer,
         "workspace": workspace,
