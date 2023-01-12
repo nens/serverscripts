@@ -5,7 +5,8 @@ Changelog of serverscripts
 2.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Fix for geoserver usage reporting. In the query parameters, uppercase
+  ``LAYERS=`` is now also detected...
 
 
 2.5 (2022-10-06)
