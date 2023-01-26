@@ -106,9 +106,10 @@ def extract_from_line(line):
     if workspace == EXTRACT_FROM_PARAM:
         # The workspace name is embedded in the layers with a colon:
         # nieuwegein_klimaatatlas:1844_nieuwegein_bluelabel_droogte,km_mask_nieuwegein
-        if ":" not in layers:
+        layers_value = layers[0]  # The parsed result is always a list.
+        if ":" not in layers_value:
             return
-        workspace = layers.split(":")[0]
+        workspace = layers_value.split(":")[0]
     return {
         "referer": referer,
         "workspace": workspace,
