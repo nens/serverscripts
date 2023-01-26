@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.7 (unreleased)
+2.7 (2023-01-26)
 ----------------
 
 - Another geoserver usage reporting fix. Sometimes the workspace name is in
