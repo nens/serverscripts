@@ -5,7 +5,9 @@ Changelog of serverscripts
 2.7 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Another geoserver usage reporting fix. Sometimes the workspace name is in
+  the ``layers=`` parameter instead of in the ``/geoserver/WORKSPACE/wms``
+  url.
 
 
 2.6 (2023-01-12)
