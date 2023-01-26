@@ -27,6 +27,14 @@ def test_extract_from_logfiles():
     # only layers= in the query parameters...
 
 
+def test_extract_from_line_no_workspace():
+    lines = open(os.path.join(OUR_DIR,
+                              "no-workspace-in-url-cornercase.log")).readlines()
+    result = geoserver.extract_from_line(lines[0])
+    assert len(result) == 1
+    assert result["workspace"] == "nieuwegein_klimaatatlas"
+
+
 def test_extract_workspaces_info():
     geoserver_configuration = {
         "geoserver_name": "geoserver.staging.lizard.net",
