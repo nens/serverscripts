@@ -21,6 +21,7 @@ OUTPUT_DIR = "/var/local/serverinfo-facts"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "geoserver.fact")
 CONFIG_DIR = "/etc/serverscripts"
 CONFIG_FILE = os.path.join(CONFIG_DIR, "geoserver.json")
+EXTRACT_FROM_PARAM = "extract workspace from layer param"
 
 logger = logging.getLogger(__name__)
 
@@ -75,12 +76,17 @@ def extract_from_line(line):
     url = request.split()[1]
     parsed_url = urlparse(url)
     path = parsed_url.path
-    # '/geoserver/klimaatatlas/wms'
-    try:
-        workspace = path.split("/")[2]  # 'klimaatatlas'
-    except IndexError:
-        # favicon.ico or something like that.
-        return
+    # '/geoserver/klimaatatlas/wms' OR '/geoserver/wms'
+    if path == "/geoserver/wms":
+        # workspace is embedded in the "layers" parameter, probably.
+        workspace = EXTRACT_FROM_PARAM
+    else:
+        # Normal case, workspace embedded in the url.
+        try:
+            workspace = path.split("/")[2]  # 'klimaatatlas'
+        except IndexError:
+            # favicon.ico or something like that.
+            return
     query = parse_qs(parsed_url.query)
     # {'SRS': ['EPSG:3857'],
     #  'bbox': ['0,7200979.560689885,313086.06785608194,7514065.628545967'],
@@ -93,9 +99,17 @@ def extract_from_line(line):
     #  'transparent': ['true'],
     #  'version': ['1.1.1'],
     #  'width': ['256']}
-    if "layers" not in query:
-        if "LAYERS" not in query:
+    layers = query.get("layers") or query.get("LAYERS")
+    if not layers:
+        # Not a regular wms request.
+        return
+    if workspace == EXTRACT_FROM_PARAM:
+        # The workspace name is embedded in the layers with a colon:
+        # nieuwegein_klimaatatlas:1844_nieuwegein_bluelabel_droogte,km_mask_nieuwegein
+        layers_value = layers[0]  # The parsed result is always a list.
+        if ":" not in layers_value:
             return
+        workspace = layers_value.split(":")[0]
     return {
         "referer": referer,
         "workspace": workspace,
