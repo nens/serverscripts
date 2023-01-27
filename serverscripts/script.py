@@ -6,6 +6,7 @@ import serverscripts.apache
 import serverscripts.checkouts
 import serverscripts.database
 import serverscripts.docker
+import serverscripts.geoserver
 import serverscripts.haproxy
 import serverscripts.nginx
 import serverscripts.pbis
@@ -29,6 +30,7 @@ def main():
         serverscripts.checkouts,
         serverscripts.database,
         serverscripts.docker,
+        serverscripts.geoserver,
         serverscripts.haproxy,
         serverscripts.nginx,
         serverscripts.pbis,

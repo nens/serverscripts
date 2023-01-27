@@ -5,7 +5,7 @@ Changelog of serverscripts
 2.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- The geoserver-info script is now called by gather-all-info.
 
 
 2.7 (2023-01-26)
