@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.9 (unreleased)
+2.9 (2023-03-03)
 ----------------
 
 - Work around weird "upstream respons is buffered to a temporary file" message
