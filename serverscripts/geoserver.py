@@ -73,7 +73,11 @@ def extract_from_line(line):
     if referer == '"-"':
         referer = None
     request = clf["r"]
-    url = request.split()[1]
+    try:
+        url = request.split()[1]
+    except IndexError:
+        logger.warn("Couldn't extract nginx logline: %s", line)
+        return
     parsed_url = urlparse(url)
     path = parsed_url.path
     # '/geoserver/klimaatatlas/wms' OR '/geoserver/wms'
