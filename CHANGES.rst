@@ -5,7 +5,9 @@ Changelog of serverscripts
 2.9 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Work around weird "upstream respons is buffered to a temporary file" message
+  that's embedded in some nginx loglines. It trips up our logfile parsing
+  library.
 
 
 2.8 (2023-01-27)
