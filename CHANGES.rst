@@ -5,7 +5,9 @@ Changelog of serverscripts
 2.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Omitting geoserver layers found in the nginx logfile *if* no corresponding
+  workspace can be found. This helps in keeping the report clean when you
+  remove old layers.
 
 
 2.9 (2023-03-03)

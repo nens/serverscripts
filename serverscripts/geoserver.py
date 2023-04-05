@@ -215,11 +215,18 @@ def extract_workspaces_info(geoserver_configuration):
     """Return list of workspaces with all info"""
     log_lines = extract_from_logfiles(geoserver_configuration["logfile"])
     workspaces = {}
+    datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
 
     workspace_names = Counter(
         [log_line["workspace"] for log_line in log_lines]
     ).most_common()
     for workspace_name, workspace_count in workspace_names:
+        if workspace_name not in datastores_info:
+            logger.warn(
+                "Workspace %s from nginx logfile is missing in workspaces dir.",
+                workspace_name
+            )
+            continue
         workspaces[workspace_name] = {}
         workspace_lines = [
             log_line
@@ -236,7 +243,7 @@ def extract_workspaces_info(geoserver_configuration):
         }
 
     result = []
-    datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
+
     for workspace_name in datastores_info:
         if workspace_name not in workspaces:
             workspaces[workspace_name] = {"usage": "", "referers": ""}
