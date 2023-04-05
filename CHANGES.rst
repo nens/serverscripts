@@ -2,7 +2,7 @@ Changelog of serverscripts
 ===================================================
 
 
-2.10 (unreleased)
+2.10 (2023-04-05)
 -----------------
 
 - Omitting geoserver layers found in the nginx logfile *if* no corresponding
