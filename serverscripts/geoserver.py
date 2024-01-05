@@ -213,12 +213,18 @@ def extract_workspaces_info(geoserver_configuration):
     workspaces = {}
     datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
 
-    workspace_names = Counter(
+    workspace_names_and_referers = Counter(
         (
-            log_line["workspace"]
+            (log_line["workspace"], log_line["referer"])
             for log_line in extract_from_logfiles(geoserver_configuration["logfile"])
         )
     ).most_common()
+
+    workspace_names_counter = Counter()
+    for (workspace_name, referer), workspace_count in workspace_names_and_referers:
+        workspace_names_counter.update({workspace_name: workspace_count})
+    workspace_names = workspace_names_counter.most_common()
+
     for workspace_name, workspace_count in workspace_names:
         if workspace_name not in datastores_info:
             logger.warn(
@@ -226,18 +232,15 @@ def extract_workspaces_info(geoserver_configuration):
                 workspace_name,
             )
             continue
-        workspaces[workspace_name] = {}
-        workspace_lines = [
-            log_line
-            for log_line in extract_from_logfiles(geoserver_configuration["logfile"])
-            if log_line["workspace"] == workspace_name
-        ]
-        referers = Counter(
-            [log_line["referer"] for log_line in workspace_lines if log_line["referer"]]
-        )
-        common_referers = [referer for (referer, count) in referers.most_common(5)]
+
+        referers = Counter()
+        for (found_workspace_name, referer), count in workspace_names_and_referers:
+            if found_workspace_name != workspace_name:
+                continue
+            referers.update({referer: count})
+        common_referers = ["%s (%d)" % (referer, count) for (referer, count) in referers.most_common(5)]
         workspaces[workspace_name] = {
-            "usage": len(workspace_lines),
+            "usage": workspace_count,
             "referers": " + ".join(common_referers),
         }
 
