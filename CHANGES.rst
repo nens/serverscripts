@@ -5,7 +5,7 @@ Changelog of serverscripts
 2.11 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Removed pbis and rabbitmq: both are unused.
 
 
 2.10 (2023-04-05)
