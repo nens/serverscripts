@@ -165,9 +165,9 @@ def extract_datastore_info(datastore_file):
             connection, "./entry[@key='database']"
         )
         result["database_user"] = get_text_or_none(connection, "./entry[@key='user']")
-        # result["database_namespace"] = get_text_or_none(
-        #     connection, "./entry[@key='namespace']"
-        # )
+        jndi_connection = get_text_or_none(connection, "./entry[@key='jndiReferenceName']")
+        if jndi_connection:
+            result["database_name"] = jndi_connection
 
     return result
 
@@ -196,11 +196,11 @@ def extract_from_dirs(data_dir):
             for workspace_datastore_file in workspace_datastore_files
         ]
         for key in [
-            "enabled",
-            "type",
-            "database_server",
-            "database_user",
-            "database_name",
+                "enabled",
+                "type",
+                "database_server",
+                "database_user",
+                "database_name",
         ]:
             workspace[key] = _combine_with_comma(datastores, key)
         result[workspace_name] = workspace
