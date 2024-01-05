@@ -14,9 +14,9 @@ def test_config_file():
 
 
 def test_extract_from_logfiles():
-    lines = geoserver.extract_from_logfiles(
+    lines = list(geoserver.extract_from_logfiles(
         os.path.join(OUR_DIR, "example_geoserver_logs/access.log")
-    )
+    ))
     assert len(lines) == 439
     # ^^^ this used to be 210, but now I'm also looking at LAYERS= instead of
     # only layers= in the query parameters...

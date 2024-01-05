@@ -3,12 +3,12 @@
 """
 from collections import Counter
 from serverscripts.clfparser import CLFParser
-from serverscripts.utils import get_output
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
 import argparse
 import glob
+import gzip
 import json
 import logging
 import os
@@ -122,26 +122,23 @@ def extract_from_line(line):
 
 def extract_from_logfiles(logfile):
     if not os.path.exists(logfile):
-        return []
+        return
 
-    logfile_pattern = logfile + "*"
-    cmd = "zcat --force %s" % logfile_pattern
-    logger.debug("Grabbing logfile output with: %s", cmd)
-    output, _ = get_output(cmd)
-    lines = output.split("\n")
-    logger.debug("Grabbed %s lines", len(lines))
-
-    results = []
-    for line in lines:
-        if "/geoserver/" not in line:
-            continue
-        if "GetMap" not in line:
-            continue
-        result = extract_from_line(line)
-        if result:
-            results.append(result)
-    logger.debug("After filtering, we have %s lines", len(results))
-    return results
+    logfiles = glob.glob(logfile + "*")
+    for logfile in logfiles:
+        if logfile.endswith(".gz"):
+            f = gzip.open(logfile, "rt")
+        else:
+            f = open(logfile, "rt")
+        for line in f:
+            if "/geoserver/" not in line:
+                continue
+            if "GetMap" not in line:
+                continue
+            result = extract_from_line(line)
+            if result:
+                yield result
+        f.close()
 
 
 def get_text_or_none(element, tag):
@@ -213,24 +210,26 @@ def extract_from_dirs(data_dir):
 
 def extract_workspaces_info(geoserver_configuration):
     """Return list of workspaces with all info"""
-    log_lines = extract_from_logfiles(geoserver_configuration["logfile"])
     workspaces = {}
     datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
 
     workspace_names = Counter(
-        [log_line["workspace"] for log_line in log_lines]
+        (
+            log_line["workspace"]
+            for log_line in extract_from_logfiles(geoserver_configuration["logfile"])
+        )
     ).most_common()
     for workspace_name, workspace_count in workspace_names:
         if workspace_name not in datastores_info:
             logger.warn(
                 "Workspace %s from nginx logfile is missing in workspaces dir.",
-                workspace_name
+                workspace_name,
             )
             continue
         workspaces[workspace_name] = {}
         workspace_lines = [
             log_line
-            for log_line in log_lines
+            for log_line in extract_from_logfiles(geoserver_configuration["logfile"])
             if log_line["workspace"] == workspace_name
         ]
         referers = Counter(
