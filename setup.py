@@ -56,7 +56,6 @@ setup(
             "haproxy-info = serverscripts.haproxy:main",
             "nginx-info = serverscripts.nginx:main",
             "pbis-info = serverscripts.pbis:main",
-            "rabbitmq-checker = serverscripts.rabbitmq:main",
             # The one below runs all above ones, except for cifsfixer
             "gather-all-info = serverscripts.script:main",
         ]
