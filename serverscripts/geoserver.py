@@ -165,7 +165,9 @@ def extract_datastore_info(datastore_file):
             connection, "./entry[@key='database']"
         )
         result["database_user"] = get_text_or_none(connection, "./entry[@key='user']")
-        jndi_connection = get_text_or_none(connection, "./entry[@key='jndiReferenceName']")
+        jndi_connection = get_text_or_none(
+            connection, "./entry[@key='jndiReferenceName']"
+        )
         if jndi_connection:
             result["database_name"] = jndi_connection
 
@@ -196,11 +198,11 @@ def extract_from_dirs(data_dir):
             for workspace_datastore_file in workspace_datastore_files
         ]
         for key in [
-                "enabled",
-                "type",
-                "database_server",
-                "database_user",
-                "database_name",
+            "enabled",
+            "type",
+            "database_server",
+            "database_user",
+            "database_name",
         ]:
             workspace[key] = _combine_with_comma(datastores, key)
         result[workspace_name] = workspace
@@ -238,7 +240,9 @@ def extract_workspaces_info(geoserver_configuration):
             if found_workspace_name != workspace_name:
                 continue
             referers.update({referer: count})
-        common_referers = ["%s (%d)" % (referer, count) for (referer, count) in referers.most_common(5)]
+        common_referers = [
+            "%s (%d)" % (referer, count) for (referer, count) in referers.most_common(5)
+        ]
         workspaces[workspace_name] = {
             "usage": workspace_count,
             "referers": " + ".join(common_referers),
