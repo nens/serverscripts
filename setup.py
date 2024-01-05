@@ -55,7 +55,6 @@ setup(
             "geoserver-info = serverscripts.geoserver:main",
             "haproxy-info = serverscripts.haproxy:main",
             "nginx-info = serverscripts.nginx:main",
-            "pbis-info = serverscripts.pbis:main",
             # The one below runs all above ones, except for cifsfixer
             "gather-all-info = serverscripts.script:main",
         ]
