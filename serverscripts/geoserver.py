@@ -3,12 +3,12 @@
 """
 from collections import Counter
 from serverscripts.clfparser import CLFParser
-from serverscripts.utils import get_output
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
 import argparse
 import glob
+import gzip
 import json
 import logging
 import os
@@ -122,26 +122,23 @@ def extract_from_line(line):
 
 def extract_from_logfiles(logfile):
     if not os.path.exists(logfile):
-        return []
+        return
 
-    logfile_pattern = logfile + "*"
-    cmd = "zcat --force %s" % logfile_pattern
-    logger.debug("Grabbing logfile output with: %s", cmd)
-    output, _ = get_output(cmd)
-    lines = output.split("\n")
-    logger.debug("Grabbed %s lines", len(lines))
-
-    results = []
-    for line in lines:
-        if "/geoserver/" not in line:
-            continue
-        if "GetMap" not in line:
-            continue
-        result = extract_from_line(line)
-        if result:
-            results.append(result)
-    logger.debug("After filtering, we have %s lines", len(results))
-    return results
+    logfiles = glob.glob(logfile + "*")
+    for logfile in logfiles:
+        if logfile.endswith(".gz"):
+            f = gzip.open(logfile, "rt")
+        else:
+            f = open(logfile, "rt")
+        for line in f:
+            if "/geoserver/" not in line:
+                continue
+            if "GetMap" not in line:
+                continue
+            result = extract_from_line(line)
+            if result:
+                yield result
+        f.close()
 
 
 def get_text_or_none(element, tag):
@@ -168,9 +165,11 @@ def extract_datastore_info(datastore_file):
             connection, "./entry[@key='database']"
         )
         result["database_user"] = get_text_or_none(connection, "./entry[@key='user']")
-        # result["database_namespace"] = get_text_or_none(
-        #     connection, "./entry[@key='namespace']"
-        # )
+        jndi_connection = get_text_or_none(
+            connection, "./entry[@key='jndiReferenceName']"
+        )
+        if jndi_connection:
+            result["database_name"] = jndi_connection
 
     return result
 
@@ -213,32 +212,39 @@ def extract_from_dirs(data_dir):
 
 def extract_workspaces_info(geoserver_configuration):
     """Return list of workspaces with all info"""
-    log_lines = extract_from_logfiles(geoserver_configuration["logfile"])
     workspaces = {}
     datastores_info = extract_from_dirs(geoserver_configuration["data_dir"])
 
-    workspace_names = Counter(
-        [log_line["workspace"] for log_line in log_lines]
+    workspace_names_and_referers = Counter(
+        (
+            (log_line["workspace"], log_line["referer"])
+            for log_line in extract_from_logfiles(geoserver_configuration["logfile"])
+        )
     ).most_common()
+
+    workspace_names_counter = Counter()
+    for (workspace_name, referer), workspace_count in workspace_names_and_referers:
+        workspace_names_counter.update({workspace_name: workspace_count})
+    workspace_names = workspace_names_counter.most_common()
+
     for workspace_name, workspace_count in workspace_names:
         if workspace_name not in datastores_info:
             logger.warn(
                 "Workspace %s from nginx logfile is missing in workspaces dir.",
-                workspace_name
+                workspace_name,
             )
             continue
-        workspaces[workspace_name] = {}
-        workspace_lines = [
-            log_line
-            for log_line in log_lines
-            if log_line["workspace"] == workspace_name
+
+        referers = Counter()
+        for (found_workspace_name, referer), count in workspace_names_and_referers:
+            if found_workspace_name != workspace_name:
+                continue
+            referers.update({referer: count})
+        common_referers = [
+            "%s (%d)" % (referer, count) for (referer, count) in referers.most_common(5)
         ]
-        referers = Counter(
-            [log_line["referer"] for log_line in workspace_lines if log_line["referer"]]
-        )
-        common_referers = [referer for (referer, count) in referers.most_common(5)]
         workspaces[workspace_name] = {
-            "usage": len(workspace_lines),
+            "usage": workspace_count,
             "referers": " + ".join(common_referers),
         }
 

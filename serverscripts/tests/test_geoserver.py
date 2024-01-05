@@ -6,11 +6,6 @@ import os
 OUR_DIR = os.path.dirname(__file__)
 
 
-def test_broken_config_file():
-    broken_config_example = os.path.join(OUR_DIR, "example_rabbitmq_zabbix_broken.json")
-    assert geoserver.load_config(broken_config_example) is None
-
-
 def test_config_file():
     config_example = os.path.join(OUR_DIR, "example_geoserver.json")
     configuration = geoserver.load_config(config_example)
@@ -19,8 +14,10 @@ def test_config_file():
 
 
 def test_extract_from_logfiles():
-    lines = geoserver.extract_from_logfiles(
-        os.path.join(OUR_DIR, "example_geoserver_logs/access.log")
+    lines = list(
+        geoserver.extract_from_logfiles(
+            os.path.join(OUR_DIR, "example_geoserver_logs/access.log")
+        )
     )
     assert len(lines) == 439
     # ^^^ this used to be 210, but now I'm also looking at LAYERS= instead of

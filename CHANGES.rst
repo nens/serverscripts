@@ -5,7 +5,12 @@ Changelog of serverscripts
 2.11 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Removed pbis and rabbitmq: both are unused.
+
+- Sped up geoserver log extraction and made sure it didn't consume so
+  much memory anymore.
+
+- Added JNDI info for geoserver.
 
 
 2.10 (2023-04-05)

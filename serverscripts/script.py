@@ -9,8 +9,6 @@ import serverscripts.docker
 import serverscripts.geoserver
 import serverscripts.haproxy
 import serverscripts.nginx
-import serverscripts.pbis
-import serverscripts.rabbitmq
 
 
 def main():
@@ -33,8 +31,6 @@ def main():
         serverscripts.geoserver,
         serverscripts.haproxy,
         serverscripts.nginx,
-        serverscripts.pbis,
-        serverscripts.rabbitmq,
     ]:
         try:
             module.main()
