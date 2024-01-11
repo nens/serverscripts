@@ -126,6 +126,7 @@ def extract_from_logfiles(logfile):
 
     logfiles = glob.glob(logfile + "*")
     for logfile in logfiles:
+        logger.debug("Reading logfile %s", logfile)
         if logfile.endswith(".gz"):
             f = gzip.open(logfile, "rt")
         else:
